@@ -31,6 +31,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="es"
+      // Extensiones del navegador inyectan atributos en <html> antes de hidratar.
+      suppressHydrationWarning
       className={`${pressStart.variable} ${jetbrains.variable} ${courierPrime.variable}`}
     >
       <body>
