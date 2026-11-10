@@ -1,6 +1,6 @@
 # SPEC 01 — MVP visual de Arcade Vault (todas las pantallas)
 
-> **Estado:** Aprobado
+> **Estado:** Implementado
 > **Depende de:** ninguna (el CSS del tema ya está en `app/globals.css` y las fuentes en `app/layout.tsx`)
 > **Fecha:** 2026-11-10
 > **Objetivo:** Portar a Next.js (App Router, TypeScript) las 5 pantallas de `references/templates/` (biblioteca, detalle, reproductor, salón de la fama, login/registro) con datos mock y sin ningún juego real.
@@ -110,25 +110,25 @@ Antes del paso 1, leer la guía relevante de `node_modules/next/dist/docs/` (en 
 
 ## Criterios de aceptación
 
-- [ ] `npm run build` y `npm run lint` terminan sin errores.
-- [ ] Las 5 rutas (`/`, `/juegos/bloque-buster`, `/juegos/bloque-buster/jugar`, `/salon-de-la-fama`, `/login`) cargan sin errores en la consola del navegador.
-- [ ] `/juegos/no-existe` y `/juegos/no-existe/jugar` muestran 404.
-- [ ] La biblioteca muestra 8 tarjetas; el chip "SHOOTER" deja 2 (INVASORES, ROCAS).
-- [ ] Buscar "zzz" muestra "NO HAY RESULTADOS".
-- [ ] Clic en tarjeta o en "JUGAR" lleva a `/juegos/[id]` del juego correcto.
-- [ ] El detalle muestra 10 filas de leaderboard; las 3 primeras con clases `top1`/`top2`/`top3`.
-- [ ] "JUGAR AHORA" lleva a `/juegos/[id]/jugar`; "VOLVER AL VAULT" lleva a `/`.
-- [ ] En el reproductor la puntuación sube sola; "PAUSA" la detiene y muestra "EN PAUSA"; "REANUDAR" la reanuda.
-- [ ] "FIN" abre el modal con la puntuación final; "GUARDAR PUNTUACIÓN" añade una entrada a `localStorage["av_scores"]` y muestra "PUNTUACIÓN GUARDADA_".
-- [ ] "JUGAR DE NUEVO" reinicia puntuación, vidas y nivel; "SALIR" vuelve al detalle.
-- [ ] El salón muestra podio (02 · 01 · 03), 12 filas y cambia los datos al cambiar de tab.
-- [ ] La fila "TU MEJOR MARCA" aparece solo con sesión iniciada.
-- [ ] En `/login`, la pestaña "CREAR CUENTA" añade el campo de correo; enviar guarda `av_user` en mayúsculas (máx. 10 caracteres) y redirige a `/`.
-- [ ] "JUGAR COMO INVITADO" redirige a `/` sin `av_user`.
-- [ ] Tras iniciar sesión y recargar, la nav sigue mostrando el nombre; clic en él cierra sesión y borra `av_user`.
-- [ ] En ancho ≤ el breakpoint móvil de `globals.css`, la hamburguesa abre y cierra el panel lateral.
-- [ ] La nav marca "Biblioteca" activa en `/`, `/juegos/*` y `/juegos/*/jugar`, y "Salón de la Fama" activa en `/salon-de-la-fama`.
-- [ ] No hay hydration warnings al recargar con sesión guardada.
+- [x] `npm run build` y `npm run lint` terminan sin errores.
+- [x] Las 5 rutas (`/`, `/juegos/bloque-buster`, `/juegos/bloque-buster/jugar`, `/salon-de-la-fama`, `/login`) cargan sin errores en la consola del navegador.
+- [x] `/juegos/no-existe` y `/juegos/no-existe/jugar` muestran 404.
+- [x] La biblioteca muestra 8 tarjetas; el chip "SHOOTER" deja 2 (INVASORES, ROCAS).
+- [x] Buscar "zzz" muestra "NO HAY RESULTADOS".
+- [x] Clic en tarjeta o en "JUGAR" lleva a `/juegos/[id]` del juego correcto.
+- [x] El detalle muestra 10 filas de leaderboard; las 3 primeras con clases `top1`/`top2`/`top3`.
+- [x] "JUGAR AHORA" lleva a `/juegos/[id]/jugar`; "VOLVER AL VAULT" lleva a `/`.
+- [x] En el reproductor la puntuación sube sola; "PAUSA" la detiene y muestra "EN PAUSA"; "REANUDAR" la reanuda.
+- [x] "FIN" abre el modal con la puntuación final; "GUARDAR PUNTUACIÓN" añade una entrada a `localStorage["av_scores"]` y muestra "PUNTUACIÓN GUARDADA_".
+- [x] "JUGAR DE NUEVO" reinicia puntuación, vidas y nivel; "SALIR" vuelve al detalle.
+- [x] El salón muestra podio (02 · 01 · 03), 12 filas y cambia los datos al cambiar de tab.
+- [x] La fila "TU MEJOR MARCA" aparece solo con sesión iniciada.
+- [x] En `/login`, la pestaña "CREAR CUENTA" añade el campo de correo; enviar guarda `av_user` en mayúsculas (máx. 10 caracteres) y redirige a `/`.
+- [x] "JUGAR COMO INVITADO" redirige a `/` sin `av_user`.
+- [x] Tras iniciar sesión y recargar, la nav sigue mostrando el nombre; clic en él cierra sesión y borra `av_user`.
+- [x] En ancho ≤ el breakpoint móvil de `globals.css`, la hamburguesa abre y cierra el panel lateral.
+- [x] La nav marca "Biblioteca" activa en `/`, `/juegos/*` y `/juegos/*/jugar`, y "Salón de la Fama" activa en `/salon-de-la-fama`.
+- [x] No hay hydration warnings al recargar con sesión guardada.
 
 ---
 
