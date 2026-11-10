@@ -20,3 +20,4 @@ Workflow is Spec Driven Design using `/spec` and `/spec-impl` skills, installed 
 ## Stack
 
 Next.js 16.4.6 (App Router, `app/` at repo root, no `src/`), React 19.3, Tailwind CSS 4 (`@tailwindcss/turbopack`), TypeScript. Path alias `@/*` → repo root. Next.js has breaking changes vs. training data: read `node_modules/next/dist/docs/` before writing code.
+hola mundo
