@@ -1,6 +1,6 @@
 # SPEC 02 — Homepage y mover la Biblioteca a /juegos
 
-> **Estado:** Aprobado
+> **Estado:** Implementado
 > **Depende de:** SPEC 01
 > **Fecha:** 2026-11-10
 > **Objetivo:** Implementar la Home (landing) de `references/templates/home-about/` en `/`, mover la Biblioteca actual a `/juegos` y completar la nav con "Inicio" y "Acerca de" (sin página About).
@@ -119,23 +119,23 @@ Antes del paso 1, leer la guía relevante de `node_modules/next/dist/docs/` (Lin
 
 ## Criterios de aceptación
 
-- [ ] `npm run build` y `npm run lint` terminan sin errores.
-- [ ] `/` carga sin errores en la consola del navegador y muestra: hero, `// 01`, `// 02`, stats, `// 03`, `// 04` y CTA final.
-- [ ] El hero muestra el título en 3 líneas ("EL ARCADE", "CLÁSICO ESTÁ", "DE VUELTA") y 8 siluetas SVG.
-- [ ] "EXPLORAR JUEGOS", "VER TODOS LOS JUEGOS →" e "INSERTAR MONEDA →" llevan a `/juegos`.
-- [ ] "CREAR CUENTA" y "EMPEZAR GRATIS →" llevan a `/login`.
-- [ ] "VER SALÓN →" lleva a `/salon-de-la-fama`.
-- [ ] El rail muestra exactamente 6 mini-cards; clic en una lleva a `/juegos/[id]` del juego correcto.
-- [ ] "ÚLTIMAS PUNTUACIONES" muestra 7 filas y "TOP JUGADORES · HOY" 5 filas, las 3 primeras con clases `top1`/`top2`/`top3`.
-- [ ] Las secciones con clase `reveal` reciben la clase `in` al entrar en el viewport.
-- [ ] `/juegos` muestra la Biblioteca con 8 tarjetas; el chip "SHOOTER" deja 2 y buscar "zzz" muestra "NO HAY RESULTADOS".
-- [ ] El detalle `/juegos/bloque-buster` y el reproductor siguen funcionando; "VOLVER AL VAULT" lleva a `/juegos`.
-- [ ] La nav muestra "Inicio", "Biblioteca", "Salón de la Fama" y "Acerca de" en escritorio y en el panel móvil.
-- [ ] "Inicio" activo solo en `/`; "Biblioteca" activa en `/juegos` y `/juegos/*`; "Salón de la Fama" activa en `/salon-de-la-fama`.
-- [ ] "Acerca de" lleva a `/about`, que responde 404.
-- [ ] Tras login/registro/invitado se redirige a `/` y la Home se renderiza correctamente.
-- [ ] No hay hydration warnings al recargar `/` con sesión guardada.
-- [ ] En ancho ≤ 980px los feature-grid pasan a 2 columnas y en ≤ 520px a 1 columna.
+- [x] `npm run build` y `npm run lint` terminan sin errores.
+- [x] `/` carga sin errores en la consola del navegador y muestra: hero, `// 01`, `// 02`, stats, `// 03`, `// 04` y CTA final.
+- [x] El hero muestra el título en 3 líneas ("EL ARCADE", "CLÁSICO ESTÁ", "DE VUELTA") y 8 siluetas SVG.
+- [x] "EXPLORAR JUEGOS", "VER TODOS LOS JUEGOS →" e "INSERTAR MONEDA →" llevan a `/juegos`.
+- [x] "CREAR CUENTA" y "EMPEZAR GRATIS →" llevan a `/login`.
+- [x] "VER SALÓN →" lleva a `/salon-de-la-fama`.
+- [x] El rail muestra exactamente 6 mini-cards; clic en una lleva a `/juegos/[id]` del juego correcto.
+- [x] "ÚLTIMAS PUNTUACIONES" muestra 7 filas y "TOP JUGADORES · HOY" 5 filas, las 3 primeras con clases `top1`/`top2`/`top3`.
+- [x] Las secciones con clase `reveal` reciben la clase `in` al entrar en el viewport.
+- [x] `/juegos` muestra la Biblioteca con 8 tarjetas; el chip "SHOOTER" deja 2 y buscar "zzz" muestra "NO HAY RESULTADOS".
+- [x] El detalle `/juegos/bloque-buster` y el reproductor siguen funcionando; "VOLVER AL VAULT" lleva a `/juegos`.
+- [x] La nav muestra "Inicio", "Biblioteca", "Salón de la Fama" y "Acerca de" en escritorio y en el panel móvil.
+- [x] "Inicio" activo solo en `/`; "Biblioteca" activa en `/juegos` y `/juegos/*`; "Salón de la Fama" activa en `/salon-de-la-fama`.
+- [x] "Acerca de" lleva a `/about`, que responde 404.
+- [x] Tras login/registro/invitado se redirige a `/` y la Home se renderiza correctamente.
+- [x] No hay hydration warnings al recargar `/` con sesión guardada.
+- [x] En ancho ≤ 980px los feature-grid pasan a 2 columnas y en ≤ 520px a 1 columna.
 
 ---
 
