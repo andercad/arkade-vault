@@ -109,8 +109,8 @@ Convenciones:
 2. Portar los estilos de la Home a `app/globals.css`. Verificación: `npm run build` pasa; sin colisiones con clases existentes.
 3. Mover la Biblioteca: crear `app/juegos/page.tsx` con `<Library />` y actualizar enlaces que apuntaban a `/` como biblioteca (`app/juegos/[id]/page.tsx`, `components/game-player.tsx`, `components/hall-of-fame.tsx`). Verificación: `/juegos` muestra las 8 tarjetas; "VOLVER AL VAULT" lleva a `/juegos`.
 4. Actualizar `components/nav.tsx`: añadir "Inicio" y "Acerca de" en escritorio y panel móvil, y reglas de activo nuevas. Verificación: "Inicio" activo solo en `/`; "Biblioteca" en `/juegos*`; el logo lleva a `/`.
-5. Crear componentes de la Home: `components/home/silhouettes.tsx`, `components/home/feature-icon.tsx`, `components/home/mini-card.tsx` (Server Components, `Link`) y `components/home/reveal.tsx` (cliente, IntersectionObserver). Verificación: compilan aisladamente (`tsc`).
-6. Reemplazar `app/page.tsx` por la Home componiendo las secciones, con `"use client"` solo en el wrapper de `reveal`. Verificación: `/` muestra las 6 secciones con el aspecto del template y las animaciones `reveal`.
+5. Crear componentes de la Home: `components/home/silhouettes.tsx`, `components/home/feature-icon.tsx`, `components/home/mini-card.tsx` (Server Components, `Link`) y `components/home/reveal.tsx` (cliente, IntersectionObserver). Además, un componente Server por cada sección envuelta en `Reveal`, que incluye su propio `<Reveal>`: `features-section.tsx` (`// 01`), `games-section.tsx` (`// 02`), `stats-section.tsx`, `activity-section.tsx` (`// 03`), `pricing-section.tsx` (`// 04`) y `final-cta-section.tsx`. El hero no usa `Reveal` y se queda en `app/page.tsx`. Verificación: compilan aisladamente (`tsc`).
+6. Reemplazar `app/page.tsx` por la Home: hero inline y composición de los 6 componentes de sección del paso 5, con `"use client"` solo en el wrapper de `reveal`. Verificación: `/` muestra las 6 secciones con el aspecto del template y las animaciones `reveal`.
 7. Verificar enlaces y estados: CTAs, mini-cards, "VER SALÓN →", `/about` (404), responsive (breakpoints 980/520 de los grids). Ajustar `metadata` de `/` si procede. Verificación: `npm run lint` y `npm run build` pasan.
 
 Antes del paso 1, leer la guía relevante de `node_modules/next/dist/docs/` (Link, usePathname, Server vs Client Components), según `AGENTS.md`. Para el diseño visual aplicar `/frontend-design`, según `CLAUDE.md`.
@@ -150,6 +150,8 @@ Antes del paso 1, leer la guía relevante de `node_modules/next/dist/docs/` (Lin
 - **Sí:** datos mock en `lib/home.ts` tipados, como `lib/games.ts`. Separa datos de UI.
 - **No:** arrays inline en el JSX como el template. Mezcla datos y presentación.
 - **Sí:** Home como Server Component; `"use client"` solo para `reveal` (IntersectionObserver). Menos JS en cliente.
+- **Sí:** un componente por cada sección envuelta en `Reveal` (`components/home/*-section.tsx`), cada uno con su `<Reveal>` y sus datos de `lib/home.ts`/`lib/games.ts`. `app/page.tsx` solo compone. Archivos pequeños y secciones aisladas.
+- **No:** componente propio para el hero. No usa `Reveal` y no se pidió.
 - **Sí:** fidelidad 1:1 con el template (copy, animaciones, CTAs). Los botones `navigate()` se convierten en `Link` con la ruta real.
 - **Sí:** redirects de login a `/` (la Home). Es el comportamiento natural de un landing.
 - **No:** personalizar la Home según sesión. Mejora futura.
