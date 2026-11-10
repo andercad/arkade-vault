@@ -5,6 +5,26 @@ export interface ScoreRow {
   date: string;
 }
 
+export interface SavedScore {
+  game: string;
+  score: number;
+  name: string;
+  at: number;
+}
+
+const SCORES_KEY = "av_scores";
+
+// Solo escritura: las puntuaciones guardadas no se leen en ninguna pantalla (spec 01).
+export function saveScore(entry: Omit<SavedScore, "at">): void {
+  try {
+    const all: SavedScore[] = JSON.parse(
+      localStorage.getItem(SCORES_KEY) || "[]",
+    );
+    all.push({ ...entry, at: Date.now() });
+    localStorage.setItem(SCORES_KEY, JSON.stringify(all));
+  } catch {}
+}
+
 const PLAYERS = [
   "PX_KAI", "NEONFOX", "Z3R0COOL", "M00NRYU", "VAULT_07", "GLITCHA",
   "ATARI_KID", "CYBER_LU", "MAGENTA88", "SCANLINE", "BIT_LORD", "ARKADYA",
