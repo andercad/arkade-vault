@@ -5,12 +5,12 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { useAuth } from "@/lib/auth";
 
-type NavKey = "biblioteca" | "salon" | "auth";
+type NavKey = "inicio" | "biblioteca" | "salon" | "about" | "auth";
 
 function isActive(pathname: string, key: NavKey): boolean {
-  if (key === "biblioteca") {
-    return pathname === "/" || pathname.startsWith("/juegos");
-  }
+  if (key === "inicio") return pathname === "/";
+  if (key === "biblioteca") return pathname.startsWith("/juegos");
+  if (key === "about") return pathname.startsWith("/about");
   if (key === "salon") return pathname.startsWith("/salon-de-la-fama");
   return pathname.startsWith("/login");
 }
@@ -32,11 +32,17 @@ export function Nav() {
           </div>
         </Link>
         <div className="links">
-          <Link href="/" className={cls("biblioteca")}>
+          <Link href="/" className={cls("inicio")}>
+            Inicio
+          </Link>
+          <Link href="/juegos" className={cls("biblioteca")}>
             Biblioteca
           </Link>
           <Link href="/salon-de-la-fama" className={cls("salon")}>
             Salón de la Fama
+          </Link>
+          <Link href="/about" className={cls("about")}>
+            Acerca de
           </Link>
         </div>
         <div className="spacer"></div>
@@ -70,11 +76,17 @@ export function Nav() {
         <div className="pixel neon-cyan" style={{ fontSize: 11, marginBottom: 16 }}>
           MENÚ
         </div>
-        <Link href="/" className={cls("biblioteca")} onClick={close}>
+        <Link href="/" className={cls("inicio")} onClick={close}>
+          Inicio
+        </Link>
+        <Link href="/juegos" className={cls("biblioteca")} onClick={close}>
           Biblioteca
         </Link>
         <Link href="/salon-de-la-fama" className={cls("salon")} onClick={close}>
           Salón de la Fama
+        </Link>
+        <Link href="/about" className={cls("about")} onClick={close}>
+          Acerca de
         </Link>
         <Link href="/login" className={cls("auth")} onClick={close}>
           {user ? "Cuenta" : "Iniciar Sesión"}
