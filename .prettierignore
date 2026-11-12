@@ -1,0 +1,8 @@
+.next
+node_modules
+references
+package-lock.json
+.playwright-mcp
+.playwright-screenshots
+.sonarlint
+.agents
