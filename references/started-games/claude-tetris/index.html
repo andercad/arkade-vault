@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tetris</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <button id="theme-toggle" class="theme-toggle" role="switch" aria-checked="false" aria-label="Modo claro">
+    <span class="theme-label">Modo claro</span>
+    <span class="switch"></span>
+  </button>
+
+  <label class="skin-picker">
+    <span>Skin</span>
+    <select id="skin-select" aria-label="Skin visual">
+      <option value="retro">Retro</option>
+      <option value="neon">Neon</option>
+      <option value="pastel">Pastel</option>
+      <option value="pixel">Pixel art</option>
+    </select>
+  </label>
+
+  <div class="wrapper">
+    <h1 class="title">TETRIS</h1>
+    <div class="game-area">
+    <div class="game-container">
+      <canvas id="board" width="300" height="600"></canvas>
+
+      <aside class="panel">
+        <div class="panel-section">
+          <span class="label">SCORE</span>
+          <span class="value" id="score">0</span>
+        </div>
+        <div class="panel-section">
+          <span class="label">LINES</span>
+          <span class="value" id="lines">0</span>
+        </div>
+        <div class="panel-section">
+          <span class="label">LEVEL</span>
+          <span class="value" id="level">1</span>
+        </div>
+
+        <div class="panel-section">
+          <span class="label">NEXT</span>
+          <canvas id="next-canvas" width="120" height="120"></canvas>
+        </div>
+
+        <div class="panel-section controls">
+          <span class="label">CONTROLS</span>
+          <ul>
+            <li><kbd>←</kbd><kbd>→</kbd> mover</li>
+            <li><kbd>↑</kbd> rotar</li>
+            <li><kbd>↓</kbd> bajar</li>
+            <li><kbd>Space</kbd> caída</li>
+            <li><kbd>P</kbd>/<kbd>Esc</kbd> pausa</li>
+            <li><kbd>T</kbd> tema</li>
+          </ul>
+        </div>
+      </aside>
+    </div>
+
+    <div id="overlay" class="overlay hidden">
+      <div class="overlay-box">
+        <p id="overlay-title">GAME OVER</p>
+        <p id="overlay-score"></p>
+        <p id="overlay-notice" class="overlay-notice hidden"></p>
+        <div id="records" class="records hidden">
+          <span class="label">TOP 5 RECORDS</span>
+          <ol id="records-list" class="records-list"></ol>
+          <p id="records-stats" class="records-stats"></p>
+        </div>
+        <form id="name-form" class="name-form hidden" autocomplete="off">
+          <input id="name-input" type="text" maxlength="12" placeholder="Tu nombre" aria-label="Nombre del jugador" />
+          <button id="save-btn" type="submit">Guardar</button>
+        </form>
+        <button id="restart-btn">Jugar</button>
+        <button id="reset-records-btn" class="link-btn" type="button">Resetear records</button>
+      </div>
+    </div>
+
+    <div id="pause-overlay" class="overlay hidden" role="dialog" aria-label="Menú de pausa">
+      <div class="overlay-box pause-menu">
+        <p class="pause-title">PAUSA</p>
+        <div id="pause-main" class="pause-section">
+          <button id="resume-btn" class="menu-btn">Reanudar</button>
+          <button id="pause-restart-btn" class="menu-btn">Reiniciar</button>
+          <button id="controls-btn" class="menu-btn">Ver controles</button>
+          <label class="level-select">
+            <span>Nivel inicial</span>
+            <select id="start-level"></select>
+          </label>
+        </div>
+        <div id="pause-controls" class="pause-section hidden">
+          <ul class="menu-controls">
+            <li><kbd>←</kbd><kbd>→</kbd> mover</li>
+            <li><kbd>↑</kbd> / <kbd>X</kbd> rotar</li>
+            <li><kbd>↓</kbd> bajar</li>
+            <li><kbd>Space</kbd> caída</li>
+            <li><kbd>P</kbd> / <kbd>Esc</kbd> pausa</li>
+            <li><kbd>T</kbd> tema</li>
+          </ul>
+          <button id="controls-back-btn" class="menu-btn">Volver</button>
+        </div>
+      </div>
+    </div>
+    </div>
+  </div>
+
+  <script src="game.js"></script>
+</body>
+</html>
