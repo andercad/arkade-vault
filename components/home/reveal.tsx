@@ -4,9 +4,11 @@ import { useEffect, useRef, type ReactNode } from "react";
 
 export function Reveal({
   className = "",
+  ariaHidden,
   children,
 }: {
   className?: string;
+  ariaHidden?: boolean;
   children: ReactNode;
 }) {
   const ref = useRef<HTMLElement>(null);
@@ -34,7 +36,11 @@ export function Reveal({
   }, []);
 
   return (
-    <section ref={ref} className={`${className} reveal`.trim()}>
+    <section
+      ref={ref}
+      className={`${className} reveal`.trim()}
+      aria-hidden={ariaHidden || undefined}
+    >
       {children}
     </section>
   );
