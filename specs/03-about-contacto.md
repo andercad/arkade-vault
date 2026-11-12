@@ -1,6 +1,6 @@
 # SPEC 03 — Página Acerca de y formulario de contacto con Resend
 
-> **Estado:** Aprobado
+> **Estado:** Implementado
 > **Depende de:** SPEC 01, SPEC 02
 > **Fecha:** 2026-11-12
 > **Objetivo:** Implementar `/about` idéntica a `references/templates/home-about/about.jsx` y hacer que su formulario de contacto envíe un correo real al equipo mediante Resend desde una Server Action.
@@ -107,26 +107,26 @@ Antes del paso 1, leer la guía relevante de `node_modules/next/dist/docs/` (Ser
 
 ## Criterios de aceptación
 
-- [ ] `npm run build` y `npm run lint` terminan sin errores.
-- [ ] `/about` responde 200 y carga sin errores en la consola del navegador.
-- [ ] La página muestra, en orden: "ACERCA DE ARCADE VAULT", 3 highlights, divisor de 24 píxeles, "CONTÁCTANOS", 3 tips y el formulario.
-- [ ] El copy, símbolos (`▸`, `▶`, `❤️`) y mayúsculas coinciden con `about.jsx`.
-- [ ] Los highlights usan las clases `magenta`, `cyan` y `green` con iconos SVG distintos.
-- [ ] Las secciones con clase `reveal` reciben la clase `in` al entrar en el viewport.
-- [ ] La nav marca "Acerca de" activa en `/about` en escritorio y en el panel móvil.
-- [ ] Enviar con cualquier campo vacío (o solo espacios) activa `shake` ~400 ms y no llama a la Server Action.
-- [ ] Con datos válidos y credenciales correctas, el correo llega a `CONTACT_TO_EMAIL` con asunto `[Arcade Vault] Mensaje de {nombre}`, y su `Reply-To` es el correo del visitante.
-- [ ] Tras el envío se muestra `terminal-success` con "GRACIAS, {NOMBRE}." en mayúsculas.
-- [ ] "ENVIAR OTRO MENSAJE" vuelve al formulario con los 3 campos vacíos.
-- [ ] Durante el envío el botón está deshabilitado y muestra "ENVIANDO…".
-- [ ] Un correo inválido (p. ej. `abc`) es rechazado por el servidor con mensaje de error visible y el formulario conserva lo escrito.
-- [ ] Un mensaje de más de 2000 caracteres es rechazado con mensaje de error visible.
-- [ ] Con `RESEND_API_KEY` inválida se muestra un error genérico en estilo terminal, el formulario sigue visible y no se filtra el detalle del error de Resend al cliente.
-- [ ] Con el honeypot `website` relleno la acción responde éxito y no se envía ningún correo.
-- [ ] `RESEND_API_KEY` no aparece en el bundle cliente (búsqueda en `.next/static` sin coincidencias).
-- [ ] `.env.local` no está versionado y `env.template` sí.
-- [ ] No hay hydration warnings al cargar `/about`.
-- [ ] En ancho ≤ 900px el `contact-grid` pasa a 1 columna.
+- [x] `npm run build` y `npm run lint` terminan sin errores.
+- [x] `/about` responde 200 y carga sin errores en la consola del navegador.
+- [x] La página muestra, en orden: "ACERCA DE ARCADE VAULT", 3 highlights, divisor de 24 píxeles, "CONTÁCTANOS", 3 tips y el formulario.
+- [x] El copy, símbolos (`▸`, `▶`, `❤️`) y mayúsculas coinciden con `about.jsx`.
+- [x] Los highlights usan las clases `magenta`, `cyan` y `green` con iconos SVG distintos.
+- [x] Las secciones con clase `reveal` reciben la clase `in` al entrar en el viewport.
+- [x] La nav marca "Acerca de" activa en `/about` en escritorio y en el panel móvil.
+- [c] Enviar con cualquier campo vacío (o solo espacios) activa `shake` ~400 ms y no llama a la Server Action.
+- [x] Con datos válidos y credenciales correctas, el correo llega a `CONTACT_TO_EMAIL` con asunto `[Arcade Vault] Mensaje de {nombre}`, y su `Reply-To` es el correo del visitante.
+- [x] Tras el envío se muestra `terminal-success` con "GRACIAS, {NOMBRE}." en mayúsculas.
+- [x] "ENVIAR OTRO MENSAJE" vuelve al formulario con los 3 campos vacíos.
+- [x] Durante el envío el botón está deshabilitado y muestra "ENVIANDO…".
+- [x] Un correo inválido (p. ej. `abc`) es rechazado por el servidor con mensaje de error visible y el formulario conserva lo escrito.
+- [x] Un mensaje de más de 2000 caracteres es rechazado con mensaje de error visible.
+- [x] Con `RESEND_API_KEY` inválida se muestra un error genérico en estilo terminal, el formulario sigue visible y no se filtra el detalle del error de Resend al cliente.
+- [x] Con el honeypot `website` relleno la acción responde éxito y no se envía ningún correo.
+- [x] `RESEND_API_KEY` no aparece en el bundle cliente (búsqueda en `.next/static` sin coincidencias).
+- [x] `.env.local` no está versionado y `env.template` sí.
+- [x] No hay hydration warnings al cargar `/about`.
+- [x] En ancho ≤ 900px el `contact-grid` pasa a 1 columna.
 
 ---
 
