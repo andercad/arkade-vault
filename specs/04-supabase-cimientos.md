@@ -1,7 +1,7 @@
 # SPEC 04 — Cimientos de Supabase (clientes, migraciones y tipos)
 
-> **Estado:** Aprobado
-> **Depende de:** SPEC 03 (convención de variables de entorno y `env.template`)
+> **Estado:** Implementado
+> **Depende de:** SPEC 03 (convención de variables de entorno y `.env.template`)
 > **Fecha:** 2026-11-12
 > **Objetivo:** Dejar Supabase conectado a la app Next.js (clientes browser y servidor, variables de entorno, migraciones versionadas y tipos generados) y verificar la conexión con una tabla y una ruta de prueba temporales, sin tocar auth ni datos de negocio.
 
@@ -18,7 +18,7 @@ La app hoy guarda sesión (`av_user`) y puntuaciones (`av_scores`) en `localStor
 **Dentro:**
 
 - Dependencias `@supabase/supabase-js` y `@supabase/ssr`.
-- Variables de entorno `NEXT_PUBLIC_SUPABASE_URL` y `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` en `.env.local` y claves vacías documentadas en `env.template`.
+- Variables de entorno `NEXT_PUBLIC_SUPABASE_URL` y `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` en `.env.local` y claves vacías documentadas en `.env.template`.
 - Clientes tipados:
   - `lib/supabase/client.ts`: cliente para Client Components (`createBrowserClient`).
   - `lib/supabase/server.ts`: cliente para Server Components, Server Actions y Route Handlers (`createServerClient` con `cookies()`).
@@ -95,7 +95,7 @@ Convenciones:
 ## Plan de implementación
 
 1. Leer la guía de Next 16 en `node_modules/next/dist/docs/` (variables de entorno, `cookies()`, Route Handlers) y la documentación vigente de Supabase vía `search_docs` (`@supabase/ssr` con Next.js App Router). Instalar `@supabase/supabase-js` y `@supabase/ssr`. Verificación: `npx tsc --noEmit` pasa.
-2. Obtener URL y publishable key con `get_project_url` y `get_publishable_keys`; escribirlas en `.env.local` y añadir las claves vacías con comentario a `env.template`. Verificación: `.env.local` no aparece en `git status`; `env.template` sí.
+2. Obtener URL y publishable key con `get_project_url` y `get_publishable_keys`; escribirlas en `.env.local` y añadir las claves vacías con comentario a `.env.template`. Verificación: `.env.local` no aparece en `git status`; `.env.template` sí.
 3. Crear `supabase/migrations/0001_health_check.sql` y aplicarla con `apply_migration`; ejecutar `get_advisors` (security). Verificación: `list_tables` muestra `health_check` con RLS activo y sin advisors críticos.
 4. Generar tipos con `generate_typescript_types` y guardarlos en `lib/supabase/database.types.ts`. Verificación: `npx tsc --noEmit` pasa.
 5. Crear `lib/supabase/client.ts` y `lib/supabase/server.ts` tipados con `Database`. Verificación: `npx tsc --noEmit` y `npm run lint` pasan.
@@ -109,18 +109,18 @@ Para el diseño visual aplicar `/frontend-design` solo si en el futuro se añade
 
 ## Criterios de aceptación
 
-- [ ] `@supabase/supabase-js` y `@supabase/ssr` están en `package.json`.
-- [ ] `.env.local` contiene `NEXT_PUBLIC_SUPABASE_URL` y `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` y no está versionado; `env.template` los lista vacíos y sí está versionado.
-- [ ] `supabase/migrations/` contiene `0001_health_check.sql` y `0002_drop_health_check.sql`, y ambas figuran en `list_migrations`.
-- [ ] Antes de la limpieza, `GET /api/supabase-health` responde 200 con `{ "ok": true }`.
-- [ ] Con la publishable key inválida la ruta responde un error genérico (5xx) sin texto del error de Supabase.
-- [ ] `lib/supabase/client.ts` y `lib/supabase/server.ts` existen, exportan `createClient` y están tipados con `Database`.
-- [ ] `lib/supabase/database.types.ts` coincide con el esquema final (sin tablas en `public`).
-- [ ] `get_advisors` (security) no reporta tablas sin RLS ni otros avisos críticos.
-- [ ] Tras la limpieza no existe `app/api/supabase-health/` y `public` no tiene tablas.
-- [ ] Ninguna service role key ni secreto de Supabase aparece en el repo ni en `.next/static`.
-- [ ] `npm run build` y `npm run lint` terminan sin errores.
-- [ ] `lib/auth.tsx`, `lib/scores.ts` y las pantallas existentes no han cambiado.
+- [x] `@supabase/supabase-js` y `@supabase/ssr` están en `package.json`.
+- [x] `.env.local` contiene `NEXT_PUBLIC_SUPABASE_URL` y `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` y no está versionado; `.env.template` los lista vacíos y sí está versionado.
+- [x] `supabase/migrations/` contiene `0001_health_check.sql` y `0002_drop_health_check.sql`, y ambas figuran en `list_migrations`.
+- [x] Antes de la limpieza, `GET /api/supabase-health` responde 200 con `{ "ok": true }`.
+- [x] Con la publishable key inválida la ruta responde un error genérico (5xx) sin texto del error de Supabase.
+- [x] `lib/supabase/client.ts` y `lib/supabase/server.ts` existen, exportan `createClient` y están tipados con `Database`.
+- [x] `lib/supabase/database.types.ts` coincide con el esquema final (sin tablas en `public`).
+- [x] `get_advisors` (security) no reporta tablas sin RLS ni otros avisos críticos.
+- [x] Tras la limpieza no existe `app/api/supabase-health/` y `public` no tiene tablas.
+- [x] Ninguna service role key ni secreto de Supabase aparece en el repo ni en `.next/static`.
+- [x] `npm run build` y `npm run lint` terminan sin errores.
+- [x] `lib/auth.tsx`, `lib/scores.ts` y las pantallas existentes no han cambiado.
 
 ---
 
@@ -147,7 +147,7 @@ Para el diseño visual aplicar `/frontend-design` solo si en el futuro se añade
 | Cambios en el proyecto remoto vía MCP son difíciles de revertir              | Tabla temporal e inocua; migración `0002` de limpieza; revisar el SQL antes de `apply_migration`.                 |
 | Tabla sin RLS expuesta por PostgREST                                         | RLS activado en `0001` y comprobación con `get_advisors`.                                                         |
 | Clave equivocada o pegada en el archivo erróneo                              | Solo `NEXT_PUBLIC_..._PUBLISHABLE_KEY`; criterio de aceptación sin service role en repo ni bundle.                |
-| `.env.local` o claves versionadas por error                                  | `.env*` ya ignorado en `.gitignore`; `env.template` sin valores; comprobar `git status`.                          |
+| `.env.local` o claves versionadas por error                                  | `.env*` ya ignorado en `.gitignore`; `.env.template` sin valores; comprobar `git status`.                          |
 | Tipos desactualizados tras migrar                                            | Regenerar `database.types.ts` en los pasos 4 y 8.                                                                 |
 | Proyecto Supabase vinculado (`project_ref` en `.mcp.json`) no es el esperado | Confirmar la URL con `get_project_url` en el paso 2 antes de escribir variables.                                  |
 

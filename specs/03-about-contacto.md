@@ -92,7 +92,7 @@ Convenciones:
 
 ## Plan de implementación
 
-1. Instalar `resend` (`npm i resend`), crear `.env.local` con las 3 variables, y añadir `env.template` con las claves vacías (no empieza por `.env`, así que `.env*` del `.gitignore` no lo ignora y no hace falta excepción). Verificación: `npx tsc --noEmit` pasa; `.env.local` no aparece en `git status`.
+1. Instalar `resend` (`npm i resend`), crear `.env.local` con las 3 variables, y añadir `..env.template` con las claves vacías (no empieza por `.env`, así que `.env*` del `.gitignore` no lo ignora y no hace falta excepción). Verificación: `npx tsc --noEmit` pasa; `.env.local` no aparece en `git status`.
 2. Crear `lib/contact.ts` con `CONTACT_LIMITS`, tipos y `validateContact`. Verificación: `npx tsc --noEmit` pasa.
 3. Crear `app/about/actions.ts` con `sendContactMessage`: honeypot, validación, envío con Resend (`replyTo`, texto plano), manejo de `error` de Resend y de variables ausentes. Verificación: `npx tsc --noEmit` pasa.
 4. Portar los estilos de About a `app/globals.css`. Verificación: `npm run build` pasa; sin colisiones con clases existentes.
@@ -124,7 +124,7 @@ Antes del paso 1, leer la guía relevante de `node_modules/next/dist/docs/` (Ser
 - [x] Con `RESEND_API_KEY` inválida se muestra un error genérico en estilo terminal, el formulario sigue visible y no se filtra el detalle del error de Resend al cliente.
 - [x] Con el honeypot `website` relleno la acción responde éxito y no se envía ningún correo.
 - [x] `RESEND_API_KEY` no aparece en el bundle cliente (búsqueda en `.next/static` sin coincidencias).
-- [x] `.env.local` no está versionado y `env.template` sí.
+- [x] `.env.local` no está versionado y `.env.template` sí.
 - [x] No hay hydration warnings al cargar `/about`.
 - [x] En ancho ≤ 900px el `contact-grid` pasa a 1 columna.
 
@@ -155,11 +155,11 @@ Antes del paso 1, leer la guía relevante de `node_modules/next/dist/docs/` (Ser
 
 | Riesgo | Mitigación |
 | --- | --- |
-| Remitente `onboarding@resend.dev` solo entrega al correo dueño de la cuenta | `CONTACT_TO_EMAIL` = correo de la cuenta Resend; documentado en `env.template`. Cambiar `CONTACT_FROM_EMAIL` cuando haya dominio verificado. |
-| `RESEND_API_KEY` filtrada al cliente o al repo | Leerla solo en `actions.ts`; sin prefijo `NEXT_PUBLIC_`; `.env*` ignorado y `env.template` versionado sin valores; criterio de aceptación de búsqueda en `.next/static`. |
+| Remitente `onboarding@resend.dev` solo entrega al correo dueño de la cuenta | `CONTACT_TO_EMAIL` = correo de la cuenta Resend; documentado en `.env.template`. Cambiar `CONTACT_FROM_EMAIL` cuando haya dominio verificado. |
+| `RESEND_API_KEY` filtrada al cliente o al repo | Leerla solo en `actions.ts`; sin prefijo `NEXT_PUBLIC_`; `.env*` ignorado y `.env.template` versionado sin valores; criterio de aceptación de búsqueda en `.next/static`. |
 | Abuso del endpoint de la Server Action (spam masivo, cuota de Resend) | Validación servidor, límites de longitud y honeypot; rate limit/CAPTCHA diferidos a otra spec. |
 | Resend cambia la API respecto a la memoria del modelo | Consultar la documentación vigente antes del paso 3; verificar con un envío real en el paso 8. |
-| Variables de entorno ausentes en otro entorno | La acción responde error genérico y registra `console.error`; `env.template` documenta las claves. |
+| Variables de entorno ausentes en otro entorno | La acción responde error genérico y registra `console.error`; `.env.template` documenta las claves. |
 | Server Actions en Next 16 con diferencias respecto al conocimiento previo | Leer `node_modules/next/dist/docs/` antes de codificar, como exige `AGENTS.md`. |
 | Inyección de cabeceras o HTML vía nombre/mensaje | Texto plano, `subject` construido con el nombre recortado y sin saltos de línea (`replace(/[\r\n]+/g, " ")`). |
 | CSS de About choca con clases existentes | Revisar antes de pegar; no duplicar reglas ya presentes. |
