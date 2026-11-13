@@ -5,7 +5,8 @@ import { DataError } from "@/components/data-error";
 import { Leaderboard } from "@/components/leaderboard";
 import { formatPlays, type Game } from "@/lib/games";
 import { getGame } from "@/lib/games.server";
-import { seededScores } from "@/lib/scores";
+import type { ScoreRow } from "@/lib/scores";
+import { getTopScores } from "@/lib/scores.server";
 
 export default function GameDetailPage({ params }: PageProps<"/juegos/[id]">) {
   return (
@@ -43,7 +44,14 @@ async function GameDetail({
   }
   if (!game) notFound();
 
-  const scores = seededScores(id.length * 17 + 3, 10);
+  // Un fallo del ranking no tumba la ficha: el Leaderboard pinta su propio error.
+  let scores: ScoreRow[] | null;
+  try {
+    scores = await getTopScores(game.id, 10);
+  } catch (e) {
+    unstable_rethrow(e);
+    scores = null;
+  }
 
   return (
     <div className="av-detail fade-in">
@@ -102,7 +110,7 @@ async function GameDetail({
       </div>
 
       <aside>
-        <Leaderboard rows={scores} />
+        <Leaderboard rows={scores} playHref={`/juegos/${game.id}/jugar`} />
       </aside>
     </div>
   );

@@ -4,6 +4,7 @@ import { DataError } from "@/components/data-error";
 import { HallOfFame } from "@/components/hall-of-fame";
 import type { Game } from "@/lib/games";
 import { getGames } from "@/lib/games.server";
+import { getTopScores } from "@/lib/scores.server";
 
 async function HallData() {
   let games: Game[];
@@ -14,7 +15,19 @@ async function HallData() {
     return <DataError />;
   }
   if (games.length === 0) return <DataError />;
-  return <HallOfFame games={games} />;
+
+  // Un fallo del ranking de un juego no tumba la página: null → error en su tab.
+  const entries = await Promise.all(
+    games.map(async (g) => {
+      try {
+        return [g.id, await getTopScores(g.id, 12)] as const;
+      } catch (e) {
+        unstable_rethrow(e);
+        return [g.id, null] as const;
+      }
+    }),
+  );
+  return <HallOfFame games={games} scores={Object.fromEntries(entries)} />;
 }
 
 export default function SalonDeLaFamaPage() {
