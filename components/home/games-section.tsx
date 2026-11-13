@@ -1,7 +1,28 @@
+import { Suspense } from "react";
 import Link from "next/link";
-import { GAMES } from "@/lib/games";
+import { unstable_rethrow } from "next/navigation";
+import { DataError } from "@/components/data-error";
+import type { DbGame } from "@/lib/games";
+import { getGames } from "@/lib/games.server";
 import { MiniCard } from "@/components/home/mini-card";
 import { Reveal } from "@/components/home/reveal";
+
+async function GamesRail() {
+  let games: DbGame[];
+  try {
+    games = await getGames();
+  } catch (e) {
+    unstable_rethrow(e);
+    return <DataError />;
+  }
+  return (
+    <div className="mini-rail">
+      {games.slice(0, 6).map((g) => (
+        <MiniCard key={g.id} game={g} />
+      ))}
+    </div>
+  );
+}
 
 export function GamesSection() {
   return (
@@ -11,11 +32,9 @@ export function GamesSection() {
         <h2 className="section-title">JUEGOS DISPONIBLES AHORA</h2>
         <div className="section-rule"></div>
       </div>
-      <div className="mini-rail">
-        {GAMES.slice(0, 6).map((g) => (
-          <MiniCard key={g.id} game={g} />
-        ))}
-      </div>
+      <Suspense fallback={<div className="mini-rail" />}>
+        <GamesRail />
+      </Suspense>
       <div style={{ textAlign: "center", marginTop: 24 }}>
         <Link href="/juegos" className="btn lg">
           VER TODOS LOS JUEGOS →

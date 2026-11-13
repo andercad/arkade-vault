@@ -2,9 +2,9 @@
 
 import { useRef, type MouseEvent } from "react";
 import { useRouter } from "next/navigation";
-import type { Game } from "@/lib/games";
+import type { DbGame } from "@/lib/games";
 
-export function GameCard({ game }: { game: Game }) {
+export function GameCard({ game }: { game: DbGame }) {
   const router = useRouter();
   const tiltRef = useRef<HTMLDivElement>(null);
   const href = `/juegos/${game.id}`;
@@ -24,7 +24,11 @@ export function GameCard({ game }: { game: Game }) {
   };
 
   const btnColor =
-    game.color === "magenta" ? "magenta" : game.color === "yellow" ? "yellow" : "";
+    game.color === "magenta"
+      ? "magenta"
+      : game.color === "yellow"
+        ? "yellow"
+        : "";
 
   return (
     <div
