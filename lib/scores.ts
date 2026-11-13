@@ -1,3 +1,7 @@
+import { createClient } from "@/lib/supabase/client";
+import type { AccentColor } from "@/lib/games";
+
+// Tipos y submitScore (cliente). Las lecturas están en lib/scores.server.ts.
 export interface ScoreRow {
   rank: number;
   name: string;
@@ -5,26 +9,31 @@ export interface ScoreRow {
   date: string;
 }
 
-export interface SavedScore {
-  game: string;
+export interface RecentScore {
+  player: string;
+  gameTitle: string;
+  color: AccentColor;
   score: number;
+  createdAt: string;
+}
+
+// Inserta una puntuación (RLS + CHECKs en BD). Devuelve false si falla.
+export async function submitScore(e: {
+  gameId: string;
   name: string;
-  at: number;
-}
-
-const SCORES_KEY = "av_scores";
-
-// Solo escritura: las puntuaciones guardadas no se leen en ninguna pantalla (spec 01).
-export function saveScore(entry: Omit<SavedScore, "at">): void {
+  score: number;
+}): Promise<boolean> {
   try {
-    const all: SavedScore[] = JSON.parse(
-      localStorage.getItem(SCORES_KEY) || "[]",
-    );
-    all.push({ ...entry, at: Date.now() });
-    localStorage.setItem(SCORES_KEY, JSON.stringify(all));
-  } catch {}
+    const { error } = await createClient()
+      .from("scores")
+      .insert({ game_id: e.gameId, player_name: e.name, score: e.score });
+    return !error;
+  } catch {
+    return false;
+  }
 }
 
+// TEMPORAL: se elimina en el paso 9 al pasar ficha y Salón a getTopScores.
 const PLAYERS = [
   "PX_KAI", "NEONFOX", "Z3R0COOL", "M00NRYU", "VAULT_07", "GLITCHA",
   "ATARI_KID", "CYBER_LU", "MAGENTA88", "SCANLINE", "BIT_LORD", "ARKADYA",

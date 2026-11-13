@@ -3,7 +3,7 @@
 import { useRef, useState } from "react";
 import Link from "next/link";
 import type { Game } from "@/lib/games";
-import { saveScore } from "@/lib/scores";
+import { submitScore } from "@/lib/scores";
 import { useAuth } from "@/lib/auth";
 import type { AsteroidsSnapshot } from "@/lib/asteroids/types";
 import {
@@ -28,6 +28,8 @@ export function GamePlayer({ game }: { game: Game }) {
   const [snap, setSnap] = useState<AsteroidsSnapshot>(INITIAL_SNAPSHOT);
   const [over, setOver] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState(false);
   // Override manual del nombre; si es null se usa el de la sesión o "INVITADO".
   const [typedName, setTypedName] = useState<string | null>(null);
 
@@ -49,11 +51,19 @@ export function GamePlayer({ game }: { game: Game }) {
     control.current?.restart();
     setOver(false);
     setSaved(false);
+    setSaveError(false);
   };
 
-  const save = () => {
-    saveScore({ game: game.id, score, name });
-    setSaved(true);
+  const save = async () => {
+    if (saving) return;
+    setSaving(true);
+    setSaveError(false);
+    // Nombre vacío → "INVITADO" (el CHECK de BD exige 1 a 10 caracteres).
+    const finalName = name.trim().toUpperCase().slice(0, 10) || "INVITADO";
+    const ok = await submitScore({ gameId: game.id, name: finalName, score });
+    setSaving(false);
+    if (ok) setSaved(true);
+    else setSaveError(true);
   };
 
   return (
@@ -147,12 +157,25 @@ export function GamePlayer({ game }: { game: Game }) {
                   }
                   placeholder="TUS INICIALES"
                 />
-                <button className="btn yellow" onClick={save}>
+                <button
+                  className="btn yellow"
+                  onClick={save}
+                  disabled={saving}
+                >
                   GUARDAR PUNTUACIÓN
                 </button>
               </div>
             ) : (
               <div className="toast-saved">▸ PUNTUACIÓN GUARDADA_</div>
+            )}
+            {saveError && !saved && (
+              <div
+                role="alert"
+                className="pixel"
+                style={{ fontSize: 10, color: "var(--magenta)", marginTop: 12 }}
+              >
+                NO SE PUDO GUARDAR · REINTENTA
+              </div>
             )}
             <div className="actions">
               <button className="btn" onClick={restart}>
