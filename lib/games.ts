@@ -126,3 +126,13 @@ export const CATS: ("TODOS" | Category)[] = [
 export function getGame(id: string): Game | undefined {
   return GAMES.find((g) => g.id === id);
 }
+
+// TEMPORAL (pasos 3-5): convive con Game (plays: string) hasta quitar GAMES (paso 6),
+// cuando DbGame pasa a ser Game. Las lecturas están en lib/games.server.ts.
+export type DbGame = Omit<Game, "plays"> & { plays: number };
+
+export function formatPlays(n: number): string {
+  if (n < 1000) return String(n);
+  const k = (Math.round(n / 100) / 10).toFixed(1).replace(".", ",");
+  return `${k.replace(/,0$/, "")}K`;
+}
