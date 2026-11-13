@@ -1,6 +1,6 @@
 # SPEC 05 — Asteroids: primer juego real jugable en la plataforma
 
-> **Estado:** Aprobado
+> **Estado:** Implementado
 > **Depende de:** SPEC 01 (reproductor `/juegos/[id]/jugar`, `GamePlayer`, `saveScore`, `av_scores`)
 > **Fecha:** 2026-11-13
 > **Objetivo:** Portar el juego de `references/started-games/asteroids` a un módulo TypeScript sin globales, añadirlo al catálogo como juego nuevo `asteroids` y jugarlo en `/juegos/asteroids/jugar` dentro del reproductor existente, que controla pausa, fin de juego y guardado de puntuación.
@@ -142,34 +142,34 @@ Antes del paso 1, leer la guía relevante de `node_modules/next/dist/docs/` seg�
 
 ## Criterios de aceptación
 
-- [ ] `npm run build` y `npm run lint` terminan sin errores.
-- [ ] La biblioteca muestra 9 tarjetas y "ASTEROIDS" aparece con la portada `cover-asteroids`; el chip "SHOOTER" deja 3 (INVASORES, ROCAS, ASTEROIDS).
+- [x] `npm run build` y `npm run lint` terminan sin errores.
+- [x] La biblioteca muestra 9 tarjetas y "ASTEROIDS" aparece con la portada `cover-asteroids`; el chip "SHOOTER" deja 3 (INVASORES, ROCAS, ASTEROIDS).
 - [ ] `/juegos/asteroids` carga; "JUGAR AHORA" lleva a `/juegos/asteroids/jugar`.
-- [ ] El juego `rocas` conserva su ficha, portada y reproductor simulado sin cambios.
-- [ ] `/juegos/bloque-buster/jugar` sigue mostrando la simulación (puntuación que sube sola).
-- [ ] En `/juegos/asteroids/jugar` el canvas muestra la nave centrada y 4 asteroides grandes al iniciar, sin errores en la consola.
-- [ ] `←` y `→` rotan la nave, `↑` la propulsa, `Espacio` dispara una bala por pulsación y la página no hace scroll con las flechas ni con `Espacio`.
-- [ ] Un asteroide grande destruido suma 20, uno mediano 50 y uno pequeño 100; el HUD de plataforma y el HUD del canvas muestran la misma puntuación.
-- [ ] Un asteroide grande se parte en 2 medianos, y uno mediano en 2 pequeños.
-- [ ] Nave, balas y asteroides reaparecen por el lado opuesto al salir del canvas.
-- [ ] La partida empieza con 3 vidas; chocar con un asteroide resta una, la nave reaparece tras 2 s parpadeando durante la invencibilidad de 3 s.
-- [ ] Al destruir todos los asteroides, el nivel sube y aparecen `3 + nivel` asteroides grandes.
-- [ ] Al recoger el power-up "3" la nave dispara 3 balas en abanico durante 5 s y el HUD muestra `TRIPLE Ns`.
-- [ ] "PAUSA" congela nave, asteroides y balas y muestra "EN PAUSA"; "REANUDAR" continúa donde se dejó; las teclas pulsadas durante la pausa no mueven la nave ni disparan.
-- [ ] `Esc` y `P` pausan y reanudan el juego igual que el botón: el contenedor muestra "EN PAUSA", el botón pasa a "REANUDAR" y viceversa.
-- [ ] Mantener pulsada `P` o `Esc` no alterna la pausa repetidamente, y en game over no tienen efecto.
-- [ ] El canvas no dibuja ningún texto de pausa; la pista "PULSA REANUDAR, P O ESC PARA CONTINUAR" aparece en el overlay de React.
-- [ ] Pulsar `Espacio` con el foco en el botón PAUSA/FIN no dispara el botón ni altera la pausa.
-- [ ] Perder las 3 vidas abre el modal "FIN DEL JUEGO" con la puntuación real; el canvas no dibuja texto "GAME OVER" propio.
-- [ ] "FIN" abre el mismo modal desde cualquier estado (jugando, esperando reaparición o en pausa).
-- [ ] En game over `Espacio` no reinicia la partida; solo "JUGAR DE NUEVO" lo hace.
-- [ ] "JUGAR DE NUEVO" reinicia puntuación a 0, 3 vidas, nivel 1, sin teclas pegadas.
-- [ ] "GUARDAR PUNTUACIÓN" añade `{ game: "asteroids", score, name, at }` a `localStorage["av_scores"]` y muestra "PUNTUACIÓN GUARDADA_".
-- [ ] "SALIR" y "VOLVER AL VAULT" navegan sin dejar listeners ni bucle activos: tras salir, las flechas vuelven a hacer scroll y la consola no muestra errores.
-- [ ] En desarrollo (StrictMode) hay una sola nave y una sola velocidad de juego (sin bucle ni listeners duplicados).
-- [ ] No hay hydration warnings al cargar `/juegos/asteroids/jugar`.
-- [ ] A 375 px de ancho el canvas se escala sin desbordar; con `pointer: coarse` aparece el aviso "REQUIERE TECLADO" y en escritorio no.
-- [ ] `references/started-games/asteroids/` no ha cambiado.
+- [x] El juego `rocas` conserva su ficha, portada y reproductor simulado sin cambios.
+- [x] `/juegos/bloque-buster/jugar` sigue mostrando la simulación (puntuación que sube sola).
+- [x] En `/juegos/asteroids/jugar` el canvas muestra la nave centrada y 4 asteroides grandes al iniciar, sin errores en la consola.
+- [x] `←` y `→` rotan la nave, `↑` la propulsa, `Espacio` dispara una bala por pulsación y la página no hace scroll con las flechas ni con `Espacio`.
+- [x] Un asteroide grande destruido suma 20, uno mediano 50 y uno pequeño 100; el HUD de plataforma y el HUD del canvas muestran la misma puntuación.
+- [x] Un asteroide grande se parte en 2 medianos, y uno mediano en 2 pequeños.
+- [x] Nave, balas y asteroides reaparecen por el lado opuesto al salir del canvas.
+- [x] La partida empieza con 3 vidas; chocar con un asteroide resta una, la nave reaparece tras 2 s parpadeando durante la invencibilidad de 3 s.
+- [x] Al destruir todos los asteroides, el nivel sube y aparecen `3 + nivel` asteroides grandes.
+- [x] Al recoger el power-up "3" la nave dispara 3 balas en abanico durante 5 s y el HUD muestra `TRIPLE Ns`.
+- [x] "PAUSA" congela nave, asteroides y balas y muestra "EN PAUSA"; "REANUDAR" continúa donde se dejó; las teclas pulsadas durante la pausa no mueven la nave ni disparan.
+- [x] `Esc` y `P` pausan y reanudan el juego igual que el botón: el contenedor muestra "EN PAUSA", el botón pasa a "REANUDAR" y viceversa.
+- [x] Mantener pulsada `P` o `Esc` no alterna la pausa repetidamente, y en game over no tienen efecto.
+- [x] El canvas no dibuja ningún texto de pausa; la pista "PULSA REANUDAR, P O ESC PARA CONTINUAR" aparece en el overlay de React.
+- [x] Pulsar `Espacio` con el foco en el botón PAUSA/FIN no dispara el botón ni altera la pausa.
+- [x] Perder las 3 vidas abre el modal "FIN DEL JUEGO" con la puntuación real; el canvas no dibuja texto "GAME OVER" propio.
+- [x] "FIN" abre el mismo modal desde cualquier estado (jugando, esperando reaparición o en pausa).
+- [x] En game over `Espacio` no reinicia la partida; solo "JUGAR DE NUEVO" lo hace.
+- [x] "JUGAR DE NUEVO" reinicia puntuación a 0, 3 vidas, nivel 1, sin teclas pegadas.
+- [x] "GUARDAR PUNTUACIÓN" añade `{ game: "asteroids", score, name, at }` a `localStorage["av_scores"]` y muestra "PUNTUACIÓN GUARDADA_".
+- [x] "SALIR" y "VOLVER AL VAULT" navegan sin dejar listeners ni bucle activos: tras salir, las flechas vuelven a hacer scroll y la consola no muestra errores.
+- [x] En desarrollo (StrictMode) hay una sola nave y una sola velocidad de juego (sin bucle ni listeners duplicados).
+- [x] No hay hydration warnings al cargar `/juegos/asteroids/jugar`.
+- [x] A 375 px de ancho el canvas se escala sin desbordar; con `pointer: coarse` aparece el aviso "REQUIERE TECLADO" y en escritorio no.
+- [x] `references/started-games/asteroids/` no ha cambiado.
 
 ---
 
