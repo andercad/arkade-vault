@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import type { Game } from "@/lib/games";
+import type { DbGame } from "@/lib/games";
 import { saveScore } from "@/lib/scores";
 import { useAuth } from "@/lib/auth";
 import type { AsteroidsSnapshot } from "@/lib/asteroids/types";
@@ -22,7 +22,7 @@ const INITIAL_SNAPSHOT: AsteroidsSnapshot = {
   status: "playing",
 };
 
-export function GamePlayer({ game }: { game: Game }) {
+export function GamePlayer({ game }: { game: DbGame }) {
   const { user } = useAuth();
   // Asteroids usa el motor real; el resto de juegos sigue con la simulación.
   const real = game.id === "asteroids";

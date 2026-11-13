@@ -1,18 +1,46 @@
+import { Suspense } from "react";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, unstable_rethrow } from "next/navigation";
+import { DataError } from "@/components/data-error";
 import { Leaderboard } from "@/components/leaderboard";
-import { GAMES, getGame } from "@/lib/games";
+import { formatPlays, type DbGame } from "@/lib/games";
+import { fetchGame } from "@/lib/games.server";
 import { seededScores } from "@/lib/scores";
 
-export function generateStaticParams() {
-  return GAMES.map((g) => ({ id: g.id }));
+export default function GameDetailPage({ params }: PageProps<"/juegos/[id]">) {
+  return (
+    <Suspense
+      fallback={
+        <div
+          className="pixel"
+          style={{
+            textAlign: "center",
+            padding: 80,
+            color: "var(--ink-faint)",
+          }}
+        >
+          CARGANDO…
+        </div>
+      }
+    >
+      <GameDetail params={params} />
+    </Suspense>
+  );
 }
 
-export default async function GameDetailPage({
+async function GameDetail({
   params,
-}: PageProps<"/juegos/[id]">) {
+}: {
+  params: PageProps<"/juegos/[id]">["params"];
+}) {
   const { id } = await params;
-  const game = getGame(id);
+  let game: DbGame | null;
+  try {
+    game = await fetchGame(id);
+  } catch (e) {
+    unstable_rethrow(e);
+    return <DataError />;
+  }
   if (!game) notFound();
 
   const scores = seededScores(id.length * 17 + 3, 10);
@@ -35,7 +63,7 @@ export default async function GameDetailPage({
           <div className="stat-strip">
             <div>
               <div className="l">Partidas</div>
-              <div className="v">{game.plays}</div>
+              <div className="v">{formatPlays(game.plays)}</div>
             </div>
             <div>
               <div className="l">Mejor global</div>
