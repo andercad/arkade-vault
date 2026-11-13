@@ -2,9 +2,9 @@
 
 import { useRef, type MouseEvent } from "react";
 import { useRouter } from "next/navigation";
-import type { DbGame } from "@/lib/games";
+import type { Game } from "@/lib/games";
 
-export function GameCard({ game }: { game: DbGame }) {
+export function GameCard({ game }: { game: Game }) {
   const router = useRouter();
   const tiltRef = useRef<HTMLDivElement>(null);
   const href = `/juegos/${game.id}`;

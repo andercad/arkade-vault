@@ -1,10 +1,10 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { CATS, type DbGame } from "@/lib/games";
+import { CATS, type Game } from "@/lib/games";
 import { GameCard } from "./game-card";
 
-export function Library({ games }: { games: DbGame[] }) {
+export function Library({ games }: { games: Game[] }) {
   const [q, setQ] = useState("");
   const [cat, setCat] = useState<(typeof CATS)[number]>("TODOS");
 

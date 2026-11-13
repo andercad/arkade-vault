@@ -1,7 +1,7 @@
 import Link from "next/link";
-import type { DbGame } from "@/lib/games";
+import type { Game } from "@/lib/games";
 
-export function MiniCard({ game }: { game: DbGame }) {
+export function MiniCard({ game }: { game: Game }) {
   return (
     <Link href={`/juegos/${game.id}`} className="mini-card">
       <div className="mini-cover">

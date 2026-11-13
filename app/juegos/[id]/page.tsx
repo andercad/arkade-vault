@@ -3,8 +3,8 @@ import Link from "next/link";
 import { notFound, unstable_rethrow } from "next/navigation";
 import { DataError } from "@/components/data-error";
 import { Leaderboard } from "@/components/leaderboard";
-import { formatPlays, type DbGame } from "@/lib/games";
-import { fetchGame } from "@/lib/games.server";
+import { formatPlays, type Game } from "@/lib/games";
+import { getGame } from "@/lib/games.server";
 import { seededScores } from "@/lib/scores";
 
 export default function GameDetailPage({ params }: PageProps<"/juegos/[id]">) {
@@ -34,9 +34,9 @@ async function GameDetail({
   params: PageProps<"/juegos/[id]">["params"];
 }) {
   const { id } = await params;
-  let game: DbGame | null;
+  let game: Game | null;
   try {
-    game = await fetchGame(id);
+    game = await getGame(id);
   } catch (e) {
     unstable_rethrow(e);
     return <DataError />;

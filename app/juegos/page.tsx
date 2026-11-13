@@ -2,11 +2,11 @@ import { Suspense } from "react";
 import { unstable_rethrow } from "next/navigation";
 import { DataError } from "@/components/data-error";
 import { Library } from "@/components/library";
-import type { DbGame } from "@/lib/games";
+import type { Game } from "@/lib/games";
 import { getGames } from "@/lib/games.server";
 
 async function LibraryData() {
-  let games: DbGame[];
+  let games: Game[];
   try {
     games = await getGames();
   } catch (e) {

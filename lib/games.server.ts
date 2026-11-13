@@ -2,12 +2,12 @@
 // Los tipos, CATS y formatPlays viven en lib/games.ts para poder usarse en el cliente.
 import { createClient } from "@/lib/supabase/server";
 import type { Database } from "@/lib/supabase/database.types";
-import type { AccentColor, Category, DbGame } from "@/lib/games";
+import type { AccentColor, Category, Game } from "@/lib/games";
 
 type GameRow = Database["public"]["Tables"]["games"]["Row"];
 type StatsRow = Database["public"]["Views"]["game_stats"]["Row"];
 
-function toGame(row: GameRow, stats?: StatsRow): DbGame {
+function toGame(row: GameRow, stats?: StatsRow): Game {
   return {
     id: row.id,
     title: row.title,
@@ -21,7 +21,7 @@ function toGame(row: GameRow, stats?: StatsRow): DbGame {
   };
 }
 
-export async function getGames(): Promise<DbGame[]> {
+export async function getGames(): Promise<Game[]> {
   const supabase = await createClient();
   const [games, stats] = await Promise.all([
     supabase.from("games").select("*").order("sort_order"),
@@ -33,9 +33,7 @@ export async function getGames(): Promise<DbGame[]> {
   return games.data.map((g) => toGame(g, byId.get(g.id)));
 }
 
-// TEMPORAL (pasos 3-5): se llama fetchGame por el choque con el getGame síncrono
-// de lib/games.ts. Pasa a llamarse getGame al quitar GAMES (paso 6).
-export async function fetchGame(id: string): Promise<DbGame | null> {
+export async function getGame(id: string): Promise<Game | null> {
   const supabase = await createClient();
   const [game, stats] = await Promise.all([
     supabase.from("games").select("*").eq("id", id).maybeSingle(),

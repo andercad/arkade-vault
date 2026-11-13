@@ -2,15 +2,15 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import { GAMES } from "@/lib/games";
+import type { Game } from "@/lib/games";
 import { seededScores } from "@/lib/scores";
 import { useAuth } from "@/lib/auth";
 
-export function HallOfFame() {
+export function HallOfFame({ games }: { games: Game[] }) {
   const { user } = useAuth();
-  const [tab, setTab] = useState(GAMES[0].id);
+  const [tab, setTab] = useState(games[0].id);
   const rows = useMemo(() => seededScores(tab.length * 23 + 7, 12), [tab]);
-  const game = GAMES.find((g) => g.id === tab) ?? GAMES[0];
+  const game = games.find((g) => g.id === tab) ?? games[0];
   const youRank = 8 + (tab.length % 4);
   const youScore = rows[5].score - 2400;
   const fmt = (n: number) => n.toLocaleString("es-ES");
@@ -25,7 +25,7 @@ export function HallOfFame() {
       </div>
 
       <div className="hall-tabs">
-        {GAMES.map((g) => (
+        {games.map((g) => (
           <button
             key={g.id}
             className={"chip" + (tab === g.id ? " active" : "")}
@@ -46,7 +46,11 @@ export function HallOfFame() {
         <div className="podium-slot gold">
           <div
             className="pixel"
-            style={{ fontSize: 9, color: "var(--gold)", letterSpacing: "0.18em" }}
+            style={{
+              fontSize: 9,
+              color: "var(--gold)",
+              letterSpacing: "0.18em",
+            }}
           >
             CAMPEÓN
           </div>

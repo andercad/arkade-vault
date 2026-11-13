@@ -2,13 +2,13 @@ import { Suspense } from "react";
 import Link from "next/link";
 import { unstable_rethrow } from "next/navigation";
 import { DataError } from "@/components/data-error";
-import type { DbGame } from "@/lib/games";
+import type { Game } from "@/lib/games";
 import { getGames } from "@/lib/games.server";
 import { MiniCard } from "@/components/home/mini-card";
 import { Reveal } from "@/components/home/reveal";
 
 async function GamesRail() {
-  let games: DbGame[];
+  let games: Game[];
   try {
     games = await getGames();
   } catch (e) {

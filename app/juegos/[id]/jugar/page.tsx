@@ -2,8 +2,8 @@ import { Suspense } from "react";
 import { notFound, unstable_rethrow } from "next/navigation";
 import { DataError } from "@/components/data-error";
 import { GamePlayer } from "@/components/game-player";
-import type { DbGame } from "@/lib/games";
-import { fetchGame } from "@/lib/games.server";
+import type { Game } from "@/lib/games";
+import { getGame } from "@/lib/games.server";
 
 async function PlayData({
   params,
@@ -11,9 +11,9 @@ async function PlayData({
   params: PageProps<"/juegos/[id]/jugar">["params"];
 }) {
   const { id } = await params;
-  let game: DbGame | null;
+  let game: Game | null;
   try {
-    game = await fetchGame(id);
+    game = await getGame(id);
   } catch (e) {
     unstable_rethrow(e);
     return <DataError />;
