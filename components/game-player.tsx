@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import Link from "next/link";
 import type { Game } from "@/lib/games";
 import { saveScore } from "@/lib/scores";
@@ -12,7 +12,6 @@ import {
 } from "@/components/asteroids-canvas";
 
 const LIVES = 3;
-const POINTS_PER_LEVEL = 2500;
 
 const INITIAL_SNAPSHOT: AsteroidsSnapshot = {
   score: 0,
@@ -24,12 +23,8 @@ const INITIAL_SNAPSHOT: AsteroidsSnapshot = {
 
 export function GamePlayer({ game }: { game: Game }) {
   const { user } = useAuth();
-  // Asteroids usa el motor real; el resto de juegos sigue con la simulación.
-  const real = game.id === "asteroids";
   const control = useRef<AsteroidsControl>(null);
 
-  const [simScore, setSimScore] = useState(0);
-  const [simPaused, setSimPaused] = useState(false);
   const [snap, setSnap] = useState<AsteroidsSnapshot>(INITIAL_SNAPSHOT);
   const [over, setOver] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -37,43 +32,21 @@ export function GamePlayer({ game }: { game: Game }) {
   const [typedName, setTypedName] = useState<string | null>(null);
 
   const name = typedName ?? user?.name ?? "INVITADO";
-  const score = real ? snap.score : simScore;
-  const paused = real ? snap.status === "paused" : simPaused;
-  const lives = real ? snap.lives : LIVES;
-  const level = real ? snap.level : 1 + Math.floor(simScore / POINTS_PER_LEVEL);
+  const { score, lives, level } = snap;
+  const paused = snap.status === "paused";
   const fmt = (n: number) => n.toLocaleString("es-ES");
 
-  useEffect(() => {
-    if (real || over || simPaused) return;
-    const t = setInterval(
-      () => setSimScore((s) => s + Math.floor(10 + Math.random() * 90)),
-      220,
-    );
-    return () => clearInterval(t);
-  }, [real, over, simPaused]);
-
   const togglePause = () => {
-    if (!real) {
-      setSimPaused((p) => !p);
-      return;
-    }
     if (snap.status === "paused") control.current?.resume();
     else control.current?.pause();
   };
 
   const finish = () => {
-    if (real)
-      control.current?.end(); // el motor avisa vía onGameOver
-    else setOver(true);
+    control.current?.end(); // el motor avisa vía onGameOver
   };
 
   const restart = () => {
-    if (real) {
-      control.current?.restart();
-    } else {
-      setSimScore(0);
-      setSimPaused(false);
-    }
+    control.current?.restart();
     setOver(false);
     setSaved(false);
   };
@@ -119,25 +92,15 @@ export function GamePlayer({ game }: { game: Game }) {
         </div>
       </div>
 
-      {real && <div className="keyboard-notice">REQUIERE TECLADO</div>}
+      <div className="keyboard-notice">REQUIERE TECLADO</div>
 
       <div className="crt">
         <div className="crt-screen">
-          {real ? (
-            <AsteroidsCanvas
-              ref={control}
-              onState={setSnap}
-              onGameOver={() => setOver(true)}
-            />
-          ) : (
-            <div className="game-arena">
-              <div className="grid-floor"></div>
-              <div className="enemy e1"></div>
-              <div className="enemy e2"></div>
-              <div className="enemy e3"></div>
-              <div className="player-ship"></div>
-            </div>
-          )}
+          <AsteroidsCanvas
+            ref={control}
+            onState={setSnap}
+            onGameOver={() => setOver(true)}
+          />
           {paused && (
             <div
               className="crt-content"
@@ -156,9 +119,7 @@ export function GamePlayer({ game }: { game: Game }) {
                     letterSpacing: "0.16em",
                   }}
                 >
-                  {real
-                    ? "PULSA REANUDAR, P O ESC PARA CONTINUAR"
-                    : "PULSA REANUDAR PARA CONTINUAR"}
+                  PULSA REANUDAR, P O ESC PARA CONTINUAR
                 </div>
               </div>
             </div>
