@@ -119,6 +119,8 @@ export function GamePlayer({ game }: { game: Game }) {
         </div>
       </div>
 
+      {real && <div className="keyboard-notice">REQUIERE TECLADO</div>}
+
       <div className="crt">
         <div className="crt-screen">
           {real ? (

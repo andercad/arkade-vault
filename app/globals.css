@@ -1100,6 +1100,34 @@ a {
   );
   pointer-events: none;
 }
+/* Asteroids: canvas lógico 800x600 escalado por CSS manteniendo 4:3 */
+.asteroids-canvas {
+  display: block;
+  width: 100%;
+  max-width: 800px;
+  aspect-ratio: 4 / 3;
+  height: auto;
+  margin: 0 auto;
+}
+/* Aviso de teclado: solo en pantallas táctiles */
+.keyboard-notice {
+  display: none;
+  margin-bottom: 12px;
+  padding: 10px 14px;
+  border: 1px solid var(--yellow);
+  border-radius: 6px;
+  color: var(--yellow);
+  font-family: var(--pixel);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-align: center;
+  text-shadow: 0 0 6px rgba(245, 255, 0, 0.6);
+}
+@media (pointer: coarse) {
+  .keyboard-notice {
+    display: block;
+  }
+}
 .crt-content {
   position: absolute;
   inset: 0;
