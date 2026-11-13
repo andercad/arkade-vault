@@ -1,5 +1,6 @@
 // Lecturas de puntuaciones desde Supabase (solo servidor: usa cookies()).
 // Los tipos y submitScore (cliente) viven en lib/scores.ts.
+import { connection } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import type { AccentColor } from "@/lib/games";
 import type { RecentScore, ScoreRow } from "@/lib/scores";
@@ -12,6 +13,16 @@ function formatDate(iso: string): string {
     year: "numeric",
     timeZone: "UTC",
   });
+}
+
+// Tiempo relativo calculado en servidor (evita hydration mismatch).
+export function timeAgo(iso: string): string {
+  const min = Math.floor((Date.now() - new Date(iso).getTime()) / 60000);
+  if (min < 1) return "ahora mismo";
+  if (min < 60) return `hace ${min} min`;
+  const h = Math.floor(min / 60);
+  if (h < 24) return `hace ${h} h`;
+  return `hace ${Math.floor(h / 24)} d`;
 }
 
 // Ranking: score desc, created_at asc; rank consecutivo al leer (sin empates).
@@ -64,6 +75,7 @@ export async function getRecentScores(limit: number): Promise<RecentScore[]> {
 export async function getTopLast24h(
   limit: number,
 ): Promise<{ player: string; score: number }[]> {
+  await connection(); // la hora actual solo se lee en tiempo de petición
   const supabase = await createClient();
   const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
   const { data, error } = await supabase
