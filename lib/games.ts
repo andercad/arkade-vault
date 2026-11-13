@@ -102,6 +102,17 @@ export const GAMES: Game[] = [
     best: 24,
     plays: "4.2K",
   },
+  {
+    id: "asteroids",
+    title: "ASTEROIDS",
+    short: "Sobrevive al campo de asteroides.",
+    long: "Pilota tu nave en un espacio sin bordes. Rota, propulsa y dispara para partir asteroides en fragmentos cada vez más pequeños. Recoge el disparo triple y aguanta oleadas cada vez mayores.",
+    cat: "SHOOTER",
+    cover: "cover-asteroids",
+    color: "magenta",
+    best: 0,
+    plays: "0",
+  },
 ];
 
 export const CATS: ("TODOS" | Category)[] = [
