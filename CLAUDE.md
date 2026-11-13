@@ -12,7 +12,7 @@ Workflow is Spec Driven Design using `/spec` and `/spec-impl` skills, installed 
 
 ## Specs
 
-Specs en `specs/` (01 MVP pantallas, 02 homepage, 03 about/contacto, 04 Supabase cimientos, 05 Asteroids). Leer la spec relevante y sus dependencias antes de implementar.
+Specs en `specs/` (01 MVP pantallas, 02 homepage, 03 about/contacto, 04 Supabase cimientos, 05 Asteroids, 06 leaderboard y juegos). Leer la spec relevante y sus dependencias antes de implementar.
 
 Buenas prácticas:
 

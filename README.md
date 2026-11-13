@@ -24,13 +24,14 @@ npx skills@latest add Klerith/fernando-skills
 
 ## Specs (`specs/`)
 
-| Spec                       | Contenido                                                           |
-| -------------------------- | ------------------------------------------------------------------- |
-| `01-mvp-pantallas.md`      | MVP visual: 5 pantallas con datos mock                              |
-| `02-homepage.md`           | Home en `/`, Biblioteca movida a `/juegos`, nav completa            |
-| `03-about-contacto.md`     | `/about` + formulario de contacto (Resend, Server Action)           |
-| `04-supabase-cimientos.md` | Supabase: clientes, migraciones, tipos generados                    |
-| `05-asteroids.md`          | Asteroids: primer juego real jugable (motor TS en `lib/asteroids/`) |
+| Spec                         | Contenido                                                                |
+| ---------------------------- | ------------------------------------------------------------------------ |
+| `01-mvp-pantallas.md`        | MVP visual: 5 pantallas con datos mock                                   |
+| `02-homepage.md`             | Home en `/`, Biblioteca movida a `/juegos`, nav completa                 |
+| `03-about-contacto.md`       | `/about` + formulario de contacto (Resend, Server Action)                |
+| `04-supabase-cimientos.md`   | Supabase: clientes, migraciones, tipos generados                         |
+| `05-asteroids.md`            | Asteroids: primer juego real jugable (motor TS en `lib/asteroids/`)      |
+| `06-leaderboard-y-juegos.md` | Tablas `games` y `scores` en Supabase; leaderboard real (solo Asteroids) |
 
 ### Buenas prácticas
 
