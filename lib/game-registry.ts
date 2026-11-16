@@ -7,6 +7,12 @@ import type {
 import { createAsteroidsGame } from "@/lib/asteroids/engine";
 import { H as ASTEROIDS_H, W as ASTEROIDS_W } from "@/lib/asteroids/constants";
 import type { AsteroidsSnapshot } from "@/lib/asteroids/types";
+import { createArkanoidGame } from "@/lib/arkanoid/engine";
+import {
+  CANVAS_H as ARKANOID_H,
+  CANVAS_W as ARKANOID_W,
+} from "@/lib/arkanoid/constants";
+import type { ArkanoidSnapshot } from "@/lib/arkanoid/types";
 import { createTetrisGame } from "@/lib/tetris/engine";
 import {
   H as TETRIS_H,
@@ -106,9 +112,33 @@ const tetris: GameDefinition = {
   },
 };
 
+function arkanoidSnapshot(s: ArkanoidSnapshot): GameSnapshot {
+  return {
+    score: s.score,
+    status: s.status,
+    hud: [
+      { key: "lives", label: "Vidas", value: "♥ ".repeat(s.lives).trim() },
+      { key: "level", label: "Nivel", value: String(s.level).padStart(2, "0") },
+    ],
+  };
+}
+
+const arkanoid: GameDefinition = {
+  id: "arkanoid",
+  width: ARKANOID_W,
+  height: ARKANOID_H,
+  aria: "Arkanoid",
+  create: (canvas, cb) =>
+    createArkanoidGame(canvas, {
+      onState: (s) => cb.onState(arkanoidSnapshot(s)),
+      onGameOver: cb.onGameOver,
+    }),
+};
+
 export const GAME_REGISTRY: Record<string, GameDefinition> = {
   asteroids,
   tetris,
+  arkanoid,
 };
 
 export function getGameDefinition(id: string): GameDefinition | null {
