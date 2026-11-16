@@ -1,6 +1,6 @@
 # SPEC 08 — Arkanoid: tercer juego real con sonido y 5 niveles
 
-> **Estado:** Aprobado
+> **Estado:** Implementado
 > **Depende de:** SPEC 01 (reproductor y modal), SPEC 04 (migraciones de Supabase), SPEC 05 (Asteroids, patrón de motor), SPEC 06 (tablas `games` y `scores`, `submitScore`), SPEC 07 (registro genérico de juegos)
 > **Fecha:** 2026-11-16
 > **Objetivo:** Portar `references/started-games/claude-arkanoid` a un motor TypeScript sin globales, añadirlo como juego real `arkanoid` (fila en `games`, leaderboard en `scores`) y registrarlo en el registro genérico de juegos.
@@ -166,42 +166,42 @@ Cada paso = un commit `08-arkanoid: Paso N`. Antes del paso 1, leer la guía rel
 
 **Genéricos:**
 
-- [ ] `npm run build` y `npm run lint` terminan sin errores.
-- [ ] `supabase/migrations/0006_seed_arkanoid.sql` existe y figura en `list_migrations`; `games` contiene `arkanoid` (ARCADE, `cover-arkanoid`, yellow, `sort_order` 3 o el siguiente libre) y `get_advisors` (security) no reporta avisos críticos.
-- [ ] `/juegos` muestra la tarjeta ARKANOID con su portada; `/juegos/arkanoid` carga y "JUGAR AHORA" lleva a `/juegos/arkanoid/jugar`.
-- [ ] El canvas arranca sin errores en la consola ni hydration warnings, y el spritesheet y los 2 MP3 cargan con 200.
-- [ ] `PAUSA`/`REANUDAR` congela y continúa (bola, partículas, explosiones y sonido); `Esc` y `P` hacen lo mismo; mantener pulsada la tecla no alterna; en game over no tienen efecto; el canvas no dibuja texto de pausa; el overlay "EN PAUSA" muestra la pista de teclas.
-- [ ] Durante la pausa, el ratón y las teclas de movimiento no mueven la pala y `Espacio`/clic no lanzan la bola.
-- [ ] `Espacio` con el foco en PAUSA/FIN no activa el botón.
-- [ ] Las flechas y `Espacio` no hacen scroll en la página mientras Arkanoid está montado.
-- [ ] Perder la última vida, ganar el nivel 5 y FIN abren el modal "FIN DEL JUEGO" con la puntuación real; el canvas no dibuja "GAME OVER" ni "VICTORIA".
-- [ ] "JUGAR DE NUEVO" reinicia a puntuación 0, 3 vidas, nivel 1 y bloques completos, con la bola pegada y sin teclas pegadas.
-- [ ] Guardar con nombre "TEST" inserta una fila con `game_id = 'arkanoid'`; nombre vacío guarda `INVITADO`; se muestra "PUNTUACIÓN GUARDADA_".
-- [ ] La puntuación aparece en la ficha, en el Salón (tab ARKANOID) y en la actividad de la home; la tarjeta muestra `best` y `plays` actualizados.
-- [ ] "SALIR" y "VOLVER AL VAULT" no dejan listeners, bucle ni sonidos activos (las flechas vuelven a hacer scroll).
-- [ ] En desarrollo (StrictMode) hay una sola instancia y la bola va a velocidad normal.
-- [ ] A 375 px de ancho el canvas se escala sin desbordar; el ratón mueve la pala hasta los bordes del canvas escalado; el aviso táctil solo aparece con `pointer: coarse`.
-- [ ] Asteroids y Tetris siguen funcionando igual.
-- [ ] `references/started-games/` y `lib/asteroids/` y `lib/tetris/` no han cambiado; no se escribe `localStorage`.
-- [ ] Tras verificar, las filas de prueba de `scores` están borradas.
+- [x] `npm run build` y `npm run lint` terminan sin errores.
+- [x] `supabase/migrations/0006_seed_arkanoid.sql` existe y figura en `list_migrations`; `games` contiene `arkanoid` (ARCADE, `cover-arkanoid`, yellow, `sort_order` 3 o el siguiente libre) y `get_advisors` (security) no reporta avisos críticos.
+- [x] `/juegos` muestra la tarjeta ARKANOID con su portada; `/juegos/arkanoid` carga y "JUGAR AHORA" lleva a `/juegos/arkanoid/jugar`.
+- [x] El canvas arranca sin errores en la consola ni hydration warnings, y el spritesheet y los 2 MP3 cargan con 200.
+- [x] `PAUSA`/`REANUDAR` congela y continúa (bola, partículas, explosiones y sonido); `Esc` y `P` hacen lo mismo; mantener pulsada la tecla no alterna; en game over no tienen efecto; el canvas no dibuja texto de pausa; el overlay "EN PAUSA" muestra la pista de teclas.
+- [x] Durante la pausa, el ratón y las teclas de movimiento no mueven la pala y `Espacio`/clic no lanzan la bola.
+- [x] `Espacio` con el foco en PAUSA/FIN no activa el botón.
+- [x] Las flechas y `Espacio` no hacen scroll en la página mientras Arkanoid está montado.
+- [x] Perder la última vida, ganar el nivel 5 y FIN abren el modal "FIN DEL JUEGO" con la puntuación real; el canvas no dibuja "GAME OVER" ni "VICTORIA".
+- [x] "JUGAR DE NUEVO" reinicia a puntuación 0, 3 vidas, nivel 1 y bloques completos, con la bola pegada y sin teclas pegadas.
+- [x] Guardar con nombre "TEST" inserta una fila con `game_id = 'arkanoid'`; nombre vacío guarda `INVITADO`; se muestra "PUNTUACIÓN GUARDADA_".
+- [x] La puntuación aparece en la ficha, en el Salón (tab ARKANOID) y en la actividad de la home; la tarjeta muestra `best` y `plays` actualizados.
+- [x] "SALIR" y "VOLVER AL VAULT" no dejan listeners, bucle ni sonidos activos (las flechas vuelven a hacer scroll).
+- [x] En desarrollo (StrictMode) hay una sola instancia y la bola va a velocidad normal.
+- [x] A 375 px de ancho el canvas se escala sin desbordar; el ratón mueve la pala hasta los bordes del canvas escalado; el aviso táctil solo aparece con `pointer: coarse`.
+- [x] Asteroids y Tetris siguen funcionando igual.
+- [x] `references/started-games/` y `lib/asteroids/` y `lib/tetris/` no han cambiado; no se escribe `localStorage`.
+- [x] Tras verificar, las filas de prueba de `scores` están borradas.
 
 **Específicos de Arkanoid:**
 
-- [ ] Al iniciar, el canvas muestra el nivel 1 (60 bloques en 6 filas, colores red, yellow, cyan, magenta, hotpink, green de arriba abajo), la pala centrada, la bola pegada a ella, el aviso "Espacio o clic para lanzar" y el HUD del canvas con PUNTOS 0, NIVEL 1 y 3 bolas; el HUD de plataforma muestra Jugador, Puntuación 0, Vidas ♥ ♥ ♥ y Nivel 01.
-- [ ] El canvas no muestra el campo RÉCORD.
-- [ ] `A`/`←` y `D`/`→` mueven la pala a 420 px/s sin salir del canvas; el ratón la centra bajo el cursor y la limita a los bordes.
-- [ ] `Espacio` o clic lanzan la bola recta hacia arriba (`vx = 0`) a la velocidad del nivel; con la bola ya lanzada no tienen efecto.
-- [ ] Un bloque roto suma exactamente 10 puntos, desaparece, genera 8 partículas y una explosión de 150 ms, y rompe como máximo un bloque por frame.
-- [ ] El rebote en la pala depende del punto de impacto: centro → vertical; borde → 60° respecto a la vertical.
-- [ ] La bola rebota en paredes laterales, techo y bloques sin atravesar bloques ni pala a 30 fps.
-- [ ] Perder la bola por abajo resta una vida, pega la bola a la pala y no reinicia los bloques; con 0 vidas abre el modal.
-- [ ] El nivel 1 tiene 60 bloques; los niveles 2 a 5 tienen 40, 30, 30 y 24 bloques con sus patrones.
-- [ ] Al romper el último bloque de los niveles 1-4 aparece "NIVEL N COMPLETADO", la bola queda quieta y `Espacio` o clic cargan el nivel siguiente con pala centrada y bola pegada; el HUD de plataforma muestra el nuevo nivel.
-- [ ] La velocidad de la bola es 360, 388,8, 417,6, 446,4 y 475,2 px/s en los niveles 1 a 5.
-- [ ] Al romper el último bloque del nivel 5 se abre el modal con la puntuación acumulada.
-- [ ] El rebote en paredes, techo o pala suena una vez por frame como máximo y un bloque roto suena al romperse; si el navegador bloquea el audio, no hay errores en la consola.
-- [ ] No existe selector de nivel ni teclas `1`-`5` que salten de nivel.
-- [ ] La puntuación máxima posible (1.840) se guarda sin error.
+- [x] Al iniciar, el canvas muestra el nivel 1 (60 bloques en 6 filas, colores red, yellow, cyan, magenta, hotpink, green de arriba abajo), la pala centrada, la bola pegada a ella, el aviso "Espacio o clic para lanzar" y el HUD del canvas con PUNTOS 0, NIVEL 1 y 3 bolas; el HUD de plataforma muestra Jugador, Puntuación 0, Vidas ♥ ♥ ♥ y Nivel 01.
+- [x] El canvas no muestra el campo RÉCORD.
+- [x] `A`/`←` y `D`/`→` mueven la pala a 420 px/s sin salir del canvas; el ratón la centra bajo el cursor y la limita a los bordes.
+- [x] `Espacio` o clic lanzan la bola recta hacia arriba (`vx = 0`) a la velocidad del nivel; con la bola ya lanzada no tienen efecto.
+- [x] Un bloque roto suma exactamente 10 puntos, desaparece, genera 8 partículas y una explosión de 150 ms, y rompe como máximo un bloque por frame.
+- [x] El rebote en la pala depende del punto de impacto: centro → vertical; borde → 60° respecto a la vertical.
+- [x] La bola rebota en paredes laterales, techo y bloques sin atravesar bloques ni pala a 30 fps.
+- [x] Perder la bola por abajo resta una vida, pega la bola a la pala y no reinicia los bloques; con 0 vidas abre el modal.
+- [x] El nivel 1 tiene 60 bloques; los niveles 2 a 5 tienen 40, 30, 30 y 24 bloques con sus patrones.
+- [x] Al romper el último bloque de los niveles 1-4 aparece "NIVEL N COMPLETADO", la bola queda quieta y `Espacio` o clic cargan el nivel siguiente con pala centrada y bola pegada; el HUD de plataforma muestra el nuevo nivel.
+- [x] La velocidad de la bola es 360, 388,8, 417,6, 446,4 y 475,2 px/s en los niveles 1 a 5.
+- [x] Al romper el último bloque del nivel 5 se abre el modal con la puntuación acumulada.
+- [x] El rebote en paredes, techo o pala suena una vez por frame como máximo y un bloque roto suena al romperse; si el navegador bloquea el audio, no hay errores en la consola.
+- [x] No existe selector de nivel ni teclas `1`-`5` que salten de nivel.
+- [x] La puntuación máxima posible (1.840) se guarda sin error.
 
 ---
 
