@@ -2,8 +2,10 @@
 export const COLS = 20;
 export const ROWS = 20;
 export const CELL = 30;
+export const HUD_H = 30; // franja del HUD sobre el tablero
 export const W = COLS * CELL; // 600
-export const H = ROWS * CELL; // 600
+export const BOARD_H = ROWS * CELL; // 600
+export const H = HUD_H + BOARD_H; // 630
 
 export const INITIAL_LENGTH = 3;
 export const FRUITS_PER_LEVEL = 5;

@@ -1,7 +1,9 @@
 import {
+  BOARD_H,
   CELL,
   COLS,
   H,
+  HUD_H,
   INITIAL_LENGTH,
   MAX_DT,
   POINTS_PER_FRUIT,
@@ -206,7 +208,7 @@ export function createSnakeGame(
     c.beginPath();
     for (let col = 1; col < COLS; col++) {
       c.moveTo(col * CELL + 0.5, 0);
-      c.lineTo(col * CELL + 0.5, H);
+      c.lineTo(col * CELL + 0.5, BOARD_H);
     }
     for (let row = 1; row < ROWS; row++) {
       c.moveTo(0, row * CELL + 0.5);
@@ -253,17 +255,23 @@ export function createSnakeGame(
   }
 
   function drawHud() {
-    c.fillStyle = "rgba(11, 11, 20, 0.6)";
-    c.fillRect(0, 0, W, 26);
+    c.fillStyle = "#12121f";
+    c.fillRect(0, 0, W, HUD_H);
+    c.strokeStyle = GRID_COLOR;
+    c.lineWidth = 1;
+    c.beginPath();
+    c.moveTo(0, HUD_H - 0.5);
+    c.lineTo(W, HUD_H - 0.5);
+    c.stroke();
     c.font = "bold 14px monospace";
     c.textBaseline = "middle";
     c.fillStyle = "#f0f0f8";
     c.textAlign = "left";
-    c.fillText(`PUNTOS: ${score}`, 10, 14);
+    c.fillText(`PUNTOS: ${score}`, 10, HUD_H / 2);
     c.textAlign = "center";
-    c.fillText(`NIVEL: ${level}`, W / 2, 14);
+    c.fillText(`NIVEL: ${level}`, W / 2, HUD_H / 2);
     c.textAlign = "right";
-    c.fillText(`LONGITUD: ${body.length}`, W - 10, 14);
+    c.fillText(`LONGITUD: ${body.length}`, W - 10, HUD_H / 2);
   }
 
   // Sin overlays de pausa ni game over: los dibuja el contenedor (React).
@@ -271,13 +279,16 @@ export function createSnakeGame(
     c.clearRect(0, 0, W, H);
     c.fillStyle = BG_COLOR;
     c.fillRect(0, 0, W, H);
+
+    // El tablero va desplazado bajo la franja del HUD.
+    c.save();
+    c.translate(0, HUD_H);
     drawGrid();
-
     if (fruit) drawFruit(c, sheet, fruit.key, fruit.cell);
-
     for (let i = body.length - 1; i >= 1; i--) drawSegment(body[i], BODY_COLOR);
     drawSegment(body[0], HEAD_COLOR);
     drawEyes(body[0]);
+    c.restore();
 
     drawHud();
   }

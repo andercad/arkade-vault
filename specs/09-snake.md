@@ -26,7 +26,7 @@ El registro genérico (`lib/game-registry.ts`) ya existe desde la SPEC 07; esta 
 **Dentro:**
 
 - **Motor** en `lib/snake/` con `createSnakeGame`: diseño nuevo, sin globales, DOM ni `localStorage`.
-  - Canvas lógico 600×600: tablero de 20×20 celdas de 30 px; sin panel lateral.
+  - Canvas lógico 600×630: franja de HUD de 30 px sobre el tablero de 20×20 celdas de 30 px (600×600); sin panel lateral.
   - Serpiente de longitud 3 al centro, avanza a la derecha; se mueve por pasos fijos de celda.
   - Una fruta a la vez en una celda libre, elegida al azar entre las 22 del atlas; al comerla, la serpiente crece 1 y aparece otra.
   - Muerte al chocar con pared o con el propio cuerpo (decisión del usuario).
@@ -34,7 +34,7 @@ El registro genérico (`lib/game-registry.ts`) ya existe desde la SPEC 07; esta 
   - Puntuación `10 × nivel` por fruta.
   - HUD propio del canvas: PUNTOS, NIVEL y LONGITUD.
 - Asset `public/games/snake/fruits.png` (copia de `fruits.png`).
-- Registrar `snake` en `lib/game-registry.ts` (600×600, sin opciones, adaptador con `hud` Longitud y Nivel).
+- Registrar `snake` en `lib/game-registry.ts` (600×630, sin opciones, adaptador con `hud` Longitud y Nivel).
 - Fila `snake` en `games` por migración `0007_seed_snake.sql`; portada `.cover-snake`.
 - HUD de plataforma: Jugador, Puntuación, Longitud, Nivel.
 - Pausa por botón y por `Esc`/`P`, FIN, game over, "JUGAR DE NUEVO", guardado con `submitScore`.
@@ -145,9 +145,9 @@ Convenciones del juego (valores de diseño nuevo, decididos aquí):
 1. Leer en `node_modules/next/dist/docs/` lo relativo a Client Components, `useEffect`/refs y a servir archivos estáticos de `public/` (AGENTS.md); revisar `components/game-player.tsx`, `components/game-canvas.tsx`, `lib/game-registry.ts` y `lib/tetris/engine.ts` como patrón. Copiar `fruits.png` a `public/games/snake/` y crear `lib/snake/constants.ts`, `utils.ts` y `types.ts`. Verificación: `npx tsc --noEmit`; `/games/snake/fruits.png` responde 200 con el servidor de desarrollo.
 2. Crear `lib/snake/sprites.ts`: `FRUITS` portado de `sprites.js:23-44`, carga cancelable de la imagen y `drawFruit`. Verificación: `npx tsc --noEmit` y `npm run lint`.
 3. Crear `lib/snake/engine.ts`: estado, paso por acumulador, colisiones, fruta, nivel y puntuación, `draw` (rejilla, fruta, serpiente, HUD del canvas), bucle rAF tras cargar la imagen, input con cleanup y cola de direcciones, `pause/resume/restart/end/destroy`, snapshot solo ante cambios y `onGameOver` único. Verificación: `npx tsc --noEmit` y `npm run lint`.
-4. Registrar `snake` en `lib/game-registry.ts` (600×600, `aria` "Snake", sin opciones, adaptador con `hud` Longitud y Nivel). Verificación: `npx tsc --noEmit` y `npm run lint` pasan; los demás juegos no cambian; `/juegos/snake/jugar` devuelve 404 hasta que el paso 5 inserte la fila en `games`.
+4. Registrar `snake` en `lib/game-registry.ts` (600×630, `aria` "Snake", sin opciones, adaptador con `hud` Longitud y Nivel). Verificación: `npx tsc --noEmit` y `npm run lint` pasan; los demás juegos no cambian; `/juegos/snake/jugar` devuelve 404 hasta que el paso 5 inserte la fila en `games`.
 5. Crear `supabase/migrations/0007_seed_snake.sql` y aplicarla con `apply_migration`; regenerar `lib/supabase/database.types.ts` si hace falta. Comprobar `select sort_order from games` y usar el siguiente libre si el 4 está ocupado. Verificación: `list_migrations`, `select id from games` incluye `snake`, `get_advisors` (security) sin avisos críticos, y `/juegos/snake/jugar` monta el canvas con tablero, serpiente, fruta y HUD.
-6. Portada `.cover-snake` en `app/globals.css` (aplicar `/frontend-design`; serpiente verde y fruta, distinguible de las demás portadas) y comprobación del escalado del canvas cuadrado 600×600. Verificación: tarjeta en `/juegos`, `/juegos/snake` con portada, 375 px sin desbordar.
+6. Portada `.cover-snake` en `app/globals.css` (aplicar `/frontend-design`; serpiente verde y fruta, distinguible de las demás portadas) y comprobación del escalado del canvas 600×630. Verificación: tarjeta en `/juegos`, `/juegos/snake` con portada, 375 px sin desbordar.
 7. Verificar en el navegador con Playwright (jugar, guardar "TEST", ver leaderboard), borrar las filas de prueba de `scores` con `execute_sql`, y añadir la spec 09 a `CLAUDE.md` y `README.md` en el mismo commit. Verificación: ambos mencionan `09-snake.md`; `npm run lint` y `npm run build` pasan.
 
 Cada paso = un commit `09-snake: Paso N`. Antes del paso 1, leer la guía relevante de `node_modules/next/dist/docs/` según `AGENTS.md`. Para el diseño visual (portada, estados) aplicar `/frontend-design`, según `CLAUDE.md`.
@@ -209,7 +209,7 @@ Cada paso = un commit `09-snake: Paso N`. Antes del paso 1, leer la guía releva
 - **Sí:** paso por acumulador con `dt` máximo 0,05 s (checklist) y `lastTime` reiniciado en `resume()`. Con paso fijo de celda no hay riesgo de atravesar nada.
 - **Sí:** copiar el PNG íntegro a `public/` (585 KB) y dejar `references/` intacto. Recortar la hoja es optimización posible en otra spec.
 - **No:** sonido, skins, selector de nivel, récords locales. Sin original al que ser fieles, se mantiene el mínimo viable.
-- **No:** `devicePixelRatio`; canvas lógico 600×600 escalado por CSS, como los demás juegos.
+- **No:** `devicePixelRatio`; canvas lógico 600×630 escalado por CSS, como los demás juegos.
 - **Sí:** victoria al llenar el tablero se notifica por `onGameOver`; el contrato no distingue victoria (como en SPEC 08).
 
 ---
