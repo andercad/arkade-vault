@@ -28,3 +28,5 @@ Next.js 16.4.6 (App Router, `app/` at repo root, no `src/`), React 19.3, Tailwin
 ## Skills
 
 Usa siempre /frontend-design para diseñar interfaces de usuario
+
+Para añadir un juego real (desde `references/started-games/` o nuevo) usa `/add-game`: genera la spec (motor TS, fila en `games`, leaderboard en `scores`) siguiendo SPEC 05 y 06; luego se implementa con `/spec-impl`. Archivos en `.claude/skills/add-game/`.

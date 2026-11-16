@@ -15,6 +15,8 @@ https://github.com/Klerith/fernando-skills
 npx skills@latest add Klerith/fernando-skills
 ```
 
+Skill propia del proyecto: `/add-game` (`.claude/skills/add-game/`). Genera la spec para añadir un juego real con leaderboard (desde `references/started-games/` o nuevo), siguiendo SPEC 05 y 06; se implementa con `/spec-impl`.
+
 ## Commands
 
 - `npm run dev` — dev server (Turbopack)
