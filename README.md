@@ -34,6 +34,7 @@ Skill propia del proyecto: `/add-game` (`.claude/skills/add-game/`). Genera la s
 | `04-supabase-cimientos.md`   | Supabase: clientes, migraciones, tipos generados                         |
 | `05-asteroids.md`            | Asteroids: primer juego real jugable (motor TS en `lib/asteroids/`)      |
 | `06-leaderboard-y-juegos.md` | Tablas `games` y `scores` en Supabase; leaderboard real (solo Asteroids) |
+| `07-tetris.md`               | Tetris (motor TS en `lib/tetris/`) y registro genérico de juegos         |
 
 ### Buenas prácticas
 
