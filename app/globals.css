@@ -846,6 +846,25 @@ a {
   filter: drop-shadow(0 0 6px rgba(0, 245, 255, 0.5));
 }
 
+/* Arkanoid: muro de bloques amarillos con una brecha; la bola la atraviesa desde la pala */
+.cover-arkanoid {
+  background:
+    radial-gradient(
+      ellipse at 50% 120%,
+      rgba(245, 255, 0, 0.2),
+      transparent 60%
+    ),
+    #0a0900;
+}
+.cover-arkanoid::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 300' fill='%23f5ff00'><g fill-opacity='0.9'><rect x='2' y='46' width='46' height='18' rx='2'/><rect x='52' y='46' width='46' height='18' rx='2'/><rect x='102' y='46' width='46' height='18' rx='2'/><rect x='202' y='46' width='46' height='18' rx='2'/><rect x='252' y='46' width='46' height='18' rx='2'/><rect x='302' y='46' width='46' height='18' rx='2'/><rect x='352' y='46' width='46' height='18' rx='2'/></g><g fill-opacity='0.6'><rect x='2' y='68' width='46' height='18' rx='2'/><rect x='52' y='68' width='46' height='18' rx='2'/><rect x='102' y='68' width='46' height='18' rx='2'/><rect x='202' y='68' width='46' height='18' rx='2'/><rect x='252' y='68' width='46' height='18' rx='2'/><rect x='302' y='68' width='46' height='18' rx='2'/><rect x='352' y='68' width='46' height='18' rx='2'/></g><g fill-opacity='0.32'><rect x='2' y='90' width='46' height='18' rx='2'/><rect x='52' y='90' width='46' height='18' rx='2'/><rect x='102' y='90' width='46' height='18' rx='2'/><rect x='202' y='90' width='46' height='18' rx='2'/><rect x='252' y='90' width='46' height='18' rx='2'/><rect x='302' y='90' width='46' height='18' rx='2'/><rect x='352' y='90' width='46' height='18' rx='2'/></g><g fill-opacity='0.5'><rect x='144' y='110' width='6' height='6'/><rect x='204' y='100' width='5' height='5'/><rect x='138' y='128' width='4' height='4'/><rect x='212' y='124' width='4' height='4'/></g><path d='M240 244L175 52' fill='none' stroke='%23f5ff00' stroke-opacity='0.6' stroke-width='2' stroke-dasharray='5 7'/><circle cx='175' cy='46' r='7'/><rect x='190' y='250' width='100' height='10' rx='5'/></svg>")
+    center / cover no-repeat;
+  filter: drop-shadow(0 0 6px rgba(245, 255, 0, 0.5));
+}
+
 .cover-rana {
   background: linear-gradient(180deg, #001f2a, #0a0a18);
 }
@@ -1224,7 +1243,8 @@ a {
 }
 .crt-portrait .game-canvas {
   width: auto;
-  max-width: 100%;
+  /* !important: el max-width inline del canvas (ancho lógico) ganaría y lo recortaría en móvil */
+  max-width: 100% !important;
   /* 100svh − (nav + HUD + opciones + marco CRT + márgenes) */
   max-height: max(320px, min(600px, calc(100svh - 350px)));
 }
