@@ -1184,12 +1184,10 @@ a {
   );
   pointer-events: none;
 }
-/* Asteroids: canvas lógico 800x600 escalado por CSS manteniendo 4:3 */
-.asteroids-canvas {
+/* Canvas lógico escalado por CSS; aspect-ratio y max-width por inline style */
+.game-canvas {
   display: block;
   width: 100%;
-  max-width: 800px;
-  aspect-ratio: 4 / 3;
   height: auto;
   margin: 0 auto;
 }

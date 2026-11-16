@@ -5,27 +5,23 @@ import Link from "next/link";
 import type { Game } from "@/lib/games";
 import { submitScore } from "@/lib/scores";
 import { useAuth } from "@/lib/auth";
-import type { AsteroidsSnapshot } from "@/lib/asteroids/types";
-import {
-  AsteroidsCanvas,
-  type AsteroidsControl,
-} from "@/components/asteroids-canvas";
+import type { GameSnapshot } from "@/lib/game-engine";
+import { getGameDefinition } from "@/lib/game-registry";
+import { GameCanvas, type GameControl } from "@/components/game-canvas";
 
-const LIVES = 3;
-
-const INITIAL_SNAPSHOT: AsteroidsSnapshot = {
+const INITIAL_SNAPSHOT: GameSnapshot = {
   score: 0,
-  lives: LIVES,
-  level: 1,
-  tripleSeconds: 0,
   status: "playing",
+  hud: [],
 };
 
 export function GamePlayer({ game }: { game: Game }) {
   const { user } = useAuth();
-  const control = useRef<AsteroidsControl>(null);
+  const control = useRef<GameControl>(null);
+  // La página ya devuelve 404 si el id no está en el registro.
+  const definition = getGameDefinition(game.id)!;
 
-  const [snap, setSnap] = useState<AsteroidsSnapshot>(INITIAL_SNAPSHOT);
+  const [snap, setSnap] = useState<GameSnapshot>(INITIAL_SNAPSHOT);
   const [over, setOver] = useState(false);
   const [saved, setSaved] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -34,7 +30,7 @@ export function GamePlayer({ game }: { game: Game }) {
   const [typedName, setTypedName] = useState<string | null>(null);
 
   const name = typedName ?? user?.name ?? "INVITADO";
-  const { score, lives, level } = snap;
+  const { score } = snap;
   const paused = snap.status === "paused";
   const fmt = (n: number) => n.toLocaleString("es-ES");
 
@@ -80,14 +76,12 @@ export function GamePlayer({ game }: { game: Game }) {
             <div className="l">Puntuación</div>
             <div className="v">{fmt(score)}</div>
           </div>
-          <div className="hud-stat lives">
-            <div className="l">Vidas</div>
-            <div className="v">{"♥ ".repeat(lives).trim()}</div>
-          </div>
-          <div className="hud-stat level">
-            <div className="l">Nivel</div>
-            <div className="v">{String(level).padStart(2, "0")}</div>
-          </div>
+          {snap.hud.map((item) => (
+            <div key={item.key} className={`hud-stat ${item.key}`}>
+              <div className="l">{item.label}</div>
+              <div className="v">{item.value}</div>
+            </div>
+          ))}
         </div>
         <div className="hud-actions">
           <button className="btn yellow" onClick={togglePause}>
@@ -106,7 +100,8 @@ export function GamePlayer({ game }: { game: Game }) {
 
       <div className="crt">
         <div className="crt-screen">
-          <AsteroidsCanvas
+          <GameCanvas
+            definition={definition}
             ref={control}
             onState={setSnap}
             onGameOver={() => setOver(true)}
@@ -157,11 +152,7 @@ export function GamePlayer({ game }: { game: Game }) {
                   }
                   placeholder="TUS INICIALES"
                 />
-                <button
-                  className="btn yellow"
-                  onClick={save}
-                  disabled={saving}
-                >
+                <button className="btn yellow" onClick={save} disabled={saving}>
                   GUARDAR PUNTUACIÓN
                 </button>
               </div>
