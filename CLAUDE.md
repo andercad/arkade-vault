@@ -12,7 +12,7 @@ Workflow is Spec Driven Design using `/spec` and `/spec-impl` skills, installed 
 
 ## Specs
 
-Specs en `specs/` (01 MVP pantallas, 02 homepage, 03 about/contacto, 04 Supabase cimientos, 05 Asteroids, 06 leaderboard y juegos: `06-leaderboard-y-juegos.md`). Leer la spec relevante y sus dependencias antes de implementar.
+Specs en `specs/` (01 MVP pantallas, 02 homepage, 03 about/contacto, 04 Supabase cimientos, 05 Asteroids, 06 leaderboard y juegos: `06-leaderboard-y-juegos.md`, 07 Tetris + registro genérico de juegos: `07-tetris.md`). Leer la spec relevante y sus dependencias antes de implementar.
 
 Buenas prácticas:
 
@@ -28,3 +28,5 @@ Next.js 16.4.6 (App Router, `app/` at repo root, no `src/`), React 19.3, Tailwin
 ## Skills
 
 Usa siempre /frontend-design para diseñar interfaces de usuario
+
+Para añadir un juego real (desde `references/started-games/` o nuevo) usa `/add-game`: genera la spec (motor TS, fila en `games`, leaderboard en `scores`) siguiendo SPEC 05 y 06; luego se implementa con `/spec-impl`. Archivos en `.claude/skills/add-game/`.

@@ -5,27 +5,23 @@ import Link from "next/link";
 import type { Game } from "@/lib/games";
 import { submitScore } from "@/lib/scores";
 import { useAuth } from "@/lib/auth";
-import type { AsteroidsSnapshot } from "@/lib/asteroids/types";
-import {
-  AsteroidsCanvas,
-  type AsteroidsControl,
-} from "@/components/asteroids-canvas";
+import type { GameOption, GameSnapshot } from "@/lib/game-engine";
+import { getGameDefinition } from "@/lib/game-registry";
+import { GameCanvas, type GameControl } from "@/components/game-canvas";
 
-const LIVES = 3;
-
-const INITIAL_SNAPSHOT: AsteroidsSnapshot = {
+const INITIAL_SNAPSHOT: GameSnapshot = {
   score: 0,
-  lives: LIVES,
-  level: 1,
-  tripleSeconds: 0,
   status: "playing",
+  hud: [],
 };
 
 export function GamePlayer({ game }: { game: Game }) {
   const { user } = useAuth();
-  const control = useRef<AsteroidsControl>(null);
+  const control = useRef<GameControl>(null);
+  // La página ya devuelve 404 si el id no está en el registro.
+  const definition = getGameDefinition(game.id)!;
 
-  const [snap, setSnap] = useState<AsteroidsSnapshot>(INITIAL_SNAPSHOT);
+  const [snap, setSnap] = useState<GameSnapshot>(INITIAL_SNAPSHOT);
   const [over, setOver] = useState(false);
   const [saved, setSaved] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -33,8 +29,22 @@ export function GamePlayer({ game }: { game: Game }) {
   // Override manual del nombre; si es null se usa el de la sesión o "INVITADO".
   const [typedName, setTypedName] = useState<string | null>(null);
 
+  // Valores de las opciones del juego (skin, nivel inicial…), declaradas en el registro.
+  const [optionValues, setOptionValues] = useState<Record<string, string>>(() =>
+    Object.fromEntries(
+      (definition.options ?? []).map((o) => [o.key, o.defaultValue]),
+    ),
+  );
+
   const name = typedName ?? user?.name ?? "INVITADO";
-  const { score, lives, level } = snap;
+  const { score } = snap;
+  // "live" se ven siempre en la barra; "restart" solo en el overlay de pausa.
+  const liveOptions = (definition.options ?? []).filter(
+    (o) => o.appliesOn === "live",
+  );
+  const restartOptions = (definition.options ?? []).filter(
+    (o) => o.appliesOn === "restart",
+  );
   const paused = snap.status === "paused";
   const fmt = (n: number) => n.toLocaleString("es-ES");
 
@@ -54,13 +64,42 @@ export function GamePlayer({ game }: { game: Game }) {
     setSaveError(false);
   };
 
+  const changeOption = (key: string, value: string) => {
+    setOptionValues((prev) => ({ ...prev, [key]: value }));
+    control.current?.setOption?.(key, value);
+  };
+
+  const renderOption = (opt: GameOption) => (
+    <label key={opt.key} className="player-option">
+      <span className="l">{opt.label}</span>
+      <select
+        value={optionValues[opt.key]}
+        onChange={(e) => {
+          changeOption(opt.key, e.target.value);
+          e.target.blur(); // flechas y Espacio no deben cambiar el selector
+        }}
+      >
+        {opt.choices.map((ch) => (
+          <option key={ch.value} value={ch.value}>
+            {ch.label}
+          </option>
+        ))}
+      </select>
+    </label>
+  );
+
   const save = async () => {
     if (saving) return;
     setSaving(true);
     setSaveError(false);
     // Nombre vacío → "INVITADO" (el CHECK de BD exige 1 a 10 caracteres).
     const finalName = name.trim().toUpperCase().slice(0, 10) || "INVITADO";
-    const ok = await submitScore({ gameId: game.id, name: finalName, score });
+    // La BD admite 0 a 1.000.000 (CHECK).
+    const ok = await submitScore({
+      gameId: game.id,
+      name: finalName,
+      score: Math.min(score, 1_000_000),
+    });
     setSaving(false);
     if (ok) setSaved(true);
     else setSaveError(true);
@@ -80,14 +119,12 @@ export function GamePlayer({ game }: { game: Game }) {
             <div className="l">Puntuación</div>
             <div className="v">{fmt(score)}</div>
           </div>
-          <div className="hud-stat lives">
-            <div className="l">Vidas</div>
-            <div className="v">{"♥ ".repeat(lives).trim()}</div>
-          </div>
-          <div className="hud-stat level">
-            <div className="l">Nivel</div>
-            <div className="v">{String(level).padStart(2, "0")}</div>
-          </div>
+          {snap.hud.map((item) => (
+            <div key={item.key} className={`hud-stat ${item.key}`}>
+              <div className="l">{item.label}</div>
+              <div className="v">{item.value}</div>
+            </div>
+          ))}
         </div>
         <div className="hud-actions">
           <button className="btn yellow" onClick={togglePause}>
@@ -102,11 +139,20 @@ export function GamePlayer({ game }: { game: Game }) {
         </div>
       </div>
 
+      {liveOptions.length > 0 && (
+        <div className="player-options">{liveOptions.map(renderOption)}</div>
+      )}
+
       <div className="keyboard-notice">REQUIERE TECLADO</div>
 
-      <div className="crt">
+      <div
+        className={
+          definition.height > definition.width ? "crt crt-portrait" : "crt"
+        }
+      >
         <div className="crt-screen">
-          <AsteroidsCanvas
+          <GameCanvas
+            definition={definition}
             ref={control}
             onState={setSnap}
             onGameOver={() => setOver(true)}
@@ -131,6 +177,14 @@ export function GamePlayer({ game }: { game: Game }) {
                 >
                   PULSA REANUDAR, P O ESC PARA CONTINUAR
                 </div>
+                {restartOptions.length > 0 && (
+                  <div className="pause-options">
+                    {restartOptions.map(renderOption)}
+                    <button className="btn" onClick={restart}>
+                      REINICIAR
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           )}
@@ -157,11 +211,7 @@ export function GamePlayer({ game }: { game: Game }) {
                   }
                   placeholder="TUS INICIALES"
                 />
-                <button
-                  className="btn yellow"
-                  onClick={save}
-                  disabled={saving}
-                >
+                <button className="btn yellow" onClick={save} disabled={saving}>
                   GUARDAR PUNTUACIÓN
                 </button>
               </div>

@@ -4,6 +4,7 @@ import { DataError } from "@/components/data-error";
 import { GamePlayer } from "@/components/game-player";
 import type { Game } from "@/lib/games";
 import { getGame } from "@/lib/games.server";
+import { getGameDefinition } from "@/lib/game-registry";
 
 async function PlayData({
   params,
@@ -18,7 +19,7 @@ async function PlayData({
     unstable_rethrow(e);
     return <DataError />;
   }
-  if (!game) notFound();
+  if (!game || !getGameDefinition(game.id)) notFound();
 
   return <GamePlayer game={game} />;
 }
