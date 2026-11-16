@@ -1214,6 +1214,7 @@ a {
 .crt-portrait {
   max-width: 580px;
   margin: 0 auto;
+  padding: 14px;
 }
 .crt-portrait .crt-screen {
   aspect-ratio: auto;
@@ -1224,7 +1225,8 @@ a {
 .crt-portrait .game-canvas {
   width: auto;
   max-width: 100%;
-  max-height: max(360px, min(600px, calc(100svh - 300px)));
+  /* 100svh − (nav + HUD + opciones + marco CRT + márgenes) */
+  max-height: max(320px, min(600px, calc(100svh - 350px)));
 }
 
 /* Barra de opciones del juego (declaradas en el registro) */
@@ -1233,15 +1235,25 @@ a {
   flex-wrap: wrap;
   gap: 12px 28px;
   align-items: center;
-  padding: 10px 18px;
-  margin-bottom: 18px;
+  padding: 8px 18px;
+  margin-bottom: 14px;
   border: 1px solid var(--line);
   background: var(--bg-2);
 }
 .player-option {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 10px;
+  gap: 6px 10px;
+  min-width: 0;
+}
+/* Opciones "al reiniciar": dentro del overlay de pausa */
+.pause-options {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 28px; /* el marco decorativo de .btn sobresale unos px: dejar aire */
+  margin-top: 32px;
 }
 .player-option .l {
   font-family: var(--mono);
@@ -1259,13 +1271,21 @@ a {
   font-family: var(--pixel);
   font-size: 11px;
   cursor: pointer;
+  color-scheme: dark;
+}
+.player-option select option {
+  background: #0a0a12;
+  color: var(--ink);
+  font-family: var(--mono);
+  font-size: 13px;
 }
 .player-option select:focus-visible {
   outline: 2px solid var(--cyan);
   outline-offset: 2px;
 }
 .player-option select:disabled {
-  opacity: 0.4;
+  opacity: 0.6;
+  color: var(--ink-dim);
   cursor: not-allowed;
 }
 

@@ -1,6 +1,6 @@
 # SPEC 07 — Tetris: segundo juego real con registro genérico de juegos
 
-> **Estado:** Aprobado
+> **Estado:** Implementado
 > **Depende de:** SPEC 01 (reproductor y modal), SPEC 04 (migraciones de Supabase), SPEC 05 (Asteroids, patrón de motor), SPEC 06 (tablas `games` y `scores`, `submitScore`)
 > **Fecha:** 2026-11-16
 > **Objetivo:** Portar `references/started-games/claude-tetris` a un motor TypeScript sin globales, añadirlo como juego real `tetris` (fila en `games`, leaderboard en `scores`) y extraer un registro genérico de juegos para que `GamePlayer` deje de ramificarse por id.
@@ -39,7 +39,7 @@ Además, `components/game-player.tsx` y `components/asteroids-canvas.tsx` están
   - Rotación con wall kicks `[0,-1,1,-2,2]` (`game.js:276-286`), ghost piece (`game.js:318-322`, `406-411`), soft drop y hard drop, puntuación `LINE_SCORES × nivel`, niveles y gravedad.
   - **Canvas lógico 460×600:** tablero 300×600 a la izquierda y panel lateral dibujado en el mismo canvas con SCORE, LINES, LEVEL y NEXT (sustituye al `next-canvas` y al `aside.panel` DOM).
   - **4 skins** (Retro, Neon, Pastel, Pixel art; `game.js:7-91`) con cambio inmediato, y **nivel inicial 1..15** (`game.js:131-132`, `611-619`).
-- **Opciones del juego en el reproductor:** selector de skin y selector de nivel inicial, declarados en el registro y renderizados por `GamePlayer`. El nivel inicial se aplica en el siguiente reinicio, como en el original (`game.js:617-619`).
+- **Opciones del juego en el reproductor:** selector de skin y selector de nivel inicial, declarados en el registro y renderizados por `GamePlayer` según `appliesOn`: la skin (`live`) en una barra de opciones siempre visible; el nivel inicial (`restart`) solo dentro del overlay "EN PAUSA", en columna sobre el botón REINICIAR y con espacio entre ambos (el marco decorativo de `.btn` sobresale). El nivel inicial se aplica en el siguiente reinicio, como en el original (`game.js:617-619`).
 - Fila `tetris` en `games` por migración `0005_seed_tetris.sql`; portada `.cover-tetris`.
 - HUD de plataforma generalizado (pares etiqueta/valor): Jugador, Puntuación, Líneas, Nivel.
 - Pausa por botón y por `Esc`/`P`, FIN, game over con modal, "JUGAR DE NUEVO", guardado con `submitScore` (puntuaciones en Supabase).
@@ -198,7 +198,7 @@ Convenciones del juego (valores idénticos al original):
 3. Crear `lib/tetris/constants.ts`, `utils.ts` y `types.ts` con los valores del original. Verificación: `npx tsc --noEmit`.
 4. Crear `lib/tetris/skins.ts` con las 4 skins (`colors`, `bg`, `grid`, `draw`). Verificación: `npx tsc --noEmit` y `npm run lint`.
 5. Crear `lib/tetris/engine.ts`: estado, `spawn`/`lockPiece`/`clearLines`, `update`/`draw` (tablero, ghost, panel lateral con SCORE, LINES, LEVEL y NEXT), bucle rAF, input con cleanup (`Esc`/`P`), `pause/resume/restart/end/destroy/setSkin/setStartLevel`, snapshot solo ante cambios. Verificación: `npx tsc --noEmit` y `npm run lint`.
-6. Registrar `tetris` en `lib/game-registry.ts` (460×600, opciones `skin` en vivo y `startLevel` al reiniciar, adaptador con `hud` Líneas y Nivel). En `GamePlayer`: barra de opciones declarativa (selects que hacen `blur()` tras cambiar; `startLevel` deshabilitado mientras `status` sea `playing`), botón REINICIAR en el overlay "EN PAUSA" solo si el juego declara opciones `restart`, y puntuación acotada a 1.000.000. Verificación: `npx tsc --noEmit` y `npm run lint` pasan, y `/juegos/asteroids/jugar` no cambia (`/juegos/tetris/jugar` devuelve 404 hasta que el paso 7 inserte la fila en `games`).
+6. Registrar `tetris` en `lib/game-registry.ts` (460×600, opciones `skin` en vivo y `startLevel` al reiniciar, adaptador con `hud` Líneas y Nivel). En `GamePlayer`: opciones declarativas (selects que hacen `blur()` tras cambiar): las `live` (skin) en una barra siempre visible y las `restart` (`startLevel`) solo en el overlay "EN PAUSA", junto al botón REINICIAR (solo si el juego declara opciones `restart`), y puntuación acotada a 1.000.000. Verificación: `npx tsc --noEmit` y `npm run lint` pasan, y `/juegos/asteroids/jugar` no cambia (`/juegos/tetris/jugar` devuelve 404 hasta que el paso 7 inserte la fila en `games`).
 7. Crear `supabase/migrations/0005_seed_tetris.sql` y aplicarla con `apply_migration`; regenerar `lib/supabase/database.types.ts` si hace falta. Verificación: `list_migrations`, `select id from games` devuelve `asteroids` y `tetris`, `get_advisors` (security) sin avisos críticos, y `/juegos/tetris/jugar` monta el canvas con tablero, panel y opciones.
 8. Portada `.cover-tetris` y CSS del canvas/escalado en `app/globals.css` (aplicar `/frontend-design`; piezas en cyan, distinguible de `.cover-asteroids`). Comprobar la altura del reproductor con un canvas vertical. Verificación: tarjeta en `/juegos`, `/juegos/tetris` con portada, 375 px sin desbordar.
 9. Verificar en el navegador con Playwright (jugar, guardar "TEST", ver leaderboard), borrar las filas de prueba de `scores` con `execute_sql`, y añadir la spec 07 a `CLAUDE.md` y `README.md` en el mismo commit. Verificación: ambos mencionan `07-tetris.md`; `npm run lint` y `npm run build` pasan.
@@ -211,40 +211,40 @@ Cada paso = un commit `07-tetris: Paso N`. Antes del paso 1, leer la guía relev
 
 **Genéricos:**
 
-- [ ] `npm run build` y `npm run lint` terminan sin errores.
-- [ ] `supabase/migrations/0005_seed_tetris.sql` existe y figura en `list_migrations`; `games` contiene `tetris` (PUZZLE, `cover-tetris`, cyan, `sort_order` 2) y `get_advisors` (security) no reporta avisos críticos.
-- [ ] `/juegos` muestra la tarjeta TETRIS con su portada; `/juegos/tetris` carga y "JUGAR AHORA" lleva a `/juegos/tetris/jugar`.
-- [ ] El canvas arranca sin errores en la consola ni hydration warnings.
-- [ ] `PAUSA`/`REANUDAR` congela y continúa; `Esc` y `P` hacen lo mismo; mantener pulsada la tecla no alterna; en game over no tienen efecto; el canvas no dibuja texto de pausa; el overlay "EN PAUSA" muestra la pista de teclas.
-- [ ] Durante la pausa, las teclas de juego no mueven, rotan ni sueltan la pieza, y al reanudar no cae de golpe.
-- [ ] `Espacio` con el foco en PAUSA/FIN no activa el botón; con el foco en un selector de opciones, flechas y `Espacio` no lo cambian (se hace `blur` tras elegir).
-- [ ] Las flechas y `Espacio` no hacen scroll en la página mientras Tetris está montado.
-- [ ] Perder (la pieza nueva no cabe) y FIN abren el modal "FIN DEL JUEGO" con la puntuación real; el canvas no dibuja "GAME OVER".
-- [ ] "JUGAR DE NUEVO" reinicia tablero, puntuación 0, líneas 0 y nivel inicial elegido.
-- [ ] Guardar con nombre "TEST" inserta una fila con `game_id = 'tetris'`; nombre vacío guarda `INVITADO`; se muestra "PUNTUACIÓN GUARDADA_".
-- [ ] La puntuación aparece en la ficha, en el Salón (tab TETRIS) y en la actividad de la home; la tarjeta muestra `best` y `plays` actualizados.
-- [ ] "SALIR" y "VOLVER AL VAULT" no dejan listeners ni bucle activos (las flechas vuelven a hacer scroll).
-- [ ] En desarrollo (StrictMode) hay una sola instancia y la caída va a velocidad normal.
-- [ ] A 375 px de ancho el canvas se escala sin desbordar; en escritorio la altura del reproductor cabe sin recortar el tablero.
-- [ ] `/juegos/asteroids/jugar` funciona como antes (criterios de SPEC 05) y `GamePlayer` no contiene ramas por `game.id`.
-- [ ] Un id presente en `games` pero ausente del registro devuelve 404 en `/juegos/<id>/jugar`.
-- [ ] `references/started-games/` y `lib/asteroids/` no han cambiado; no se escribe `localStorage` (`tetris-records`, `theme`, `skin`).
-- [ ] Tras verificar, las filas de prueba de `scores` están borradas.
+- [x] `npm run build` y `npm run lint` terminan sin errores.
+- [x] `supabase/migrations/0005_seed_tetris.sql` existe y figura en `list_migrations`; `games` contiene `tetris` (PUZZLE, `cover-tetris`, cyan, `sort_order` 2) y `get_advisors` (security) no reporta avisos críticos.
+- [x] `/juegos` muestra la tarjeta TETRIS con su portada; `/juegos/tetris` carga y "JUGAR AHORA" lleva a `/juegos/tetris/jugar`.
+- [x] El canvas arranca sin errores en la consola ni hydration warnings.
+- [x] `PAUSA`/`REANUDAR` congela y continúa; `Esc` y `P` hacen lo mismo; mantener pulsada la tecla no alterna; en game over no tienen efecto; el canvas no dibuja texto de pausa; el overlay "EN PAUSA" muestra la pista de teclas.
+- [x] Durante la pausa, las teclas de juego no mueven, rotan ni sueltan la pieza, y al reanudar no cae de golpe.
+- [x] `Espacio` con el foco en PAUSA/FIN no activa el botón; con el foco en un selector de opciones, flechas y `Espacio` no lo cambian (se hace `blur` tras elegir).
+- [x] Las flechas y `Espacio` no hacen scroll en la página mientras Tetris está montado.
+- [x] Perder (la pieza nueva no cabe) y FIN abren el modal "FIN DEL JUEGO" con la puntuación real; el canvas no dibuja "GAME OVER".
+- [x] "JUGAR DE NUEVO" reinicia tablero, puntuación 0, líneas 0 y nivel inicial elegido.
+- [x] Guardar con nombre "TEST" inserta una fila con `game_id = 'tetris'`; nombre vacío guarda `INVITADO`; se muestra "PUNTUACIÓN GUARDADA_".
+- [x] La puntuación aparece en la ficha, en el Salón (tab TETRIS) y en la actividad de la home; la tarjeta muestra `best` y `plays` actualizados.
+- [x] "SALIR" y "VOLVER AL VAULT" no dejan listeners ni bucle activos (las flechas vuelven a hacer scroll).
+- [x] En desarrollo (StrictMode) hay una sola instancia y la caída va a velocidad normal.
+- [x] A 375 px de ancho el canvas se escala sin desbordar; en escritorio la altura del reproductor cabe sin recortar el tablero.
+- [x] `/juegos/asteroids/jugar` funciona como antes (criterios de SPEC 05) y `GamePlayer` no contiene ramas por `game.id`.
+- [x] Un id presente en `games` pero ausente del registro devuelve 404 en `/juegos/<id>/jugar`.
+- [x] `references/started-games/` y `lib/asteroids/` no han cambiado; no se escribe `localStorage` (`tetris-records`, `theme`, `skin`).
+- [x] Tras verificar, las filas de prueba de `scores` están borradas.
 
 **Específicos de Tetris:**
 
-- [ ] Al iniciar, el canvas muestra el tablero 10×20 vacío, una pieza en la fila 0 y el panel con SCORE 0, LINES 0, LEVEL 1 y NEXT con la pieza siguiente; el HUD de plataforma muestra Jugador, Puntuación, Líneas y Nivel.
-- [ ] Existen 8 tipos de pieza; la tuerca ocupa 3×3 con la celda central vacía.
-- [ ] `←` y `→` mueven una columna sin salir del tablero; `↑` y `X` rotan en sentido horario; una rotación que choca prueba los desplazamientos `0, −1, +1, −2, +2` y se descarta si ninguno cabe.
-- [ ] `↓` baja una fila y suma 1 punto; si no puede bajar, fija la pieza.
-- [ ] `Espacio` suelta la pieza hasta el ghost y suma 2 puntos por celda recorrida.
-- [ ] El ghost se dibuja con transparencia 0,2 donde aterrizará la pieza, y no se dibuja la pieza actual en game over.
-- [ ] Borrar 1, 2, 3 y 4 líneas suma 100, 300, 500 y 800 multiplicado por el nivel previo al recálculo.
-- [ ] El nivel es `nivel inicial + floor(líneas / 10)` y sube al llegar a 10 líneas desde el nivel inicial.
-- [ ] El intervalo de caída es `max(100, 1000 − (nivel − 1) × 90)` ms (nivel 1 → 1000 ms; nivel 11 → 100 ms).
-- [ ] El selector de nivel inicial ofrece 1 a 15, está deshabilitado mientras se juega, y tras REINICIAR (pausa) o "JUGAR DE NUEVO" la partida empieza en ese nivel con su gravedad.
-- [ ] El selector de skin ofrece Retro, Neon, Pastel y Pixel art; el cambio se ve al instante, sin reiniciar, en tablero, NEXT y ghost.
-- [ ] Una puntuación mayor que 1.000.000 se envía como 1.000.000.
+- [x] Al iniciar, el canvas muestra el tablero 10×20 vacío, una pieza en la fila 0 y el panel con SCORE 0, LINES 0, LEVEL 1 y NEXT con la pieza siguiente; el HUD de plataforma muestra Jugador, Puntuación, Líneas y Nivel.
+- [x] Existen 8 tipos de pieza; la tuerca ocupa 3×3 con la celda central vacía.
+- [x] `←` y `→` mueven una columna sin salir del tablero; `↑` y `X` rotan en sentido horario; una rotación que choca prueba los desplazamientos `0, −1, +1, −2, +2` y se descarta si ninguno cabe.
+- [x] `↓` baja una fila y suma 1 punto; si no puede bajar, fija la pieza.
+- [x] `Espacio` suelta la pieza hasta el ghost y suma 2 puntos por celda recorrida.
+- [x] El ghost se dibuja con transparencia 0,2 donde aterrizará la pieza, y no se dibuja la pieza actual en game over.
+- [x] Borrar 1, 2, 3 y 4 líneas suma 100, 300, 500 y 800 multiplicado por el nivel previo al recálculo.
+- [x] El nivel es `nivel inicial + floor(líneas / 10)` y sube al llegar a 10 líneas desde el nivel inicial.
+- [x] El intervalo de caída es `max(100, 1000 − (nivel − 1) × 90)` ms (nivel 1 → 1000 ms; nivel 11 → 100 ms).
+- [x] El selector de nivel inicial ofrece 1 a 15, solo aparece en el overlay "EN PAUSA" (no en la barra de opciones), y tras REINICIAR (pausa) o "JUGAR DE NUEVO" la partida empieza en ese nivel con su gravedad.
+- [x] El selector de skin ofrece Retro, Neon, Pastel y Pixel art; el cambio se ve al instante, sin reiniciar, en tablero, NEXT y ghost.
+- [x] Una puntuación mayor que 1.000.000 se envía como 1.000.000.
 
 ---
 
@@ -262,6 +262,7 @@ Cada paso = un commit `07-tetris: Paso N`. Antes del paso 1, leer la guía relev
 - **Sí:** puntuaciones en Supabase con `submitScore` (decisión del usuario); récords locales, combo y líneas máximas quedan fuera.
 - **No:** tema claro/oscuro ni tecla `T`, ni `localStorage` para skin y nivel. El tema es de la plataforma; persistir opciones merece su propia spec.
 - **Sí:** nivel inicial aplicado en el siguiente reinicio, como el original (`game.js:617-619`), con REINICIAR en el overlay de pausa solo para juegos con opciones de reinicio. Sin pantalla de inicio, es la única forma de cambiarlo.
+- **Sí:** el selector de nivel inicial vive solo en el overlay de pausa y no en la barra de opciones (decisión del usuario tras probarlo). Un selector deshabilitado durante la partida con un aviso resultaba confuso; en la pausa el flujo es claro: elegir nivel y pulsar REINICIAR. Consecuencia aceptada: tras un game over el modal no permite cambiar el nivel; se usa el último elegido en pausa.
 - **Sí:** limitar `dt` a 0,05 s en la gravedad (checklist). Efecto práctico mínimo: el original ya cae como máximo una fila por frame.
 - **Sí:** `preventDefault` en flechas y `Espacio` (el original solo en `Espacio`), imprescindible para no hacer scroll en la plataforma.
 - **No:** ignorar `event.repeat` en movimientos, soft drop o hard drop. Es comportamiento del original; cambiarlo sería rebalancear.

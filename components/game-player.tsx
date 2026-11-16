@@ -5,7 +5,7 @@ import Link from "next/link";
 import type { Game } from "@/lib/games";
 import { submitScore } from "@/lib/scores";
 import { useAuth } from "@/lib/auth";
-import type { GameSnapshot } from "@/lib/game-engine";
+import type { GameOption, GameSnapshot } from "@/lib/game-engine";
 import { getGameDefinition } from "@/lib/game-registry";
 import { GameCanvas, type GameControl } from "@/components/game-canvas";
 
@@ -38,7 +38,11 @@ export function GamePlayer({ game }: { game: Game }) {
 
   const name = typedName ?? user?.name ?? "INVITADO";
   const { score } = snap;
-  const hasRestartOptions = (definition.options ?? []).some(
+  // "live" se ven siempre en la barra; "restart" solo en el overlay de pausa.
+  const liveOptions = (definition.options ?? []).filter(
+    (o) => o.appliesOn === "live",
+  );
+  const restartOptions = (definition.options ?? []).filter(
     (o) => o.appliesOn === "restart",
   );
   const paused = snap.status === "paused";
@@ -64,6 +68,25 @@ export function GamePlayer({ game }: { game: Game }) {
     setOptionValues((prev) => ({ ...prev, [key]: value }));
     control.current?.setOption?.(key, value);
   };
+
+  const renderOption = (opt: GameOption) => (
+    <label key={opt.key} className="player-option">
+      <span className="l">{opt.label}</span>
+      <select
+        value={optionValues[opt.key]}
+        onChange={(e) => {
+          changeOption(opt.key, e.target.value);
+          e.target.blur(); // flechas y Espacio no deben cambiar el selector
+        }}
+      >
+        {opt.choices.map((ch) => (
+          <option key={ch.value} value={ch.value}>
+            {ch.label}
+          </option>
+        ))}
+      </select>
+    </label>
+  );
 
   const save = async () => {
     if (saving) return;
@@ -116,30 +139,8 @@ export function GamePlayer({ game }: { game: Game }) {
         </div>
       </div>
 
-      {definition.options && (
-        <div className="player-options">
-          {definition.options.map((opt) => (
-            <label key={opt.key} className="player-option">
-              <span className="l">{opt.label}</span>
-              <select
-                value={optionValues[opt.key]}
-                disabled={
-                  opt.appliesOn === "restart" && snap.status === "playing"
-                }
-                onChange={(e) => {
-                  changeOption(opt.key, e.target.value);
-                  e.target.blur(); // flechas y Espacio no deben cambiar el selector
-                }}
-              >
-                {opt.choices.map((ch) => (
-                  <option key={ch.value} value={ch.value}>
-                    {ch.label}
-                  </option>
-                ))}
-              </select>
-            </label>
-          ))}
-        </div>
+      {liveOptions.length > 0 && (
+        <div className="player-options">{liveOptions.map(renderOption)}</div>
       )}
 
       <div className="keyboard-notice">REQUIERE TECLADO</div>
@@ -176,14 +177,13 @@ export function GamePlayer({ game }: { game: Game }) {
                 >
                   PULSA REANUDAR, P O ESC PARA CONTINUAR
                 </div>
-                {hasRestartOptions && (
-                  <button
-                    className="btn"
-                    style={{ marginTop: 16 }}
-                    onClick={restart}
-                  >
-                    REINICIAR
-                  </button>
+                {restartOptions.length > 0 && (
+                  <div className="pause-options">
+                    {restartOptions.map(renderOption)}
+                    <button className="btn" onClick={restart}>
+                      REINICIAR
+                    </button>
+                  </div>
                 )}
               </div>
             </div>
