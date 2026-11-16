@@ -29,8 +29,18 @@ export function GamePlayer({ game }: { game: Game }) {
   // Override manual del nombre; si es null se usa el de la sesión o "INVITADO".
   const [typedName, setTypedName] = useState<string | null>(null);
 
+  // Valores de las opciones del juego (skin, nivel inicial…), declaradas en el registro.
+  const [optionValues, setOptionValues] = useState<Record<string, string>>(() =>
+    Object.fromEntries(
+      (definition.options ?? []).map((o) => [o.key, o.defaultValue]),
+    ),
+  );
+
   const name = typedName ?? user?.name ?? "INVITADO";
   const { score } = snap;
+  const hasRestartOptions = (definition.options ?? []).some(
+    (o) => o.appliesOn === "restart",
+  );
   const paused = snap.status === "paused";
   const fmt = (n: number) => n.toLocaleString("es-ES");
 
@@ -50,13 +60,23 @@ export function GamePlayer({ game }: { game: Game }) {
     setSaveError(false);
   };
 
+  const changeOption = (key: string, value: string) => {
+    setOptionValues((prev) => ({ ...prev, [key]: value }));
+    control.current?.setOption?.(key, value);
+  };
+
   const save = async () => {
     if (saving) return;
     setSaving(true);
     setSaveError(false);
     // Nombre vacío → "INVITADO" (el CHECK de BD exige 1 a 10 caracteres).
     const finalName = name.trim().toUpperCase().slice(0, 10) || "INVITADO";
-    const ok = await submitScore({ gameId: game.id, name: finalName, score });
+    // La BD admite 0 a 1.000.000 (CHECK).
+    const ok = await submitScore({
+      gameId: game.id,
+      name: finalName,
+      score: Math.min(score, 1_000_000),
+    });
     setSaving(false);
     if (ok) setSaved(true);
     else setSaveError(true);
@@ -96,6 +116,32 @@ export function GamePlayer({ game }: { game: Game }) {
         </div>
       </div>
 
+      {definition.options && (
+        <div className="player-options">
+          {definition.options.map((opt) => (
+            <label key={opt.key} className="player-option">
+              <span className="l">{opt.label}</span>
+              <select
+                value={optionValues[opt.key]}
+                disabled={
+                  opt.appliesOn === "restart" && snap.status === "playing"
+                }
+                onChange={(e) => {
+                  changeOption(opt.key, e.target.value);
+                  e.target.blur(); // flechas y Espacio no deben cambiar el selector
+                }}
+              >
+                {opt.choices.map((ch) => (
+                  <option key={ch.value} value={ch.value}>
+                    {ch.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+          ))}
+        </div>
+      )}
+
       <div className="keyboard-notice">REQUIERE TECLADO</div>
 
       <div className="crt">
@@ -126,6 +172,15 @@ export function GamePlayer({ game }: { game: Game }) {
                 >
                   PULSA REANUDAR, P O ESC PARA CONTINUAR
                 </div>
+                {hasRestartOptions && (
+                  <button
+                    className="btn"
+                    style={{ marginTop: 16 }}
+                    onClick={restart}
+                  >
+                    REINICIAR
+                  </button>
+                )}
               </div>
             </div>
           )}
