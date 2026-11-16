@@ -149,6 +149,11 @@ export function GamePlayer({ game }: { game: Game }) {
         className={
           definition.height > definition.width ? "crt crt-portrait" : "crt"
         }
+        style={
+          {
+            "--ar": definition.width / definition.height,
+          } as React.CSSProperties
+        }
       >
         <div className="crt-screen">
           <GameCanvas
