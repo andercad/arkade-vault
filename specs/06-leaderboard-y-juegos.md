@@ -1,6 +1,6 @@
 # SPEC 06 — Tabla `games` y leaderboard real en Supabase (solo Asteroids)
 
-> **Estado:** Aprobado
+> **Estado:** Implementado
 > **Depende de:** SPEC 01 (pantallas, reproductor, modal de fin de juego), SPEC 02 (home), SPEC 04 (clientes y migraciones de Supabase), SPEC 05 (Asteroids, único juego real)
 > **Fecha:** 2026-11-13
 > **Objetivo:** Mover el catálogo a una tabla `games` de Supabase que contiene solo Asteroids (el único juego real) y guardar y leer sus puntuaciones en una tabla `scores`, mostrando el leaderboard real en el Salón de la Fama, la ficha del juego y la actividad de la home.
@@ -186,31 +186,31 @@ Antes del paso 1, leer la guía relevante de `node_modules/next/dist/docs/` seg�
 
 ## Criterios de aceptación
 
-- [ ] `npm run build` y `npm run lint` terminan sin errores.
-- [ ] `supabase/migrations/` contiene `0003_games_scores.sql` y `0004_seed_asteroids.sql`, y ambas figuran en `list_migrations`.
-- [ ] `games` tiene exactamente 1 fila (`asteroids`) con el mismo título, `cat`, `cover` y `color` que tenía en `lib/games.ts`.
-- [ ] `games` y `scores` tienen RLS activo y `get_advisors` (security) no reporta tablas sin RLS ni otros avisos críticos.
-- [ ] Con la clave publishable, un insert en `scores` con `game_id` inexistente, `score` negativo, `score` > 1000000, `player_name` vacío o de más de 10 caracteres falla.
-- [ ] Con la clave publishable, `update` y `delete` sobre `scores` y cualquier `insert`/`update`/`delete` sobre `games` no afectan filas.
-- [ ] `lib/supabase/database.types.ts` incluye `games`, `scores` y `game_stats`.
-- [ ] No existen `GAMES`, `getGame` síncrono, `saveScore`, `seededScores`, `RECENT_SCORES` ni `TOP_PLAYERS`: `grep -r` sin resultados en `app`, `components` y `lib`.
-- [ ] `/juegos` y la home muestran solo ASTEROIDS, leído de la BD, con `best` y `plays` en 0 al inicio.
-- [ ] `/juegos/asteroids` carga y "JUGAR AHORA" lleva a `/juegos/asteroids/jugar`.
-- [ ] `/juegos/bloque-buster`, `/juegos/rocas` y cualquier id inexistente (ficha y `/jugar`) devuelven 404.
-- [ ] El tab del Salón y la ficha solo muestran Asteroids.
-- [ ] Guardar una puntuación con nombre "TEST" añade una fila en `scores` con `game_id = 'asteroids'` y muestra "PUNTUACIÓN GUARDADA_".
-- [ ] Guardar con el nombre vacío inserta `player_name = 'INVITADO'`.
-- [ ] Si el insert falla, el modal sigue abierto y muestra "NO SE PUDO GUARDAR · REINTENTA".
-- [ ] Tras guardar, la ficha y el Salón muestran la puntuación en el top y la tarjeta muestra `best` y `plays` actualizados.
-- [ ] Dos puntuaciones iguales se ordenan por antigüedad y reciben posiciones consecutivas distintas.
-- [ ] Con `scores` vacía, ficha, Salón y actividad de la home muestran el mensaje vacío.
-- [ ] "ÚLTIMAS PUNTUACIONES" muestra hasta 8 filas de más reciente a más antigua; "TOP JUGADORES · HOY" muestra hasta 5 de las últimas 24 h por puntuación.
-- [ ] `localStorage["av_scores"]` ya no se escribe.
-- [ ] Asteroids se juega igual que en SPEC 05 (pausa, FIN, modal, guardado) tras eliminar la simulación del reproductor.
-- [ ] Si Supabase no responde (clave inválida), biblioteca, ficha, Salón y home muestran un error genérico sin texto del error de Supabase.
-- [ ] No hay hydration warnings ni errores en la consola en `/`, `/juegos`, `/juegos/asteroids`, `/juegos/asteroids/jugar` y `/salon-de-la-fama`.
-- [ ] Ninguna service role key ni secreto de Supabase aparece en el repo ni en `.next/static`.
-- [ ] Tras la verificación, `scores` queda vacía y `lib/auth.tsx`, `lib/asteroids/` y `references/started-games/` no han cambiado.
+- [x] `npm run build` y `npm run lint` terminan sin errores.
+- [x] `supabase/migrations/` contiene `0003_games_scores.sql` y `0004_seed_asteroids.sql`, y ambas figuran en `list_migrations`.
+- [x] `games` tiene exactamente 1 fila (`asteroids`) con el mismo título, `cat`, `cover` y `color` que tenía en `lib/games.ts`.
+- [x] `games` y `scores` tienen RLS activo y `get_advisors` (security) no reporta tablas sin RLS ni otros avisos críticos.
+- [x] Con la clave publishable, un insert en `scores` con `game_id` inexistente, `score` negativo, `score` > 1000000, `player_name` vacío o de más de 10 caracteres falla.
+- [x] Con la clave publishable, `update` y `delete` sobre `scores` y cualquier `insert`/`update`/`delete` sobre `games` no afectan filas.
+- [x] `lib/supabase/database.types.ts` incluye `games`, `scores` y `game_stats`.
+- [x] No existen `GAMES`, `getGame` síncrono, `saveScore`, `seededScores`, `RECENT_SCORES` ni `TOP_PLAYERS`: `grep -r` sin resultados en `app`, `components` y `lib`.
+- [x] `/juegos` y la home muestran solo ASTEROIDS, leído de la BD, con `best` y `plays` en 0 al inicio.
+- [x] `/juegos/asteroids` carga y "JUGAR AHORA" lleva a `/juegos/asteroids/jugar`.
+- [x] `/juegos/bloque-buster`, `/juegos/rocas` y cualquier id inexistente (ficha y `/jugar`) devuelven 404.
+- [x] El tab del Salón y la ficha solo muestran Asteroids.
+- [x] Guardar una puntuación con nombre "TEST" añade una fila en `scores` con `game_id = 'asteroids'` y muestra "PUNTUACIÓN GUARDADA_".
+- [x] Guardar con el nombre vacío inserta `player_name = 'INVITADO'`.
+- [x] Si el insert falla, el modal sigue abierto y muestra "NO SE PUDO GUARDAR · REINTENTA".
+- [x] Tras guardar, la ficha y el Salón muestran la puntuación en el top y la tarjeta muestra `best` y `plays` actualizados.
+- [x] Dos puntuaciones iguales se ordenan por antigüedad y reciben posiciones consecutivas distintas.
+- [x] Con `scores` vacía, ficha, Salón y actividad de la home muestran el mensaje vacío.
+- [x] "ÚLTIMAS PUNTUACIONES" muestra hasta 8 filas de más reciente a más antigua; "TOP JUGADORES · HOY" muestra hasta 5 de las últimas 24 h por puntuación.
+- [x] `localStorage["av_scores"]` ya no se escribe.
+- [x] Asteroids se juega igual que en SPEC 05 (pausa, FIN, modal, guardado) tras eliminar la simulación del reproductor.
+- [x] Si Supabase no responde (clave inválida), biblioteca, ficha, Salón y home muestran un error genérico sin texto del error de Supabase.
+- [x] No hay hydration warnings ni errores en la consola en `/`, `/juegos`, `/juegos/asteroids`, `/juegos/asteroids/jugar` y `/salon-de-la-fama`.
+- [x] Ninguna service role key ni secreto de Supabase aparece en el repo ni en `.next/static`.
+- [x] Tras la verificación, `scores` queda vacía y `lib/auth.tsx`, `lib/asteroids/` y `references/started-games/` no han cambiado.
 
 ---
 
