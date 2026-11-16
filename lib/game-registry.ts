@@ -19,6 +19,9 @@ import {
   MAX_START_LEVEL,
   W as TETRIS_W,
 } from "@/lib/tetris/constants";
+import { createSnakeGame } from "@/lib/snake/engine";
+import { H as SNAKE_H, W as SNAKE_W } from "@/lib/snake/constants";
+import type { SnakeSnapshot } from "@/lib/snake/types";
 import { DEFAULT_SKIN, SKINS } from "@/lib/tetris/skins";
 import type { SkinName, TetrisSnapshot } from "@/lib/tetris/types";
 
@@ -135,10 +138,34 @@ const arkanoid: GameDefinition = {
     }),
 };
 
+function snakeSnapshot(s: SnakeSnapshot): GameSnapshot {
+  return {
+    score: s.score,
+    status: s.status,
+    hud: [
+      { key: "length", label: "Longitud", value: String(s.length) },
+      { key: "level", label: "Nivel", value: String(s.level).padStart(2, "0") },
+    ],
+  };
+}
+
+const snake: GameDefinition = {
+  id: "snake",
+  width: SNAKE_W,
+  height: SNAKE_H,
+  aria: "Snake",
+  create: (canvas, cb) =>
+    createSnakeGame(canvas, {
+      onState: (s) => cb.onState(snakeSnapshot(s)),
+      onGameOver: cb.onGameOver,
+    }),
+};
+
 export const GAME_REGISTRY: Record<string, GameDefinition> = {
   asteroids,
   tetris,
   arkanoid,
+  snake,
 };
 
 export function getGameDefinition(id: string): GameDefinition | null {
