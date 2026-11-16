@@ -1169,6 +1169,13 @@ a {
 
 .crt {
   position: relative;
+  /* Alto máximo del canvas: 100svh − (nav + HUD + opciones + marco CRT + márgenes) */
+  --game-h: max(320px, min(600px, calc(100svh - 350px)));
+  --pad: 24px;
+  /* El marco se ajusta al canvas: ancho = alto × proporción (--ar inline) + padding */
+  width: min(100%, calc(var(--game-h) * var(--ar, 1.3333) + var(--pad) * 2));
+  max-width: 100%;
+  margin: 0 auto;
   border-radius: 28px;
   background: #050507;
   padding: 24px;
@@ -1191,7 +1198,9 @@ a {
 }
 .crt-screen {
   position: relative;
-  aspect-ratio: 4 / 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background: #000;
   border-radius: 12px / 28px;
   overflow: hidden;
@@ -1225,28 +1234,18 @@ a {
 /* Canvas lógico escalado por CSS; aspect-ratio y max-width por inline style */
 .game-canvas {
   display: block;
-  width: 100%;
+  width: auto;
   height: auto;
   margin: 0 auto;
-}
-/* Juegos verticales (alto > ancho): sin 4:3 fijo, altura acotada al viewport */
-.crt-portrait {
-  max-width: 580px;
-  margin: 0 auto;
-  padding: 14px;
-}
-.crt-portrait .crt-screen {
-  aspect-ratio: auto;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.crt-portrait .game-canvas {
-  width: auto;
   /* !important: el max-width inline del canvas (ancho lógico) ganaría y lo recortaría en móvil */
   max-width: 100% !important;
-  /* 100svh − (nav + HUD + opciones + marco CRT + márgenes) */
-  max-height: max(320px, min(600px, calc(100svh - 350px)));
+  /* Altura acotada al viewport para jugar sin scroll */
+  max-height: var(--game-h);
+}
+/* Juegos verticales (alto > ancho): marco con menos padding */
+.crt-portrait {
+  --pad: 14px;
+  padding: 14px;
 }
 
 /* Barra de opciones del juego (declaradas en el registro) */
