@@ -144,7 +144,11 @@ export function GamePlayer({ game }: { game: Game }) {
 
       <div className="keyboard-notice">REQUIERE TECLADO</div>
 
-      <div className="crt">
+      <div
+        className={
+          definition.height > definition.width ? "crt crt-portrait" : "crt"
+        }
+      >
         <div className="crt-screen">
           <GameCanvas
             definition={definition}
