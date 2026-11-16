@@ -710,22 +710,23 @@ a {
   image-rendering: pixelated;
 }
 
+/* Snake: tablero de celdas; la serpiente zigzaguea (cola tenue → cabeza viva) hacia una fruta */
 .cover-snake {
-  background: linear-gradient(135deg, #003a2a, #0a0a18);
+  background:
+    radial-gradient(
+      ellipse at 50% 120%,
+      rgba(57, 255, 20, 0.2),
+      transparent 60%
+    ),
+    #010a02;
 }
 .cover-snake::after {
   content: "";
   position: absolute;
   inset: 0;
-  background-image:
-    radial-gradient(circle at 70% 50%, var(--magenta) 0 6px, transparent 7px),
-    linear-gradient(90deg, var(--green) 0 40px, transparent 40px) 20% 50% /
-      200px 12px no-repeat,
-    linear-gradient(90deg, var(--green) 0 12px, transparent 12px)
-      calc(20% + 40px) calc(50% - 12px) / 12px 12px no-repeat,
-    linear-gradient(90deg, var(--green) 0 12px, transparent 12px)
-      calc(20% + 28px) calc(50% - 12px) / 12px 12px no-repeat;
-  filter: drop-shadow(0 0 6px rgba(0, 255, 136, 0.6));
+  background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 300'><defs><pattern id='g' width='25' height='25' patternUnits='userSpaceOnUse'><path d='M25 0V25M0 25H25' fill='none' stroke='white' stroke-opacity='0.06'/></pattern></defs><rect width='400' height='300' fill='url(%23g)'/><g fill='%2339ff14'><rect x='27' y='227' width='21' height='21' rx='5' fill-opacity='0.18'/><rect x='52' y='227' width='21' height='21' rx='5' fill-opacity='0.23'/><rect x='77' y='227' width='21' height='21' rx='5' fill-opacity='0.28'/><rect x='102' y='227' width='21' height='21' rx='5' fill-opacity='0.33'/><rect x='127' y='227' width='21' height='21' rx='5' fill-opacity='0.39'/><rect x='127' y='202' width='21' height='21' rx='5' fill-opacity='0.44'/><rect x='127' y='177' width='21' height='21' rx='5' fill-opacity='0.49'/><rect x='127' y='152' width='21' height='21' rx='5' fill-opacity='0.54'/><rect x='152' y='152' width='21' height='21' rx='5' fill-opacity='0.59'/><rect x='177' y='152' width='21' height='21' rx='5' fill-opacity='0.64'/><rect x='202' y='152' width='21' height='21' rx='5' fill-opacity='0.69'/><rect x='227' y='152' width='21' height='21' rx='5' fill-opacity='0.74'/><rect x='227' y='177' width='21' height='21' rx='5' fill-opacity='0.8'/><rect x='227' y='202' width='21' height='21' rx='5' fill-opacity='0.85'/><rect x='227' y='227' width='21' height='21' rx='5' fill-opacity='0.9'/><rect x='252' y='227' width='21' height='21' rx='5' fill-opacity='0.95'/><rect x='277' y='227' width='21' height='21' rx='5'/></g><g fill='%23010a02'><circle cx='292' cy='233' r='2.2'/><circle cx='292' cy='243' r='2.2'/></g><circle cx='337' cy='238' r='11' fill='%23ff2d6f'/><rect x='336' y='221' width='3' height='6' fill='%23ffffff' fill-opacity='0.85'/><rect x='339' y='222' width='8' height='4' rx='2' fill='%2339ff14'/></svg>")
+    center / cover no-repeat;
+  filter: drop-shadow(0 0 6px rgba(57, 255, 20, 0.55));
 }
 
 .cover-glot {
