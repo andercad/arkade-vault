@@ -24,7 +24,11 @@ export function GameCard({ game }: { game: Game }) {
   };
 
   const btnColor =
-    game.color === "magenta" ? "magenta" : game.color === "yellow" ? "yellow" : "";
+    game.color === "magenta"
+      ? "magenta"
+      : game.color === "yellow"
+        ? "yellow"
+        : "";
 
   return (
     <div

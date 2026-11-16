@@ -1,5 +1,10 @@
+import { Suspense } from "react";
 import type { Metadata } from "next";
-import { Courier_Prime, JetBrains_Mono, Press_Start_2P } from "next/font/google";
+import {
+  Courier_Prime,
+  JetBrains_Mono,
+  Press_Start_2P,
+} from "next/font/google";
 import { Nav } from "@/components/nav";
 import { AuthProvider } from "@/lib/auth";
 import "./globals.css";
@@ -40,7 +45,11 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <div className="av-noise" />
         <div id="root">
           <AuthProvider>
-            <Nav />
+            {/* usePathname() en Nav bloquea el prerender de rutas dinámicas
+                (/juegos/[id]) con cacheComponents: va en Suspense. */}
+            <Suspense fallback={<nav className="av-nav" />}>
+              <Nav />
+            </Suspense>
             <main className="av-main">{children}</main>
             <footer
               style={{

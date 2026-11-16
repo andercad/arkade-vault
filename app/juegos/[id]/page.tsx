@@ -1,21 +1,57 @@
+import { Suspense } from "react";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, unstable_rethrow } from "next/navigation";
+import { DataError } from "@/components/data-error";
 import { Leaderboard } from "@/components/leaderboard";
-import { GAMES, getGame } from "@/lib/games";
-import { seededScores } from "@/lib/scores";
+import { formatPlays, type Game } from "@/lib/games";
+import { getGame } from "@/lib/games.server";
+import type { ScoreRow } from "@/lib/scores";
+import { getTopScores } from "@/lib/scores.server";
 
-export function generateStaticParams() {
-  return GAMES.map((g) => ({ id: g.id }));
+export default function GameDetailPage({ params }: PageProps<"/juegos/[id]">) {
+  return (
+    <Suspense
+      fallback={
+        <div
+          className="pixel"
+          style={{
+            textAlign: "center",
+            padding: 80,
+            color: "var(--ink-faint)",
+          }}
+        >
+          CARGANDO…
+        </div>
+      }
+    >
+      <GameDetail params={params} />
+    </Suspense>
+  );
 }
 
-export default async function GameDetailPage({
+async function GameDetail({
   params,
-}: PageProps<"/juegos/[id]">) {
+}: {
+  params: PageProps<"/juegos/[id]">["params"];
+}) {
   const { id } = await params;
-  const game = getGame(id);
+  let game: Game | null;
+  try {
+    game = await getGame(id);
+  } catch (e) {
+    unstable_rethrow(e);
+    return <DataError />;
+  }
   if (!game) notFound();
 
-  const scores = seededScores(id.length * 17 + 3, 10);
+  // Un fallo del ranking no tumba la ficha: el Leaderboard pinta su propio error.
+  let scores: ScoreRow[] | null;
+  try {
+    scores = await getTopScores(game.id, 10);
+  } catch (e) {
+    unstable_rethrow(e);
+    scores = null;
+  }
 
   return (
     <div className="av-detail fade-in">
@@ -35,7 +71,7 @@ export default async function GameDetailPage({
           <div className="stat-strip">
             <div>
               <div className="l">Partidas</div>
-              <div className="v">{game.plays}</div>
+              <div className="v">{formatPlays(game.plays)}</div>
             </div>
             <div>
               <div className="l">Mejor global</div>
@@ -74,7 +110,7 @@ export default async function GameDetailPage({
       </div>
 
       <aside>
-        <Leaderboard rows={scores} />
+        <Leaderboard rows={scores} playHref={`/juegos/${game.id}/jugar`} />
       </aside>
     </div>
   );
