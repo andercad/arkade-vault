@@ -158,39 +158,39 @@ Cada paso = un commit `09-snake: Paso N`. Antes del paso 1, leer la guía releva
 
 **Genéricos:**
 
-- [ ] `npm run build` y `npm run lint` terminan sin errores.
-- [ ] `supabase/migrations/0007_seed_snake.sql` existe y figura en `list_migrations`; `games` contiene `snake` (ARCADE, `cover-snake`, green, `sort_order` 4 o el siguiente libre) y `get_advisors` (security) no reporta avisos críticos.
-- [ ] `/juegos` muestra la tarjeta SNAKE con su portada; `/juegos/snake` carga y "JUGAR AHORA" lleva a `/juegos/snake/jugar`.
-- [ ] El canvas arranca sin errores en la consola ni hydration warnings, y `fruits.png` carga con 200.
-- [ ] `PAUSA`/`REANUDAR` congela y continúa; `Esc` y `P` hacen lo mismo; mantener pulsada la tecla no alterna; en game over no tienen efecto; el canvas no dibuja texto de pausa; el overlay "EN PAUSA" muestra la pista de teclas.
-- [ ] Durante la pausa, las teclas de dirección no cambian el rumbo de la serpiente, y al reanudar no avanza varios pasos de golpe.
-- [ ] `Espacio` con el foco en PAUSA/FIN no activa el botón.
-- [ ] Las flechas y `W/A/S/D` no hacen scroll en la página mientras Snake está montado.
-- [ ] Chocar con pared o cuerpo y FIN abren el modal "FIN DEL JUEGO" con la puntuación real; el canvas no dibuja "GAME OVER".
-- [ ] "JUGAR DE NUEVO" reinicia a puntuación 0, longitud 3, nivel 1 y dirección derecha, sin teclas pegadas.
-- [ ] Guardar con nombre "TEST" inserta una fila con `game_id = 'snake'`; nombre vacío guarda `INVITADO`; se muestra "PUNTUACIÓN GUARDADA_".
-- [ ] La puntuación aparece en la ficha, en el Salón (tab SNAKE) y en la actividad de la home; la tarjeta muestra `best` y `plays` actualizados.
-- [ ] "SALIR" y "VOLVER AL VAULT" no dejan listeners ni bucle activos (las flechas vuelven a hacer scroll).
-- [ ] En desarrollo (StrictMode) hay una sola instancia y la serpiente va a velocidad normal.
-- [ ] A 375 px de ancho el canvas se escala sin desbordar; el aviso táctil solo aparece con `pointer: coarse`.
-- [ ] Asteroids, Tetris y Arkanoid siguen funcionando igual.
-- [ ] `references/` y `lib/asteroids/`, `lib/tetris/`, `lib/arkanoid/` no han cambiado; no se escribe `localStorage`.
-- [ ] Tras verificar, las filas de prueba de `scores` están borradas.
+- [x] `npm run build` y `npm run lint` terminan sin errores.
+- [x] `supabase/migrations/0007_seed_snake.sql` existe y figura en `list_migrations`; `games` contiene `snake` (ARCADE, `cover-snake`, green, `sort_order` 4 o el siguiente libre) y `get_advisors` (security) no reporta avisos críticos.
+- [x] `/juegos` muestra la tarjeta SNAKE con su portada; `/juegos/snake` carga y "JUGAR AHORA" lleva a `/juegos/snake/jugar`.
+- [x] El canvas arranca sin errores en la consola ni hydration warnings, y `fruits.png` carga con 200.
+- [x] `PAUSA`/`REANUDAR` congela y continúa; `Esc` y `P` hacen lo mismo; mantener pulsada la tecla no alterna; en game over no tienen efecto; el canvas no dibuja texto de pausa; el overlay "EN PAUSA" muestra la pista de teclas.
+- [x] Durante la pausa, las teclas de dirección no cambian el rumbo de la serpiente, y al reanudar no avanza varios pasos de golpe.
+- [x] `Espacio` con el foco en PAUSA/FIN no activa el botón.
+- [x] Las flechas y `W/A/S/D` no hacen scroll en la página mientras Snake está montado.
+- [x] Chocar con pared o cuerpo y FIN abren el modal "FIN DEL JUEGO" con la puntuación real; el canvas no dibuja "GAME OVER".
+- [x] "JUGAR DE NUEVO" reinicia a puntuación 0, longitud 3, nivel 1 y dirección derecha, sin teclas pegadas.
+- [x] Guardar con nombre "TEST" inserta una fila con `game_id = 'snake'`; nombre vacío guarda `INVITADO`; se muestra "PUNTUACIÓN GUARDADA_".
+- [x] La puntuación aparece en la ficha, en el Salón (tab SNAKE) y en la actividad de la home; la tarjeta muestra `best` y `plays` actualizados.
+- [x] "SALIR" y "VOLVER AL VAULT" no dejan listeners ni bucle activos (las flechas vuelven a hacer scroll).
+- [x] En desarrollo (StrictMode) hay una sola instancia y la serpiente va a velocidad normal.
+- [x] A 375 px de ancho el canvas se escala sin desbordar; el aviso táctil solo aparece con `pointer: coarse`.
+- [x] Asteroids, Tetris y Arkanoid siguen funcionando igual.
+- [x] `references/` y `lib/asteroids/`, `lib/tetris/`, `lib/arkanoid/` no han cambiado; no se escribe `localStorage`.
+- [x] Tras verificar, las filas de prueba de `scores` están borradas.
 
 **Específicos de Snake:**
 
-- [ ] Al iniciar, el canvas muestra el tablero 20×20, una serpiente de 3 celdas en `(10,10)`, `(9,10)`, `(8,10)` mirando a la derecha, una fruta en una celda libre y el HUD del canvas con PUNTOS 0, NIVEL 1 y LONGITUD 3; el HUD de plataforma muestra Jugador, Puntuación 0, Longitud 3 y Nivel 01.
-- [ ] La fruta se dibuja con el sprite del atlas sin deformarse, y siempre en una celda no ocupada por la serpiente.
-- [ ] Las 22 frutas del atlas pueden aparecer.
-- [ ] La serpiente avanza una celda cada 140 ms en el nivel 1 y no se mueve entre pasos.
-- [ ] Las flechas y `W/A/S/D` giran la serpiente; invertir el sentido (180°) se ignora, incluso con dos pulsaciones rápidas dentro de un mismo paso.
-- [ ] Comer una fruta suma `10 × nivel` (nivel previo al recálculo), alarga la serpiente 1 celda y genera una fruta nueva.
-- [ ] El nivel es `1 + floor(frutas / 5)` y sube al comer la quinta fruta.
-- [ ] El intervalo de paso es `max(70, 140 − (nivel − 1) × 10)` ms (nivel 1 → 140 ms; nivel 8 y superiores → 70 ms).
-- [ ] Salir por cualquier borde del tablero termina la partida; el modal muestra la puntuación acumulada.
-- [ ] Moverse hacia la celda del propio cuerpo termina la partida; moverse hacia la celda de la cola que se libera en ese paso (sin comer) no.
-- [ ] Llenar las 400 celdas termina la partida sin errores.
-- [ ] Si `fruits.png` falla, la fruta se dibuja como círculo y el juego sigue siendo jugable.
+- [x] Al iniciar, el canvas muestra el tablero 20×20, una serpiente de 3 celdas en `(10,10)`, `(9,10)`, `(8,10)` mirando a la derecha, una fruta en una celda libre y el HUD del canvas con PUNTOS 0, NIVEL 1 y LONGITUD 3; el HUD de plataforma muestra Jugador, Puntuación 0, Longitud 3 y Nivel 01.
+- [x] La fruta se dibuja con el sprite del atlas sin deformarse, y siempre en una celda no ocupada por la serpiente.
+- [x] Las 22 frutas del atlas pueden aparecer.
+- [x] La serpiente avanza una celda cada 140 ms en el nivel 1 y no se mueve entre pasos.
+- [x] Las flechas y `W/A/S/D` giran la serpiente; invertir el sentido (180°) se ignora, incluso con dos pulsaciones rápidas dentro de un mismo paso.
+- [x] Comer una fruta suma `10 × nivel` (nivel previo al recálculo), alarga la serpiente 1 celda y genera una fruta nueva.
+- [x] El nivel es `1 + floor(frutas / 5)` y sube al comer la quinta fruta.
+- [x] El intervalo de paso es `max(70, 140 − (nivel − 1) × 10)` ms (nivel 1 → 140 ms; nivel 8 y superiores → 70 ms).
+- [x] Salir por cualquier borde del tablero termina la partida; el modal muestra la puntuación acumulada.
+- [x] Moverse hacia la celda del propio cuerpo termina la partida; moverse hacia la celda de la cola que se libera en ese paso (sin comer) no.
+- [x] Llenar las 400 celdas termina la partida sin errores.
+- [x] Si `fruits.png` falla, la fruta se dibuja como círculo y el juego sigue siendo jugable.
 
 ---
 
