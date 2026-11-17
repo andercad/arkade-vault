@@ -291,7 +291,8 @@ a {
   display: none;
 }
 
-@media (max-width: 840px) {
+/* 960px: con enlaces + monedas + botón de sesión la barra desbordaba en móviles apaisados (~844px) */
+@media (max-width: 960px) {
   .av-nav {
     padding: 12px 16px;
   }
@@ -303,6 +304,21 @@ a {
   }
   .av-nav .hamburger {
     display: inline-flex;
+  }
+}
+/* Móvil vertical: logo + sesión + hamburguesa deben caber en 390px */
+@media (max-width: 520px) {
+  .av-nav {
+    gap: 10px;
+  }
+  .av-nav .auth-btn {
+    margin-left: 0;
+    padding: 10px 12px;
+    font-size: 9px;
+    white-space: nowrap;
+  }
+  .av-nav .hamburger {
+    padding: 10px 12px;
   }
 }
 

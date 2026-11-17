@@ -61,7 +61,7 @@ export interface TouchControls {
 | Juego     | dpad                                                       | actions                                |
 | --------- | ---------------------------------------------------------- | -------------------------------------- |
 | asteroids | left/right `ArrowLeft`/`ArrowRight`, up `ArrowUp` (empuje) | `DISPARO` → `Space`                    |
-| tetris    | left/right/down `ArrowLeft`/`ArrowRight`/`ArrowDown`       | `GIRAR` → `ArrowUp`, `CAÍDA` → `Space` |
+| tetris    | left/right/down `ArrowLeft`/`ArrowRight`/`ArrowDown`       | `GIRAR` → `ArrowUp`, `BAJAR` → `Space` |
 | arkanoid  | left/right `ArrowLeft`/`ArrowRight`                        | `LANZAR` → `Space`                     |
 | snake     | up/down/left/right `Arrow*`                                | —                                      |
 

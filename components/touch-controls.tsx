@@ -87,7 +87,9 @@ function PadButton({
         if (down.current) return;
         // El táctil captura el puntero de forma implícita: soltarlo permite
         // que pointerleave se dispare al arrastrar el dedo fuera del botón.
-        e.currentTarget.releasePointerCapture(e.pointerId);
+        if (e.currentTarget.hasPointerCapture(e.pointerId)) {
+          e.currentTarget.releasePointerCapture(e.pointerId);
+        }
         down.current = true;
         emit("keydown", code);
       }}

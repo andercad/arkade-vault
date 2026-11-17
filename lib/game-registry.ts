@@ -149,7 +149,7 @@ const tetris: GameDefinition = {
     dpad: { left: "ArrowLeft", right: "ArrowRight", down: "ArrowDown" },
     actions: [
       { code: "ArrowUp", label: "GIRAR" },
-      { code: "Space", label: "CAÍDA" },
+      { code: "Space", label: "BAJAR" },
     ],
   },
   create: (canvas, cb) => {
