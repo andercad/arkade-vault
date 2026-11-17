@@ -1,6 +1,6 @@
 # SPEC 10 — Selector de skin integrado en el HUD del reproductor
 
-> **Estado:** Aprobado
+> **Estado:** Implementado
 > **Depende de:** SPEC 01 (reproductor), SPEC 07 (registro genérico y opciones `live`/`restart`; skins de Tetris)
 > **Fecha:** 2026-11-17
 > **Objetivo:** Mover las opciones `live` (selector de skin) de la barra aparte `.player-options` a la barra `.player-hud`, junto a Jugador, Puntuación, Vidas/Nivel y los botones PAUSA/FIN/SALIR.
@@ -52,14 +52,14 @@ Un commit por paso (`10-hud-skins-integrados: Paso N`).
 
 ## Criterios de aceptación
 
-- [ ] En un juego con skin, el selector aparece dentro de `.player-hud`; no existe ningún elemento `.player-options` en el DOM.
-- [ ] Cambiar de skin durante la partida sigue aplicándose en vivo sin reiniciar ni perder puntuación.
-- [ ] Tras cambiar de skin, el foco sale del `<select>` y las flechas/Espacio siguen controlando el juego.
-- [ ] PAUSA, FIN y SALIR siguen funcionando y alineados a la derecha en escritorio.
-- [ ] En juegos sin opciones `live` el HUD se ve igual que antes.
-- [ ] A ~390 px de ancho nada desborda horizontalmente; los elementos envuelven a otra línea.
-- [ ] Las opciones `restart` siguen apareciendo solo en el overlay de pausa.
-- [ ] `npm run lint` y `npm run build` sin errores.
+- [x] En un juego con skin, el selector aparece dentro de `.player-hud`; no existe ningún elemento `.player-options` en el DOM.
+- [x] Cambiar de skin durante la partida sigue aplicándose en vivo sin reiniciar ni perder puntuación.
+- [x] Tras cambiar de skin, el foco sale del `<select>` y las flechas/Espacio siguen controlando el juego.
+- [x] PAUSA, FIN y SALIR siguen funcionando y alineados a la derecha en escritorio.
+- [x] En juegos sin opciones `live` el HUD se ve igual que antes.
+- [x] A ~390 px de ancho nada desborda horizontalmente; los elementos envuelven a otra línea.
+- [x] Las opciones `restart` siguen apareciendo solo en el overlay de pausa.
+- [x] `npm run lint` y `npm run build` sin errores.
 
 ---
 
