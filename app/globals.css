@@ -1327,14 +1327,23 @@ a {
   cursor: not-allowed;
 }
 
-/* ===== Mando táctil (components/touch-controls.tsx) ===== */
+/* ===== Mando táctil Gamepad MK-II (components/touch-controls.tsx) ===== */
 /* Solo en pantallas táctiles; en escritorio (pointer: fine) no se muestra */
-.touch-controls {
+.gp {
   display: none;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  margin-top: 14px;
+  position: relative;
+  width: 100%;
+  max-width: 760px;
+  margin: 10px auto 0;
+  padding: 12px 14px 10px;
+  background: linear-gradient(180deg, #1c1c28 0%, #0c0c14 100%);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  box-shadow:
+    0 30px 80px -30px rgba(0, 245, 255, 0.4),
+    0 0 0 1px rgba(255, 255, 255, 0.02),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.6);
   /* Sin efectos del navegador: scroll, zoom, selección, menú de pulsación larga */
   touch-action: none;
   user-select: none;
@@ -1343,115 +1352,313 @@ a {
   -webkit-tap-highlight-color: transparent;
 }
 @media (pointer: coarse) {
-  .touch-controls {
-    display: flex;
+  .gp {
+    display: block;
   }
 }
-.tc-btn {
-  touch-action: none;
-  user-select: none;
-  -webkit-user-select: none;
-  -webkit-touch-callout: none;
-  -webkit-tap-highlight-color: transparent;
+.gp::before {
+  content: "";
+  position: absolute;
+  inset: 4px;
+  border: 1px solid rgba(0, 245, 255, 0.14);
+  border-radius: 12px;
+  pointer-events: none;
+}
+.gp::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(
+    rgba(255, 255, 255, 0.03) 1px,
+    transparent 1px
+  );
+  background-size: 8px 8px;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0.6;
+}
+.gp-body {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  align-items: center;
+  padding: 6px;
+}
+.gp-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+.gp-col-left {
+  justify-self: start;
+}
+.gp-col-right {
+  justify-self: end;
+}
+
+/* D-pad: cruz de 4 botones + hub central con gema */
+.gp-dpad {
+  position: relative;
+  width: 144px;
+  height: 144px;
+}
+.dp {
+  position: absolute;
+  width: 46px;
+  height: 46px;
+  padding: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--ink);
-  background: rgba(10, 10, 15, 0.85);
+  color: var(--ink-dim);
   cursor: pointer;
+  background: linear-gradient(180deg, #1a1a25, #0a0a12);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  box-shadow:
+    0 4px 0 #050507,
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.6);
+  touch-action: none;
+  -webkit-tap-highlight-color: transparent;
   transition:
-    transform 60ms ease,
-    box-shadow 120ms ease,
-    background 120ms;
+    transform 80ms,
+    box-shadow 140ms,
+    color 140ms,
+    border-color 140ms,
+    background 140ms;
 }
-.tc-btn:disabled {
-  opacity: 0.4;
+.dp-arrow {
+  width: 22px;
+  height: 22px;
+  transition: filter 140ms;
 }
-.tc-btn:active:not(:disabled) {
-  transform: scale(0.94);
+.dp:disabled {
+  opacity: 0.3;
+  cursor: default;
 }
-
-/* D-pad: rejilla 3×3, solo se pintan las direcciones que usa el juego */
-.tc-dpad {
-  display: grid;
-  grid-template-columns: repeat(3, 56px);
-  grid-template-areas:
-    ". up ."
-    "left . right"
-    ". down .";
-}
-.tc-dir {
-  width: 56px;
-  height: 56px;
-  border: 1px solid var(--cyan);
-  clip-path: polygon(
-    8px 0,
-    100% 0,
-    100% calc(100% - 8px),
-    calc(100% - 8px) 100%,
-    0 100%,
-    0 8px
-  );
-}
-.tc-dir svg {
-  width: 24px;
-  height: 24px;
+.dp.on:not(:disabled),
+.dp:active:not(:disabled) {
+  transform: translateY(3px);
   color: var(--cyan);
-  filter: drop-shadow(0 0 4px rgba(0, 245, 255, 0.7));
+  background: linear-gradient(180deg, #08161e, #030a0e);
+  border-color: var(--cyan);
+  box-shadow:
+    0 1px 0 #050507,
+    inset 0 0 16px rgba(0, 245, 255, 0.45),
+    0 0 16px rgba(0, 245, 255, 0.5);
 }
-.tc-dir:active:not(:disabled) {
-  background: rgba(0, 245, 255, 0.25);
+.dp.on:not(:disabled) .dp-arrow,
+.dp:active:not(:disabled) .dp-arrow {
+  filter: drop-shadow(0 0 6px var(--cyan)) drop-shadow(0 0 12px var(--cyan));
 }
-.tc-up {
-  grid-area: up;
+.dp-up {
+  top: 0;
+  left: 49px;
 }
-.tc-down {
-  grid-area: down;
+.dp-down {
+  bottom: 0;
+  left: 49px;
 }
-.tc-left {
-  grid-area: left;
+.dp-left {
+  left: 0;
+  top: 49px;
 }
-.tc-right {
-  grid-area: right;
+.dp-right {
+  right: 0;
+  top: 49px;
 }
-
-/* Acciones: botones redondos de arcade, el principal más grande */
-.tc-actions {
+.dp-hub {
+  position: absolute;
+  top: 49px;
+  left: 49px;
+  width: 46px;
+  height: 46px;
   display: flex;
   align-items: center;
-  gap: 14px;
-  margin-left: auto;
+  justify-content: center;
+  background: radial-gradient(circle at 50% 50%, #181822 0%, #08080d 80%);
+  border: 1px solid rgba(0, 245, 255, 0.15);
+  border-radius: 6px;
+  box-shadow:
+    inset 0 0 12px rgba(0, 0, 0, 0.8),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  pointer-events: none;
 }
-.tc-action {
+.dp-hub-gem {
+  width: 12px;
+  height: 12px;
+  background: var(--cyan);
+  box-shadow:
+    0 0 10px var(--cyan),
+    inset 0 0 4px rgba(0, 0, 0, 0.5);
+  clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
+  animation: gp-pulse-led 2s ease-in-out infinite;
+}
+@keyframes gp-pulse-led {
+  50% {
+    opacity: 0.35;
+    transform: scale(0.85);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .dp-hub-gem {
+    animation: none;
+  }
+}
+
+/* Botones A/B esféricos con rótulo del registro debajo */
+.gp-actions {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+.ab-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+.ab {
+  position: relative;
+  width: 64px;
+  height: 64px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   border-radius: 50%;
+  border: 2px solid currentColor;
+  background:
+    radial-gradient(
+      circle at 32% 26%,
+      rgba(255, 255, 255, 0.25),
+      transparent 50%
+    ),
+    radial-gradient(circle at 50% 55%, var(--ab-mid), var(--ab-deep) 75%);
+  cursor: pointer;
+  box-shadow:
+    0 6px 0 #050507,
+    0 0 22px var(--ab-glow),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    inset 0 -4px 8px rgba(0, 0, 0, 0.4);
+  touch-action: none;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    transform 80ms,
+    box-shadow 140ms;
+}
+.ab.a {
+  color: var(--magenta);
+  --ab-mid: rgba(255, 0, 110, 0.7);
+  --ab-deep: rgba(110, 0, 40, 0.95);
+  --ab-glow: rgba(255, 0, 110, 0.4);
+}
+.ab.b {
+  color: var(--cyan);
+  --ab-mid: rgba(0, 200, 230, 0.7);
+  --ab-deep: rgba(0, 50, 70, 0.95);
+  --ab-glow: rgba(0, 245, 255, 0.4);
+}
+.ab:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+.ab-letter {
+  position: relative;
+  z-index: 2;
   font-family: var(--pixel);
-  font-size: 9px;
-  letter-spacing: 0.08em;
+  font-size: 20px;
+  color: #fff;
+  letter-spacing: 0.02em;
+  text-shadow:
+    0 0 8px currentColor,
+    0 0 18px currentColor,
+    0 1px 0 rgba(0, 0, 0, 0.6);
+}
+.ab.a .ab-letter {
+  text-shadow:
+    0 0 8px var(--magenta),
+    0 0 18px var(--magenta),
+    0 1px 0 rgba(0, 0, 0, 0.6);
+}
+.ab.b .ab-letter {
+  text-shadow:
+    0 0 8px var(--cyan),
+    0 0 18px var(--cyan),
+    0 1px 0 rgba(0, 0, 0, 0.6);
+}
+.ab-ring {
+  position: absolute;
+  inset: -8px;
+  border-radius: 50%;
+  border: 1px dashed currentColor;
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity 140ms,
+    transform 200ms;
+}
+.ab.on:not(:disabled),
+.ab:active:not(:disabled) {
+  transform: translateY(4px) scale(0.97);
+  box-shadow:
+    0 1px 0 #050507,
+    0 0 36px var(--ab-glow),
+    inset 0 0 18px rgba(0, 0, 0, 0.5);
+}
+.ab.on:not(:disabled) .ab-ring,
+.ab:active:not(:disabled) .ab-ring {
+  opacity: 1;
+  transform: scale(1.08);
+}
+.ab-label {
+  max-width: 76px;
+  font-family: var(--pixel);
+  font-size: 7px;
+  letter-spacing: 0.06em;
+  color: var(--ink-dim);
+  white-space: nowrap;
   text-align: center;
 }
-.tc-primary {
-  width: 84px;
-  height: 84px;
-  border: 2px solid var(--magenta);
-  color: var(--magenta);
-  box-shadow:
-    0 0 14px rgba(255, 0, 110, 0.45),
-    inset 0 0 10px rgba(255, 0, 110, 0.3);
-}
-.tc-primary:active:not(:disabled) {
-  background: rgba(255, 0, 110, 0.3);
-}
-.tc-secondary {
-  width: 68px;
-  height: 68px;
-  border: 2px solid var(--yellow);
-  color: var(--yellow);
-  box-shadow:
-    0 0 12px rgba(245, 255, 0, 0.4),
-    inset 0 0 8px rgba(245, 255, 0, 0.25);
-}
-.tc-secondary:active:not(:disabled) {
-  background: rgba(245, 255, 0, 0.25);
+
+/* Pantallas táctiles anchas (tablet): tamaños de la referencia */
+@media (pointer: coarse) and (min-width: 621px) {
+  .gp {
+    padding: 16px 22px 14px;
+    border-radius: 22px;
+  }
+  .gp-dpad {
+    width: 156px;
+    height: 156px;
+  }
+  .dp,
+  .dp-hub {
+    width: 50px;
+    height: 50px;
+  }
+  .dp-up,
+  .dp-down {
+    left: 53px;
+  }
+  .dp-left,
+  .dp-right {
+    top: 53px;
+  }
+  .dp-hub {
+    top: 53px;
+    left: 53px;
+  }
+  .ab {
+    width: 74px;
+    height: 74px;
+  }
+  .gp-actions {
+    gap: 22px;
+  }
 }
 
 /* HUD compacto en móvil: stats en una fila, selector y botones pequeños */
@@ -1513,17 +1720,76 @@ a {
 /* Con mando táctil: reservar su altura al calcular el alto máximo del canvas */
 @media (pointer: coarse) {
   .crt {
-    --game-h: max(200px, min(600px, calc(100svh - 440px)));
+    --game-h: max(200px, min(600px, calc(100svh - 630px)));
   }
-  .tc-dpad {
-    grid-template-columns: repeat(3, 48px);
+}
+/* Móvil vertical: mando fijo abajo (fuera del flujo) para que el canvas ocupe
+   todo el alto libre. El pie de la página se oculta (no hay scroll). */
+@media (pointer: coarse) and (max-width: 620px) and (orientation: portrait) {
+  .gp {
+    position: fixed;
+    left: 8px;
+    right: 8px;
+    bottom: max(8px, env(safe-area-inset-bottom));
+    z-index: 40;
+    width: auto;
+    margin: 0;
+    padding: 6px 10px;
   }
-  .tc-dir {
-    width: 48px;
-    height: 48px;
+  .gp-body {
+    padding: 0 4px;
+    gap: 10px;
   }
-  .touch-controls {
-    margin-top: 10px;
+  .gp-dpad {
+    width: 126px;
+    height: 126px;
+  }
+  .dp,
+  .dp-hub {
+    width: 40px;
+    height: 40px;
+  }
+  .dp-up,
+  .dp-down {
+    left: 43px;
+  }
+  .dp-left,
+  .dp-right {
+    top: 43px;
+  }
+  .dp-hub {
+    top: 43px;
+    left: 43px;
+  }
+  .dp-arrow {
+    width: 18px;
+    height: 18px;
+  }
+  .ab {
+    width: 54px;
+    height: 54px;
+  }
+  .ab-letter {
+    font-size: 17px;
+  }
+  .gp-actions {
+    gap: 12px;
+  }
+  .ab-wrap {
+    gap: 6px;
+  }
+  body:has(.gp) footer {
+    display: none;
+  }
+  .av-player {
+    margin: 10px auto 0;
+    padding-bottom: 0;
+  }
+  .crt .crt-bottom {
+    display: none;
+  }
+  .crt {
+    --game-h: max(200px, min(640px, calc(100svh - 336px)));
   }
 }
 
