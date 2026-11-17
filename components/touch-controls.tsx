@@ -113,7 +113,8 @@ function PadButton({
       disabled={disabled}
       className={lit && !disabled ? `${className} on` : className}
       onPointerDown={(e) => {
-        if (down.current || !code) return;
+        // Los hijos (svg/span) reciben pointerdown aunque el botón esté disabled.
+        if (down.current || !code || disabled) return;
         // El táctil captura el puntero de forma implícita: soltarlo permite
         // que pointerleave se dispare al arrastrar el dedo fuera del botón.
         if (e.currentTarget.hasPointerCapture(e.pointerId)) {
