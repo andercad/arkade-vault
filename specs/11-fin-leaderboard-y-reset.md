@@ -18,13 +18,14 @@ Causa probable (a confirmar en el paso 1): `next.config.ts` tiene `cacheComponen
 ## Alcance
 
 **Dentro:**
-
+- el .input-row (input + GUARDAR PUNTUACIÓN) del modal de fin no desborda a ~390 px.
 - Botón nuevo en el modal de fin de `components/game-player.tsx`, junto a JUGAR DE NUEVO y VOLVER AL VAULT: `VER LEADERBOARD` → `/salon-de-la-fama?juego=<game.id>`.
 - Al pulsarlo se navega y el modal se descarta (la puntuación no guardada se pierde, igual que con VOLVER AL VAULT).
 - `app/salon-de-la-fama/page.tsx` lee `searchParams.juego` (dentro del `Suspense` existente) y lo pasa a `HallOfFame` como `initialGameId`.
 - `components/hall-of-fame.tsx`: pestaña inicial = `initialGameId` si coincide con un juego existente; si no, el primero (comportamiento actual).
 - Corregir el bug: el estado del reproductor (`over`, `saved`, `saving`, `saveError`, `typedName`, `snap`) se reinicia al salir de la página, de modo que al volver a entrar el modal está cerrado y la partida empieza limpia.
 - Verificar que el modal se cierra en todos los caminos de salida: VOLVER AL VAULT, VER LEADERBOARD, JUGAR DE NUEVO, SALIR del HUD, botón Atrás del navegador.
+- Cambiar `global.css` para ajustar boton guardar puntuación
 - Actualizar `CLAUDE.md` y `README.md` (mención de spec 11, del parámetro `?juego=` y del reset).
 
 **Fuera de alcance:**
@@ -72,6 +73,7 @@ Un commit por paso (`11-fin-leaderboard-y-reset: Paso N`).
 - [ ] Tras FIN → guardar puntuación → salir → volver a entrar, el modal no muestra "PUNTUACIÓN GUARDADA" ni el nombre escrito.
 - [ ] JUGAR DE NUEVO sigue cerrando el modal y reiniciando la partida.
 - [ ] A ~390 px de ancho los tres botones del modal no desbordan horizontalmente.
+- [ ] a ~390 px GUARDAR PUNTUACIÓN queda dentro del modal, sin scroll horizontal causado por el modal.
 - [ ] `npm run lint` y `npm run build` sin errores.
 
 ---
