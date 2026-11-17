@@ -1,7 +1,7 @@
 "use client";
 
 import type { TouchControls, TouchDirection } from "@/lib/game-engine";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const DIRECTIONS: TouchDirection[] = ["up", "left", "right", "down"];
 
@@ -47,6 +47,8 @@ function PadButton({
   children,
 }: PadButtonProps) {
   const down = useRef(false);
+  const disabledRef = useRef(disabled);
+  const [lit, setLit] = useState(false);
 
   const release = () => {
     if (!down.current || !code) return;
@@ -59,6 +61,33 @@ function PadButton({
     if (disabled) release();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [disabled]);
+
+  // Iluminar el botón (.on) con la tecla física correspondiente. Solo eventos
+  // reales (isTrusted): los sintéticos del propio mando ya usan :active.
+  useEffect(() => {
+    disabledRef.current = disabled;
+  }, [disabled]);
+
+  useEffect(() => {
+    if (!code) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (!e.isTrusted || e.repeat || e.code !== code) return;
+      if (disabledRef.current) return;
+      setLit(true);
+    };
+    const onKeyUp = (e: KeyboardEvent) => {
+      if (e.isTrusted && e.code === code) setLit(false);
+    };
+    const onBlur = () => setLit(false);
+    window.addEventListener("keydown", onKeyDown);
+    window.addEventListener("keyup", onKeyUp);
+    window.addEventListener("blur", onBlur);
+    return () => {
+      window.removeEventListener("keydown", onKeyDown);
+      window.removeEventListener("keyup", onKeyUp);
+      window.removeEventListener("blur", onBlur);
+    };
+  }, [code]);
 
   // Nunca dejar una tecla pegada: al desmontar/ocultarse (cacheComponents),
   // al perder el foco de la ventana y al cambiar de pestaña o app.
@@ -82,7 +111,7 @@ function PadButton({
       tabIndex={-1}
       aria-label={label}
       disabled={disabled}
-      className={className}
+      className={lit && !disabled ? `${className} on` : className}
       onPointerDown={(e) => {
         if (down.current || !code) return;
         // El táctil captura el puntero de forma implícita: soltarlo permite
