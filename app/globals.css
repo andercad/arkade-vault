@@ -1306,28 +1306,10 @@ a {
   cursor: not-allowed;
 }
 
-/* Aviso de teclado: solo en pantallas táctiles */
-.keyboard-notice {
-  display: none;
-  margin-bottom: 12px;
-  padding: 10px 14px;
-  border: 1px solid var(--yellow);
-  border-radius: 6px;
-  color: var(--yellow);
-  font-family: var(--pixel);
-  font-size: 11px;
-  letter-spacing: 0.12em;
-  text-align: center;
-  text-shadow: 0 0 6px rgba(245, 255, 0, 0.6);
-}
-@media (pointer: coarse) {
-  .keyboard-notice {
-    display: block;
-  }
-}
 /* ===== Mando táctil (components/touch-controls.tsx) ===== */
+/* Solo en pantallas táctiles; en escritorio (pointer: fine) no se muestra */
 .touch-controls {
-  display: flex;
+  display: none;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
@@ -1338,6 +1320,11 @@ a {
   -webkit-user-select: none;
   -webkit-touch-callout: none;
   -webkit-tap-highlight-color: transparent;
+}
+@media (pointer: coarse) {
+  .touch-controls {
+    display: flex;
+  }
 }
 .tc-btn {
   touch-action: none;

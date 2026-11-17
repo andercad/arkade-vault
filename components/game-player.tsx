@@ -1,6 +1,7 @@
 "use client";
 
 import { GameCanvas, type GameControl } from "@/components/game-canvas";
+import { TouchPad } from "@/components/touch-controls";
 import { useAuth } from "@/lib/auth";
 import type { GameOption, GameSnapshot } from "@/lib/game-engine";
 import { getGameDefinition } from "@/lib/game-registry";
@@ -154,8 +155,6 @@ export function GamePlayer({ game }: { game: Game }) {
         </div>
       </div>
 
-      <div className="keyboard-notice">REQUIERE TECLADO</div>
-
       <div
         className={
           definition.height > definition.width ? "crt crt-portrait" : "crt"
@@ -211,6 +210,13 @@ export function GamePlayer({ game }: { game: Game }) {
           <span>CARGA · 1MB</span>
         </div>
       </div>
+
+      {definition.touchControls && (
+        <TouchPad
+          controls={definition.touchControls}
+          disabled={paused || over}
+        />
+      )}
 
       {over && (
         <div className="modal-bd">
