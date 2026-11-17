@@ -6,7 +6,15 @@ import type { Game } from "@/lib/games";
 import { getGames } from "@/lib/games.server";
 import { getTopScores } from "@/lib/scores.server";
 
-async function HallData() {
+async function HallData({
+  searchParams,
+}: {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}) {
+  // Se lee aquí, dentro del Suspense (cacheComponents). Valor desconocido → HallOfFame lo ignora.
+  const { juego } = await searchParams;
+  const initialGameId = typeof juego === "string" ? juego : undefined;
+
   let games: Game[];
   try {
     games = await getGames();
@@ -27,10 +35,21 @@ async function HallData() {
       }
     }),
   );
-  return <HallOfFame games={games} scores={Object.fromEntries(entries)} />;
+  return (
+    <HallOfFame
+      key={initialGameId}
+      games={games}
+      scores={Object.fromEntries(entries)}
+      initialGameId={initialGameId}
+    />
+  );
 }
 
-export default function SalonDeLaFamaPage() {
+export default function SalonDeLaFamaPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}) {
   return (
     <Suspense
       fallback={
@@ -46,7 +65,7 @@ export default function SalonDeLaFamaPage() {
         </div>
       }
     >
-      <HallData />
+      <HallData searchParams={searchParams} />
     </Suspense>
   );
 }
