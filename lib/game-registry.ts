@@ -3,6 +3,7 @@ import type {
   GameEngine,
   GameOption,
   GameSnapshot,
+  TouchControls,
 } from "@/lib/game-engine";
 import { createAsteroidsGame } from "@/lib/asteroids/engine";
 import { H as ASTEROIDS_H, W as ASTEROIDS_W } from "@/lib/asteroids/constants";
@@ -52,6 +53,7 @@ export interface GameDefinition {
   height: number;
   aria: string;
   options?: GameOption[];
+  touchControls?: TouchControls; // sin él, no se pinta mando táctil
   create(canvas: HTMLCanvasElement, cb: GameCallbacks): GameEngine;
 }
 
@@ -82,6 +84,10 @@ const asteroids: GameDefinition = {
       appliesOn: "live",
     },
   ],
+  touchControls: {
+    dpad: { left: "ArrowLeft", right: "ArrowRight", up: "ArrowUp" },
+    actions: [{ code: "Space", label: "DISPARO" }],
+  },
   create: (canvas, cb) => {
     const game = createAsteroidsGame(canvas, {
       onState: (s) => cb.onState(asteroidsSnapshot(s)),
@@ -139,6 +145,13 @@ const tetris: GameDefinition = {
       appliesOn: "restart",
     },
   ],
+  touchControls: {
+    dpad: { left: "ArrowLeft", right: "ArrowRight", down: "ArrowDown" },
+    actions: [
+      { code: "ArrowUp", label: "GIRAR" },
+      { code: "Space", label: "CAÍDA" },
+    ],
+  },
   create: (canvas, cb) => {
     const game = createTetrisGame(canvas, {
       onState: (s) => cb.onState(tetrisSnapshot(s)),
@@ -186,6 +199,10 @@ const arkanoid: GameDefinition = {
       appliesOn: "live",
     },
   ],
+  touchControls: {
+    dpad: { left: "ArrowLeft", right: "ArrowRight" },
+    actions: [{ code: "Space", label: "LANZAR" }],
+  },
   create: (canvas, cb) => {
     const game = createArkanoidGame(canvas, {
       onState: (s) => cb.onState(arkanoidSnapshot(s)),
@@ -233,6 +250,15 @@ const snake: GameDefinition = {
       appliesOn: "live",
     },
   ],
+  touchControls: {
+    dpad: {
+      up: "ArrowUp",
+      down: "ArrowDown",
+      left: "ArrowLeft",
+      right: "ArrowRight",
+    },
+    actions: [],
+  },
   create: (canvas, cb) => {
     const game = createSnakeGame(canvas, {
       onState: (s) => cb.onState(snakeSnapshot(s)),
