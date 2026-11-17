@@ -31,7 +31,7 @@ function emit(type: "keydown" | "keyup", code: string) {
 }
 
 interface PadButtonProps {
-  code: string;
+  code: string | undefined;
   disabled: boolean;
   className: string;
   label: string;
@@ -49,7 +49,7 @@ function PadButton({
   const down = useRef(false);
 
   const release = () => {
-    if (!down.current) return;
+    if (!down.current || !code) return;
     down.current = false;
     emit("keyup", code);
   };
@@ -84,7 +84,7 @@ function PadButton({
       disabled={disabled}
       className={className}
       onPointerDown={(e) => {
-        if (down.current) return;
+        if (down.current || !code) return;
         // El táctil captura el puntero de forma implícita: soltarlo permite
         // que pointerleave se dispare al arrastrar el dedo fuera del botón.
         if (e.currentTarget.hasPointerCapture(e.pointerId)) {
@@ -112,42 +112,67 @@ export function TouchPad({
   controls: TouchControls;
   disabled?: boolean;
 }) {
-  const directions = DIRECTIONS.filter((d) => controls.dpad[d]);
+  // actions[0] → A (magenta, extremo derecho); actions[1] → B (cian, a su izquierda).
+  const actions = controls.actions
+    .slice(0, 2)
+    .map((action, i) => ({ action, letter: i === 0 ? "A" : "B" }))
+    .reverse();
 
   return (
-    <div className="touch-controls" role="group" aria-label="Mando táctil">
-      {directions.length > 0 && (
-        <div className="tc-dpad">
-          {directions.map((dir) => (
-            <PadButton
-              key={dir}
-              code={controls.dpad[dir]!}
-              disabled={disabled}
-              label={DIRECTION_LABEL[dir]}
-              className={`tc-btn tc-dir tc-${dir}`}
-            >
-              <svg viewBox="0 0 24 24" aria-hidden="true">
-                <polygon points={ARROW_POINTS[dir]} fill="currentColor" />
-              </svg>
-            </PadButton>
-          ))}
+    <div className="gp" role="group" aria-label="Mando táctil">
+      <div className="gp-body">
+        <div className="gp-col gp-col-left">
+          <div className="gp-dpad">
+            {DIRECTIONS.map((dir) => {
+              const code = controls.dpad[dir];
+              return (
+                <PadButton
+                  key={dir}
+                  code={code}
+                  disabled={disabled || !code}
+                  label={DIRECTION_LABEL[dir]}
+                  className={`dp dp-${dir}`}
+                >
+                  <svg
+                    className="dp-arrow"
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                  >
+                    <polygon points={ARROW_POINTS[dir]} fill="currentColor" />
+                  </svg>
+                </PadButton>
+              );
+            })}
+            <div className="dp-hub" aria-hidden="true">
+              <span className="dp-hub-gem" />
+            </div>
+          </div>
         </div>
-      )}
-      {controls.actions.length > 0 && (
-        <div className="tc-actions">
-          {controls.actions.map((action, i) => (
-            <PadButton
-              key={action.code + action.label}
-              code={action.code}
-              disabled={disabled}
-              label={action.label}
-              className={`tc-btn tc-action ${i === 0 ? "tc-primary" : "tc-secondary"}`}
-            >
-              {action.label}
-            </PadButton>
-          ))}
-        </div>
-      )}
+        {actions.length > 0 && (
+          <div className="gp-col gp-col-right">
+            <div className="gp-actions">
+              {actions.map(({ action, letter }) => (
+                <div key={action.code + action.label} className="ab-wrap">
+                  <PadButton
+                    code={action.code}
+                    disabled={disabled}
+                    label={action.label}
+                    className={`ab ${letter === "A" ? "a" : "b"}`}
+                  >
+                    <span className="ab-ring" aria-hidden="true" />
+                    <span className="ab-letter" aria-hidden="true">
+                      {letter}
+                    </span>
+                  </PadButton>
+                  <span className="ab-label" aria-hidden="true">
+                    {action.label}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
