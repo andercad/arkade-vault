@@ -1,6 +1,6 @@
 # SPEC 12 — Controles táctiles para jugar en móvil
 
-> **Estado:** Aprobado
+> **Estado:** Implementado
 > **Depende de:** SPEC 07 (registro genérico de juegos), SPEC 10 (HUD del reproductor), SPEC 11 (reset del reproductor)
 > **Fecha:** 2026-11-17
 > **Objetivo:** Permitir jugar los 4 juegos en un móvil táctil en vertical con un mando en pantalla bajo el canvas, configurado por juego en el registro, que emite teclas virtuales a los motores.
@@ -83,19 +83,19 @@ Un commit por paso (`12-controles-tactiles: Paso N`).
 
 ## Criterios de aceptación
 
-- [ ] Con emulación táctil a 390×844, el mando aparece bajo el canvas en los 4 juegos y no aparece "REQUIERE TECLADO".
-- [ ] En escritorio (`pointer: fine`) el mando no se muestra y el teclado funciona igual que antes.
-- [ ] Asteroids: girar, empujar y disparar con el mando; mantener ← + ↑ + DISPARO a la vez funciona.
-- [ ] Tetris: mover, bajar, girar y caída rápida con el mando; un toque = un paso.
-- [ ] Arkanoid: mover la pala manteniendo ←/→ y lanzar la bola con LANZAR.
-- [ ] Snake: cambiar de dirección con las 4 flechas.
-- [ ] Al levantar el dedo o salir del botón arrastrando, la acción se detiene (no queda tecla "pegada").
-- [ ] En pausa o con el modal de fin abierto, el mando no altera el juego.
-- [ ] Pulsar el mando no hace scroll, zoom, selección de texto ni menú contextual.
-- [ ] A 390×844 en vertical HUD + canvas + mando caben sin scroll vertical ni horizontal; en horizontal nada desborda horizontalmente.
-- [ ] Un juego sin `touchControls` en el registro no pinta mando ni da error.
-- [ ] Con `ALLOWED_DEV_ORIGINS=<ip>` se puede abrir `npm run dev` desde el móvil en la LAN; sin la variable, el comportamiento es el actual.
-- [ ] `npm run lint` y `npm run build` sin errores.
+- [x] Con emulación táctil a 390×844, el mando aparece bajo el canvas en los 4 juegos y no aparece "REQUIERE TECLADO".
+- [x] En escritorio (`pointer: fine`) el mando no se muestra y el teclado funciona igual que antes.
+- [x] Asteroids: girar, empujar y disparar con el mando; mantener ← + ↑ + DISPARO a la vez funciona.
+- [x] Tetris: mover, bajar, girar y caída rápida con el mando; un toque = un paso.
+- [x] Arkanoid: mover la pala manteniendo ←/→ y lanzar la bola con LANZAR.
+- [x] Snake: cambiar de dirección con las 4 flechas.
+- [x] Al levantar el dedo o salir del botón arrastrando, la acción se detiene (no queda tecla "pegada").
+- [x] En pausa o con el modal de fin abierto, el mando no altera el juego.
+- [x] Pulsar el mando no hace scroll, zoom, selección de texto ni menú contextual.
+- [x] A 390×844 en vertical HUD + canvas + mando caben sin scroll vertical ni horizontal; en horizontal nada desborda horizontalmente.
+- [x] Un juego sin `touchControls` en el registro no pinta mando ni da error.
+- [x] Con `ALLOWED_DEV_ORIGINS=<ip>` se puede abrir `npm run dev` desde el móvil en la LAN; sin la variable, el comportamiento es el actual.
+- [x] `npm run lint` y `npm run build` sin errores.
 
 ---
 
