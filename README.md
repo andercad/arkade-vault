@@ -44,6 +44,19 @@ Contrato de motores `lib/game-engine.ts`, registro `lib/game-registry.ts`, repro
 - `npm run lint` — ESLint (flat config, `eslint.config.mjs`)
 - No test runner configured.
 
+### Probar en el móvil por LAN
+
+Para abrir `npm run dev` desde un móvil en la misma red, Next bloquea por defecto los orígenes que no son `localhost`. Permite la IP de tu equipo con `ALLOWED_DEV_ORIGINS` (lista separada por comas; vacío por defecto, sin cambios de comportamiento):
+
+```bash
+# PowerShell
+$env:ALLOWED_DEV_ORIGINS = "192.168.1.50"; npm run dev
+# bash
+ALLOWED_DEV_ORIGINS=192.168.1.50 npm run dev
+```
+
+Luego abre `http://192.168.1.50:3000` en el móvil (la IP sale de `ipconfig`). Reinicia el servidor si cambias la variable.
+
 ## Specs (`specs/`)
 
 | Spec                            | Contenido                                                                                  |
