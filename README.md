@@ -27,7 +27,7 @@ Lista detallada de juegos (desde la BD): `references/implemented-games.md`.
 
 ## Código compartido
 
-Contrato de motores `lib/game-engine.ts`, registro `lib/game-registry.ts`, reproductor `components/game-player.tsx` / `game-canvas.tsx`, UI de scores (`leaderboard`, `hall-of-fame`), acceso a datos `lib/games*`/`lib/scores*` y clientes `lib/supabase/`. Reutilizar antes de crear código nuevo.
+Contrato de motores `lib/game-engine.ts`, registro `lib/game-registry.ts`, reproductor `components/game-player.tsx` / `game-canvas.tsx` (las opciones `live`, p. ej. skin, van en el HUD; las `restart`, en el overlay de pausa), UI de scores (`leaderboard`, `hall-of-fame`), acceso a datos `lib/games*`/`lib/scores*` y clientes `lib/supabase/`. Reutilizar antes de crear código nuevo.
 
 ## Tooling de Claude
 
@@ -57,6 +57,7 @@ Contrato de motores `lib/game-engine.ts`, registro `lib/game-registry.ts`, repro
 | `07-tetris.md`               | Tetris (motor TS en `lib/tetris/`) y registro genérico de juegos         |
 | `08-arkanoid.md`             | Arkanoid (motor TS en `lib/arkanoid/`) con sonido y 5 niveles            |
 | `09-snake.md`                | Snake (motor TS en `lib/snake/`) con sprites de frutas y niveles         |
+| `10-hud-skins-integrados.md` | Selector de skin (opciones `live`) integrado en el HUD del reproductor   |
 
 ### Buenas prácticas
 
