@@ -17,6 +17,23 @@ npx skills@latest add Klerith/fernando-skills
 
 Skill propia del proyecto: `/add-game` (`.claude/skills/add-game/`). Genera la spec para añadir un juego real con leaderboard (desde `references/started-games/` o nuevo), siguiendo SPEC 05 y 06; se implementa con `/spec-impl`.
 
+## Juegos y rutas
+
+Juegos jugables: Asteroids, Tetris, Arkanoid y Snake, cada uno con motor TS en `lib/<juego>/`, registrado en `lib/game-registry.ts` y con leaderboard en Supabase.
+
+Rutas: `/` home · `/juegos` biblioteca · `/juegos/[id]` detalle · `/juegos/[id]/jugar` · `/salon-de-la-fama` · `/login` · `/about` (contacto con Resend).
+
+Lista detallada de juegos (desde la BD): `references/implemented-games.md`.
+
+## Código compartido
+
+Contrato de motores `lib/game-engine.ts`, registro `lib/game-registry.ts`, reproductor `components/game-player.tsx` / `game-canvas.tsx`, UI de scores (`leaderboard`, `hall-of-fame`), acceso a datos `lib/games*`/`lib/scores*` y clientes `lib/supabase/`. Reutilizar antes de crear código nuevo.
+
+## Tooling de Claude
+
+- Hook `PostToolUse` (`.claude/hooks/format-lint.mjs`): Prettier + ESLint `--fix` tras cada Write/Edit.
+- MCP (`.mcp.json`): Supabase. Playwright MCP para validar UI (screenshots en `.playwright-screenshots/`).
+
 ## Commands
 
 - `npm run dev` — dev server (Turbopack)

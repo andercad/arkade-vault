@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project
 
-Arcade Vault: online games platform to compete for points. Currently a fresh `create-next-app` scaffold (only `app/page.tsx`, `app/layout.tsx`, `app/globals.css`). Course project (Udemy, Section 8: Skills + Playwright MCP).
+Arcade Vault: online games platform to compete for points. App funcional: home, biblioteca, detalle, reproductor, salón de la fama, login, about + contacto, 4 juegos jugables (Asteroids, Tetris, Arkanoid, Snake) con leaderboard real en Supabase. Course project (Udemy, Section 8: Skills + Playwright MCP).
 
 Workflow is Spec Driven Design using `/spec` and `/spec-impl` skills, installed via `npx skills@latest add Klerith/fernando-skills` (see README.md). Sibling project `../../Section 7.../arkanoid` used the same flow (specs in `specs/`).
 
@@ -25,8 +25,53 @@ Buenas prácticas:
 
 Next.js 16.4.6 (App Router, `app/` at repo root, no `src/`), React 19.3, Tailwind CSS 4 (`@tailwindcss/turbopack`), TypeScript. Path alias `@/*` → repo root. Next.js has breaking changes vs. training data: read `node_modules/next/dist/docs/` before writing code.
 
+## Commands
+
+- `npm run dev` — dev server (Turbopack)
+- `npm run build` / `npm start` — build / serve
+- `npm run lint` — ESLint (flat config)
+- Sin test runner. Prettier + `prettier-plugin-tailwindcss` (`.prettierrc.json`).
+
+## Rutas (`app/`)
+
+- `/`: home con hero, juegos destacados, features, actividad, estadísticas y CTA (`components/home/`).
+- `/juegos`: biblioteca con todos los juegos de la tabla `games`, en tarjetas.
+- `/juegos/[id]`: detalle de un juego (descripción, categoría, mejor puntuación, leaderboard). `[id]` = slug de `games.id`, p. ej. `asteroids`, `tetris`, `arkanoid`, `snake`. Lista completa en `references/implemented-games.md`.
+- `/juegos/[id]/jugar`: reproductor con canvas, HUD y opciones del juego; guarda la puntuación al terminar. El `[id]` debe existir en `GAME_REGISTRY`.
+- `/salon-de-la-fama`: mejores puntuaciones (top 12) con una pestaña por juego (`components/hall-of-fame.tsx`).
+- `/login`: formulario de acceso de jugador (`components/auth-form.tsx`).
+- `/about`: sobre la plataforma + formulario de contacto (Server Action `app/about/actions.ts`, Resend).
+
+## Arquitectura
+
+- `components/`: UI global (`nav`, `game-player`, `game-canvas`, `leaderboard`, `hall-of-fame`, `auth-form`, `library`, `game-card`…); `home/` y `about/` por sección.
+- Juegos: un motor TS por juego en `lib/<juego>/` (`constants`, `engine`, `types`, `utils` + `entities`/`levels`/`sprites`/`skins` según juego). Contrato común en `lib/game-engine.ts` (`GameEngine`, `GameSnapshot`, `GameOption`). Registro en `lib/game-registry.ts` (`GAME_REGISTRY`, `getGameDefinition`): cada juego aporta un adaptador snapshot → HUD. Añadir juego = nuevo motor + entrada en el registro + migración seed (usar `/add-game`).
+- Datos: `lib/games(.server).ts`, `lib/scores(.server).ts`, `lib/auth.tsx`, `lib/contact.ts`, `lib/home.ts`.
+- Supabase: `lib/supabase/{client,server}.ts`, tipos en `database.types.ts`, migraciones en `supabase/migrations/NNNN_*.sql` (tablas `games`, `scores`, un seed por juego). Env: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (+ clave de Resend); `.env*` ignorado por git.
+- `references/` (solo lectura): `started-games/` fuentes originales, `source-assets/` sprites, `templates/` maqueta UI.
+
+## Shared code
+
+Reutilizar antes de crear código nuevo:
+
+- `lib/game-engine.ts`: contrato común (`GameStatus`, `HudItem`, `GameSnapshot`, `GameCallbacks`, `GameEngine`, `GameOption`). Todo motor nuevo lo cumple vía adaptador.
+- `lib/game-registry.ts`: único punto de alta de juegos (`GAME_REGISTRY`, `getGameDefinition`); UI genérica, sin ramas por juego.
+- `components/game-player.tsx` + `components/game-canvas.tsx`: reproductor y canvas compartidos por todos los juegos.
+- `components/leaderboard.tsx`, `hall-of-fame.tsx`, `score-empty.tsx`, `data-error.tsx`, `game-card.tsx`, `library.tsx`: UI de scores/listados genérica.
+- `lib/games(.server).ts`, `lib/scores(.server).ts`: acceso a datos `games`/`scores` (client vs server).
+- `lib/supabase/{client,server}.ts` + `database.types.ts`: únicos clientes Supabase; regenerar tipos tras cada migración.
+- `lib/auth.tsx`: estado/sesión de jugador.
+- Cada `lib/<juego>/utils.ts`/`constants.ts`: helpers y dimensiones propios del juego; no duplicar entre juegos, promover a `lib/` si se repite.
+- Lista de juegos existentes: `references/implemented-games.md` (actualizar al añadir uno).
+
 ## Skills
 
-Usa siempre /frontend-design para diseñar interfaces de usuario
+- `/spec` y `/spec-impl`: flujo Spec Driven (config en `specs/.spec-config.yml`, `AutoCreateBranch: true` crea rama `spec-NN-slug`).
+- `/frontend-design`: usar siempre para diseñar interfaces de usuario.
+- `/add-game` (propia, `.claude/skills/add-game/`: `SKILL.md`, `template.md`, `checklist.md`): genera la spec para añadir un juego real (motor TS, fila en `games`, leaderboard en `scores`) desde `references/started-games/` o nuevo, siguiendo SPEC 05 y 06; luego se implementa con `/spec-impl`.
 
-Para añadir un juego real (desde `references/started-games/` o nuevo) usa `/add-game`: genera la spec (motor TS, fila en `games`, leaderboard en `scores`) siguiendo SPEC 05 y 06; luego se implementa con `/spec-impl`. Archivos en `.claude/skills/add-game/`.
+## Tooling de Claude
+
+- Hook `PostToolUse` (`.claude/settings.json` → `.claude/hooks/format-lint.mjs`): tras Write/Edit/MultiEdit ejecuta Prettier y ESLint `--fix`; ignora `references/`, `.claude/`, `.agents/`, `.next/`, `node_modules/`. Si falla, corregir antes de seguir.
+- MCP (`.mcp.json`): Supabase (docs, database, migraciones, tipos). Playwright MCP para validar UI; screenshots en `.playwright-screenshots/` (gitignored).
+- Mantener README.md sincronizado cuando cambie este archivo.
