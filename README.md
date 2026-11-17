@@ -27,7 +27,7 @@ Lista detallada de juegos (desde la BD): `references/implemented-games.md`.
 
 ## Código compartido
 
-Contrato de motores `lib/game-engine.ts`, registro `lib/game-registry.ts`, reproductor `components/game-player.tsx` / `game-canvas.tsx` (las opciones `live`, p. ej. skin, van en el HUD; las `restart`, en el overlay de pausa), mando táctil `components/touch-controls.tsx` (configurado por `touchControls` en el registro; emite teclas virtuales, solo con `pointer: coarse`), UI de scores (`leaderboard`, `hall-of-fame`), acceso a datos `lib/games*`/`lib/scores*` y clientes `lib/supabase/`. Reutilizar antes de crear código nuevo.
+Contrato de motores `lib/game-engine.ts`, registro `lib/game-registry.ts`, reproductor `components/game-player.tsx` / `game-canvas.tsx` (las opciones `live`, p. ej. skin, van en el HUD; las `restart`, en el overlay de pausa), mando táctil `components/touch-controls.tsx` (aspecto Gamepad MK-II, SPEC 13; configurado por `touchControls` en el registro; emite teclas virtuales, solo con `pointer: coarse`; fijo abajo en móvil vertical), UI de scores (`leaderboard`, `hall-of-fame`), acceso a datos `lib/games*`/`lib/scores*` y clientes `lib/supabase/`. Reutilizar antes de crear código nuevo.
 
 ## Tooling de Claude
 
@@ -74,6 +74,7 @@ Luego abre `http://192.168.1.50:3000` en el móvil (la IP sale de `ipconfig`). R
 | `10-hud-skins-integrados.md`    | Selector de skin (opciones `live`) integrado en el HUD del reproductor                         |
 | `11-fin-leaderboard-y-reset.md` | Botón del menú de fin al Salón de la fama (`?juego=<id>`) y reset del reproductor al salir     |
 | `12-controles-tactiles.md`      | Mando táctil bajo el canvas (`touchControls` por juego en el registro) y HUD compacto en móvil |
+| `13-gamepad-mk2.md`            | Aspecto Gamepad MK-II del mando táctil (carcasa neón, cruz con hub, botones A/B), fijo abajo en móvil |
 
 ### Buenas prácticas
 
