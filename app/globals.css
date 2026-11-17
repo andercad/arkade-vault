@@ -1723,6 +1723,75 @@ a {
     --game-h: max(200px, min(600px, calc(100svh - 630px)));
   }
 }
+/* Móvil vertical: mando fijo abajo (fuera del flujo) para que el canvas ocupe
+   todo el alto libre. El pie de la página se oculta (no hay scroll). */
+@media (pointer: coarse) and (max-width: 620px) and (orientation: portrait) {
+  .gp {
+    position: fixed;
+    left: 8px;
+    right: 8px;
+    bottom: max(8px, env(safe-area-inset-bottom));
+    z-index: 40;
+    width: auto;
+    margin: 0;
+    padding: 6px 10px;
+  }
+  .gp-body {
+    padding: 0 4px;
+    gap: 10px;
+  }
+  .gp-dpad {
+    width: 126px;
+    height: 126px;
+  }
+  .dp,
+  .dp-hub {
+    width: 40px;
+    height: 40px;
+  }
+  .dp-up,
+  .dp-down {
+    left: 43px;
+  }
+  .dp-left,
+  .dp-right {
+    top: 43px;
+  }
+  .dp-hub {
+    top: 43px;
+    left: 43px;
+  }
+  .dp-arrow {
+    width: 18px;
+    height: 18px;
+  }
+  .ab {
+    width: 54px;
+    height: 54px;
+  }
+  .ab-letter {
+    font-size: 17px;
+  }
+  .gp-actions {
+    gap: 12px;
+  }
+  .ab-wrap {
+    gap: 6px;
+  }
+  body:has(.gp) footer {
+    display: none;
+  }
+  .av-player {
+    margin: 10px auto 0;
+    padding-bottom: 0;
+  }
+  .crt .crt-bottom {
+    display: none;
+  }
+  .crt {
+    --game-h: max(200px, min(640px, calc(100svh - 336px)));
+  }
+}
 
 .crt-content {
   position: absolute;
