@@ -58,7 +58,8 @@ Estructura de archivos nueva y convenciones (teclas, constantes del original con
 4. `lib/<slug>/entities.ts` (si aplica). Verificación: `npx tsc --noEmit` y `npm run lint`.
 5. `lib/<slug>/engine.ts`: estado, update/draw, input con cleanup, `pause/resume/restart/end/destroy`, snapshot solo ante cambios. Verificación: `tsc` y `lint`.
 6. Registrar el juego en `lib/game-registry.ts`. Verificación: `/juegos/<slug>/jugar` monta el canvas.
-7. Migración `NNNN_seed_<slug>.sql` + `apply_migration`; regenerar `database.types.ts` si hace falta. Verificación: `list_migrations`, `select id from games`, `get_advisors`.
+7. _(Solo si `cat` o `color` no están soportados hoy)_ Ampliación de CHECK de `games`, `Category`/`AccentColor`/`CATEGORIES` en `lib/games.ts` y acento CSS (ver "Categoría o color nuevo" en `checklist.md`). Verificación: `tsc`, `list_migrations`.
+8. Migración `NNNN_seed_<slug>.sql` + `apply_migration`; regenerar `database.types.ts` si hace falta. Verificación: `list_migrations`, `select id from games`, `get_advisors`.
 8. Portada `.cover-<slug>` y CSS del canvas/escalado en `app/globals.css` (`/frontend-design`). Verificación: tarjeta en `/juegos`, 375 px sin desbordar.
 9. Verificación en navegador con Playwright (guardar score "TEST", ver leaderboard), borrar filas de prueba de `scores`, actualizar `CLAUDE.md` y `README.md`. Verificación: ambos mencionan la spec; `npm run lint` y `npm run build` pasan.
 

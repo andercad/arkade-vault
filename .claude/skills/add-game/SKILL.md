@@ -1,7 +1,6 @@
 ---
 name: add-game
 description: Genera la spec para añadir un juego real jugable a Arcade Vault (motor TS en canvas, fila en la tabla games, leaderboard en scores), portado desde references/started-games o diseñado desde cero. Se implementa después con /spec-impl.
-disable-model-invocation: true
 argument-hint: <carpeta de references/started-games o descripción del juego>
 allowed-tools: Read, Glob, Grep, Write, AskUserQuestion, Bash(ls:*), Bash(cat:*), Bash(date:*), Bash(git status:*)
 ---
@@ -44,7 +43,7 @@ Lee, en este orden:
 2. `specs/05-asteroids.md` y `specs/06-leaderboard-y-juegos.md` (patrón y convenciones de redacción).
 3. **Skill `/spec` (obligatorio, antes de redactar):** `.claude/skills/spec/SKILL.md` y `.claude/skills/spec/template.md`. Son la referencia de formato y método para crear specs en este repo: filosofía, fases, cabecera, estados válidos, secciones, anti-patrones de criterios y reglas globales del documento. Si no existen en `.claude/skills/spec/`, busca en `.agents/skills/spec/`; si tampoco, avisa al usuario y detente.
 4. `checklist.md` y `template.md` de este skill (mismo directorio). El `template.md` de `/add-game` **complementa** al de `/spec`: añade el contenido específico de un juego, nunca lo sustituye.
-5. Código vivo del patrón: `components/game-player.tsx`, `components/asteroids-canvas.tsx`, `lib/asteroids/types.ts`, `lib/scores.ts`, `lib/games.server.ts`, `supabase/migrations/0004_seed_asteroids.sql`.
+5. Código vivo del patrón: `components/game-player.tsx`, `components/game-canvas.tsx`, `lib/game-registry.ts`, `lib/game-engine.ts`, `lib/asteroids/types.ts`, `lib/scores.ts`, `lib/games.ts`, `lib/games.server.ts`, `supabase/migrations/0004_seed_asteroids.sql`.
 6. Specs posteriores a la 06 que existan en `specs/` (pueden haber cambiado el patrón, p. ej. un registro genérico ya implementado). Si el código real contradice las specs 05/06, manda el código.
 
 ## Fase 2 — Origen del juego
@@ -67,7 +66,8 @@ Nunca modifiques `references/`.
 
 Con `AskUserQuestion`, solo lo que no puedas deducir (máx. 4 por tanda; recomienda una opción por defecto):
 
-- `id` (slug de URL), título, `cat` (`ARCADE|PUZZLE|SHOOTER|VERSUS`), `color` (`cyan|magenta|yellow|green`), textos `short` y `long`.
+- `id` (slug de URL), título, `cat` (`ARCADE|PUZZLE|SHOOTER|VERSUS|RACING|FIGHTING|PLATFORMER|MAZE|RHYTHM|SPORTS|STRATEGY`), `color` (`cyan|magenta|yellow|green|orange|violet|red`), textos `short` y `long`.
+  - Soportados hoy por BD y código: `ARCADE|PUZZLE|SHOOTER|VERSUS` y `cyan|magenta|yellow|green` (`Category`/`AccentColor` en `lib/games.ts`, CHECK de `0003_games_scores.sql`). Si eliges otro valor, la spec incluye el paso "Categoría o color nuevo" de `checklist.md`.
 - Campos del HUD de plataforma: `score` siempre; el resto según el juego (vidas, nivel, líneas…).
 - Extras del original: ¿se portan o quedan fuera? (menús, skins, sonido, selector de nivel, récords en `localStorage`).
 - Teclas de pausa (por defecto `Esc` y `P`) y si hay controles táctiles (por defecto fuera, con aviso "REQUIERE TECLADO").
@@ -84,6 +84,17 @@ No preguntes lo que ya dicta `checklist.md`.
 4. Criterios de aceptación: los genéricos de `checklist.md` + los específicos del juego (puntuación, reglas, niveles), todos booleanos y verificables.
 5. Muestra la spec sección a sección, corrige con el usuario y guarda con `Write` al confirmar.
 6. Termina indicando: revisar la spec, pasar su Estado a `Aprobado` a mano y ejecutar `/spec-impl NN-<juego>`. Recuerda que al actualizar `CLAUDE.md` (lista de specs) se actualiza también `README.md`.
+
+## Modo game-jam
+
+Aplica cuando lo sigue el subagente `game-jam` (`.claude/agents/game-jam.md`), que lo tiene precargado vía `skills:`, o cuando `$ARGUMENTS` empieza por `game-jam:`. Un subagente no puede usar `AskUserQuestion`, y un skill precargado no recibe `$ARGUMENTS` ni garantiza que se ejecuten los comandos `!`. El subagente decide antes `id`, título, `cat`, `color`, `sort_order`, mecánica, controles y canvas; si llegan por `$ARGUMENTS`, úsalos. No los preguntes. Aplica estas diferencias:
+
+- Sin preguntas: usa lo recibido en `$ARGUMENTS`; lo que falte, decídelo tú y regístralo en Decisiones.
+- Juego siempre nuevo y original (Fase 2, rama "descripción"); no se lee `references/started-games/`.
+- Salida: `specs/game-jam/<id>/01-<id>-core.md`, cabecera `# SPEC <id>-01 — <Juego>: <frase corta>`, en lugar de `specs/NN-<slug>.md`. Estado `Borrador`.
+- Fase 4: sin mostrar sección a sección ni esperar confirmación; escribe el archivo directamente.
+- La fecha y las listas de contexto (specs, migraciones, `lib/`) se obtienen con Glob/Read; la fecha, del contexto de la conversación.
+- Los pasos del plan y los commits usan el prefijo `<id>-NN` y la migración seed el siguiente `NNNN` libre.
 
 ## Reglas
 

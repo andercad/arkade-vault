@@ -25,7 +25,7 @@ Reglas que toda spec generada por `/add-game` debe respetar. Si el código actua
 ## Componente y reproductor
 
 - `Math.random`, `localStorage` y el motor solo dentro de `useEffect`; React renderiza solo el `<canvas>` vacío (sin hydration warnings).
-- Patrón de `components/asteroids-canvas.tsx`: `ref` + `useImperativeHandle` con `pause/resume/restart/end`, callbacks vía ref para no recrear el motor, `destroy()` en el cleanup.
+- Patrón de `components/game-canvas.tsx` (ya genérico, no se crea componente por juego): `ref` + `useImperativeHandle` con `pause/resume/restart/end/setOption`, callbacks vía ref para no recrear el motor, `destroy()` en el cleanup.
 - El contenedor (`GamePlayer`) controla pausa y fin: botones PAUSA/REANUDAR, FIN, SALIR, overlay "EN PAUSA" (con pista de teclas), modal "FIN DEL JUEGO" con puntuación real, "JUGAR DE NUEVO" → `restart()`.
 - Etiqueta del botón y overlay derivados de `snapshot.status` (reflejan también la pausa por teclado).
 - `GamePlayer` no se ramifica por `game.id`: el juego se registra en el registro genérico (`lib/game-registry.ts`); si no existe, la spec lo extrae primero sin cambiar el comportamiento de Asteroids.
@@ -35,12 +35,23 @@ Reglas que toda spec generada por `/add-game` debe respetar. Si el código actua
 ## Datos y leaderboard
 
 - El juego entra al catálogo **solo por migración**: `supabase/migrations/NNNN_seed_<slug>.sql` con `insert into public.games` (`id` = slug, `cat` y `color` dentro de los CHECKs, `cover` = `cover-<slug>`, `sort_order` = siguiente libre). Aplicar con `apply_migration`; comprobar con `list_migrations` y `get_advisors`.
-- Sin cambios de esquema en `games`/`scores`/`game_stats`; si hace falta alguno, es otra spec.
+- Sin cambios de esquema en `games`/`scores`/`game_stats` (salvo ampliar los CHECK de `cat`/`color`, ver abajo); si hace falta otro, es otra spec.
 - Guardado con `submitScore({ gameId, name, score })` (`lib/scores.ts`); nombre vacío → `"INVITADO"`, máx. 10 caracteres, mayúsculas; fallo → "NO SE PUDO GUARDAR · REINTENTA".
 - Puntuación entera entre 0 y 1.000.000 (CHECK de BD); si el juego puede superar ese rango, decidirlo en la spec.
 - Biblioteca, home, ficha, Salón y actividad leen de BD (`getGames`, `getGame`, `getTopScores`…) y no necesitan código nuevo.
 - Portada `.cover-<slug>` en `app/globals.css`, distinguible de las existentes; aplicar `/frontend-design`.
 - Sin service role key ni secretos en el repo.
+
+## Categoría o color nuevo
+
+Valores permitidos en una spec: `cat` ∈ `ARCADE, PUZZLE, SHOOTER, VERSUS, RACING, FIGHTING, PLATFORMER, MAZE, RHYTHM, SPORTS, STRATEGY`; `color` ∈ `cyan, magenta, yellow, green, orange, violet, red`. Hoy BD y código solo admiten `ARCADE|PUZZLE|SHOOTER|VERSUS` y `cyan|magenta|yellow|green` (comprobar `Category`/`AccentColor` en `lib/games.ts` y los CHECK de `games`).
+
+Si el `cat` o el `color` del juego no está soportado, la spec añade un paso **antes** de la migración seed:
+
+- Migración `NNNN_extend_games_checks.sql`: `drop constraint` de `games_cat_check` y/o `games_color_check` y `add constraint … check (… in (lista completa de valores soportados))`. Aplicar con `apply_migration`; regenerar `lib/supabase/database.types.ts`.
+- Actualizar `Category`, `AccentColor` y `CATEGORIES` en `lib/games.ts`.
+- Estilos de acento del color nuevo en `app/globals.css` (mismas variantes que `cyan|magenta|yellow|green`; aplicar `/frontend-design`).
+- Criterio de aceptación: la fila se inserta; la tarjeta, la ficha y el chip de filtro de `/juegos` muestran el acento y la categoría correctos.
 
 ## Criterios de aceptación genéricos (copiar y adaptar)
 
