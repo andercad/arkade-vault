@@ -21,7 +21,7 @@ Skill propia del proyecto: `/add-game` (`.claude/skills/add-game/`). Genera la s
 
 Juegos jugables: Asteroids, Tetris, Arkanoid y Snake, cada uno con motor TS en `lib/<juego>/`, registrado en `lib/game-registry.ts` y con leaderboard en Supabase.
 
-Rutas: `/` home · `/juegos` biblioteca · `/juegos/[id]` detalle · `/juegos/[id]/jugar` · `/salon-de-la-fama` · `/login` · `/about` (contacto con Resend).
+Rutas: `/` home · `/juegos` biblioteca · `/juegos/[id]` detalle · `/juegos/[id]/jugar` (el menú de fin enlaza a `/salon-de-la-fama?juego=<id>`; el estado del reproductor se reinicia al salir) · `/salon-de-la-fama` (`?juego=<id>` elige la pestaña inicial) · `/login` · `/about` (contacto con Resend).
 
 Lista detallada de juegos (desde la BD): `references/implemented-games.md`.
 
@@ -46,18 +46,19 @@ Contrato de motores `lib/game-engine.ts`, registro `lib/game-registry.ts`, repro
 
 ## Specs (`specs/`)
 
-| Spec                         | Contenido                                                                |
-| ---------------------------- | ------------------------------------------------------------------------ |
-| `01-mvp-pantallas.md`        | MVP visual: 5 pantallas con datos mock                                   |
-| `02-homepage.md`             | Home en `/`, Biblioteca movida a `/juegos`, nav completa                 |
-| `03-about-contacto.md`       | `/about` + formulario de contacto (Resend, Server Action)                |
-| `04-supabase-cimientos.md`   | Supabase: clientes, migraciones, tipos generados                         |
-| `05-asteroids.md`            | Asteroids: primer juego real jugable (motor TS en `lib/asteroids/`)      |
-| `06-leaderboard-y-juegos.md` | Tablas `games` y `scores` en Supabase; leaderboard real (solo Asteroids) |
-| `07-tetris.md`               | Tetris (motor TS en `lib/tetris/`) y registro genérico de juegos         |
-| `08-arkanoid.md`             | Arkanoid (motor TS en `lib/arkanoid/`) con sonido y 5 niveles            |
-| `09-snake.md`                | Snake (motor TS en `lib/snake/`) con sprites de frutas y niveles         |
-| `10-hud-skins-integrados.md` | Selector de skin (opciones `live`) integrado en el HUD del reproductor   |
+| Spec                            | Contenido                                                                                  |
+| ------------------------------- | ------------------------------------------------------------------------------------------ |
+| `01-mvp-pantallas.md`           | MVP visual: 5 pantallas con datos mock                                                     |
+| `02-homepage.md`                | Home en `/`, Biblioteca movida a `/juegos`, nav completa                                   |
+| `03-about-contacto.md`          | `/about` + formulario de contacto (Resend, Server Action)                                  |
+| `04-supabase-cimientos.md`      | Supabase: clientes, migraciones, tipos generados                                           |
+| `05-asteroids.md`               | Asteroids: primer juego real jugable (motor TS en `lib/asteroids/`)                        |
+| `06-leaderboard-y-juegos.md`    | Tablas `games` y `scores` en Supabase; leaderboard real (solo Asteroids)                   |
+| `07-tetris.md`                  | Tetris (motor TS en `lib/tetris/`) y registro genérico de juegos                           |
+| `08-arkanoid.md`                | Arkanoid (motor TS en `lib/arkanoid/`) con sonido y 5 niveles                              |
+| `09-snake.md`                   | Snake (motor TS en `lib/snake/`) con sprites de frutas y niveles                           |
+| `10-hud-skins-integrados.md`    | Selector de skin (opciones `live`) integrado en el HUD del reproductor                     |
+| `11-fin-leaderboard-y-reset.md` | Botón del menú de fin al Salón de la fama (`?juego=<id>`) y reset del reproductor al salir |
 
 ### Buenas prácticas
 

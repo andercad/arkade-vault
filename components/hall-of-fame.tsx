@@ -52,13 +52,18 @@ function Slot({
 export function HallOfFame({
   games,
   scores,
+  initialGameId,
 }: {
   games: Game[];
   // null = error al leer el ranking de ese juego
   scores: Record<string, ScoreRow[] | null>;
+  // Pestaña inicial (?juego=<id>); si no coincide con ningún juego, la primera.
+  initialGameId?: string;
 }) {
   const { user } = useAuth();
-  const [tab, setTab] = useState(games[0].id);
+  const [tab, setTab] = useState(
+    games.find((g) => g.id === initialGameId)?.id ?? games[0].id,
+  );
   const game = games.find((g) => g.id === tab) ?? games[0];
   const rows = scores[game.id] ?? null;
 
