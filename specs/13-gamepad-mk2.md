@@ -1,6 +1,6 @@
 # SPEC 13 — Apariencia Gamepad MK-II del mando táctil
 
-> **Estado:** Aprobado
+> **Estado:** Implementado
 > **Depende de:** SPEC 12 (controles táctiles)
 > **Fecha:** 2026-11-17
 > **Objetivo:** Rediseñar el mando táctil del reproductor para que replique el aspecto del Gamepad MK-II de `references/gamepad-assets/` (carcasa neón, d-pad con hub y botones A/B), sin cambiar su comportamiento ni el contrato `touchControls`.
@@ -66,15 +66,15 @@ Un commit por paso (`13-gamepad-mk2: Paso N`).
 
 ## Criterios de aceptación
 
-- [ ] A 390×844 táctil el mando muestra carcasa, cruz completa con hub y gema pulsante, y botones A/B esféricos como en `gamepad-neon.png`.
-- [ ] Arkanoid muestra ↑/↓ atenuados; pulsarlos no emite teclas. Tetris ↑ atenuado; Asteroids ↓ atenuado; Snake 4 activas.
-- [ ] Asteroids/Arkanoid: solo botón A (magenta) con rótulo DISPARO/LANZAR. Tetris: A=GIRAR, B=BAJAR. Snake: sin botones de acción, sin error.
-- [ ] Pulsar un botón lo hunde e ilumina; al soltar vuelve al estado normal.
-- [ ] Con teclado físico, pulsar ←/Espacio ilumina el botón correspondiente; al soltar se apaga. En pausa/fin no se ilumina.
-- [ ] Todo el comportamiento de SPEC 12 sigue igual (multitouch, sin tecla pegada, inactivo en pausa/fin, sin scroll/zoom/selección/menú contextual).
-- [ ] A 390×844 vertical HUD + canvas + mando caben sin scroll vertical ni horizontal; en horizontal nada desborda.
-- [ ] En escritorio (`pointer: fine`) el mando no se muestra.
-- [ ] `npm run lint` y `npm run build` sin errores.
+- [x] A 390×844 táctil el mando muestra carcasa, cruz completa con hub y gema pulsante, y botones A/B esféricos como en `gamepad-neon.png`.
+- [x] Arkanoid muestra ↑/↓ atenuados; pulsarlos no emite teclas. Tetris ↑ atenuado; Asteroids ↓ atenuado; Snake 4 activas.
+- [x] Asteroids/Arkanoid: solo botón A (magenta) con rótulo DISPARO/LANZAR. Tetris: A=GIRAR, B=BAJAR. Snake: sin botones de acción, sin error.
+- [x] Pulsar un botón lo hunde e ilumina; al soltar vuelve al estado normal.
+- [x] Con teclado físico, pulsar ←/Espacio ilumina el botón correspondiente; al soltar se apaga. En pausa/fin no se ilumina.
+- [x] Todo el comportamiento de SPEC 12 sigue igual (multitouch, sin tecla pegada, inactivo en pausa/fin, sin scroll/zoom/selección/menú contextual).
+- [x] A 390×844 vertical HUD + canvas + mando caben sin scroll vertical ni horizontal; en horizontal nada desborda.
+- [x] En escritorio (`pointer: fine`) el mando no se muestra.
+- [x] `npm run lint` y `npm run build` sin errores.
 
 ---
 
@@ -87,6 +87,8 @@ Un commit por paso (`13-gamepad-mk2: Paso N`).
 - **No:** ocultar direcciones sin uso (cruz con huecos).
 - **Sí:** iluminar con teclado físico (tablets con teclado BT).
 - **No:** mostrar en escritorio; se mantiene la regla de SPEC 12.
+- **Sí:** en móvil vertical (≤620 px) el mando va `position: fixed` al borde inferior, sin leyenda del marco ni pie de página, para que el canvas ocupe el alto libre (a 390×844 el canvas pasó de ~200 a ~440 px de alto). Añadido tras probar el Paso 2: reservar la altura del mando dejaba el juego diminuto. Evidencia: `.playwright-screenshots/13-mobile-fix-*.png`.
+- **Sí:** guard `disabled` en `onPointerDown` (los hijos svg/span del botón reciben pointerdown aunque esté deshabilitado).
 - **Sí:** tokens y fuente del proyecto; no se importa el `<style>`/fuentes de Google tal cual.
 
 ---
