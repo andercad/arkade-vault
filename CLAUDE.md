@@ -34,9 +34,13 @@ Next.js 16.4.6 (App Router, `app/` at repo root, no `src/`), React 19.3, Tailwin
 
 ## Rutas (`app/`)
 
-- `/` home · `/juegos` biblioteca · `/juegos/[id]` detalle · `/juegos/[id]/jugar` reproductor
-- `/salon-de-la-fama` · `/login`
-- `/about` + formulario de contacto (Server Action `app/about/actions.ts`, Resend)
+- `/`: home con hero, juegos destacados, features, actividad, estadísticas y CTA (`components/home/`).
+- `/juegos`: biblioteca con todos los juegos de la tabla `games`, en tarjetas.
+- `/juegos/[id]`: detalle de un juego (descripción, categoría, mejor puntuación, leaderboard). `[id]` = slug de `games.id`, p. ej. `asteroids`, `tetris`, `arkanoid`, `snake`. Lista completa en `references/implemented-games.md`.
+- `/juegos/[id]/jugar`: reproductor con canvas, HUD y opciones del juego; guarda la puntuación al terminar. El `[id]` debe existir en `GAME_REGISTRY`.
+- `/salon-de-la-fama`: mejores puntuaciones (top 12) con una pestaña por juego (`components/hall-of-fame.tsx`).
+- `/login`: formulario de acceso de jugador (`components/auth-form.tsx`).
+- `/about`: sobre la plataforma + formulario de contacto (Server Action `app/about/actions.ts`, Resend).
 
 ## Arquitectura
 
@@ -45,6 +49,20 @@ Next.js 16.4.6 (App Router, `app/` at repo root, no `src/`), React 19.3, Tailwin
 - Datos: `lib/games(.server).ts`, `lib/scores(.server).ts`, `lib/auth.tsx`, `lib/contact.ts`, `lib/home.ts`.
 - Supabase: `lib/supabase/{client,server}.ts`, tipos en `database.types.ts`, migraciones en `supabase/migrations/NNNN_*.sql` (tablas `games`, `scores`, un seed por juego). Env: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (+ clave de Resend); `.env*` ignorado por git.
 - `references/` (solo lectura): `started-games/` fuentes originales, `source-assets/` sprites, `templates/` maqueta UI.
+
+## Shared code
+
+Reutilizar antes de crear código nuevo:
+
+- `lib/game-engine.ts`: contrato común (`GameStatus`, `HudItem`, `GameSnapshot`, `GameCallbacks`, `GameEngine`, `GameOption`). Todo motor nuevo lo cumple vía adaptador.
+- `lib/game-registry.ts`: único punto de alta de juegos (`GAME_REGISTRY`, `getGameDefinition`); UI genérica, sin ramas por juego.
+- `components/game-player.tsx` + `components/game-canvas.tsx`: reproductor y canvas compartidos por todos los juegos.
+- `components/leaderboard.tsx`, `hall-of-fame.tsx`, `score-empty.tsx`, `data-error.tsx`, `game-card.tsx`, `library.tsx`: UI de scores/listados genérica.
+- `lib/games(.server).ts`, `lib/scores(.server).ts`: acceso a datos `games`/`scores` (client vs server).
+- `lib/supabase/{client,server}.ts` + `database.types.ts`: únicos clientes Supabase; regenerar tipos tras cada migración.
+- `lib/auth.tsx`: estado/sesión de jugador.
+- Cada `lib/<juego>/utils.ts`/`constants.ts`: helpers y dimensiones propios del juego; no duplicar entre juegos, promover a `lib/` si se repite.
+- Lista de juegos existentes: `references/implemented-games.md` (actualizar al añadir uno).
 
 ## Skills
 

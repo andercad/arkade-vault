@@ -23,6 +23,12 @@ Juegos jugables: Asteroids, Tetris, Arkanoid y Snake, cada uno con motor TS en `
 
 Rutas: `/` home · `/juegos` biblioteca · `/juegos/[id]` detalle · `/juegos/[id]/jugar` · `/salon-de-la-fama` · `/login` · `/about` (contacto con Resend).
 
+Lista detallada de juegos (desde la BD): `references/implemented-games.md`.
+
+## Código compartido
+
+Contrato de motores `lib/game-engine.ts`, registro `lib/game-registry.ts`, reproductor `components/game-player.tsx` / `game-canvas.tsx`, UI de scores (`leaderboard`, `hall-of-fame`), acceso a datos `lib/games*`/`lib/scores*` y clientes `lib/supabase/`. Reutilizar antes de crear código nuevo.
+
 ## Tooling de Claude
 
 - Hook `PostToolUse` (`.claude/hooks/format-lint.mjs`): Prettier + ESLint `--fix` tras cada Write/Edit.
