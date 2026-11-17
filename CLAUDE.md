@@ -12,7 +12,7 @@ Workflow is Spec Driven Design using `/spec` and `/spec-impl` skills, installed 
 
 ## Specs
 
-Specs en `specs/` (01 MVP pantallas, 02 homepage, 03 about/contacto, 04 Supabase cimientos, 05 Asteroids, 06 leaderboard y juegos: `06-leaderboard-y-juegos.md`, 07 Tetris + registro genérico de juegos: `07-tetris.md`, 08 Arkanoid con sonido y 5 niveles: `08-arkanoid.md`, 09 Snake con sprites de frutas: `09-snake.md`). Leer la spec relevante y sus dependencias antes de implementar.
+Specs en `specs/` (01 MVP pantallas, 02 homepage, 03 about/contacto, 04 Supabase cimientos, 05 Asteroids, 06 leaderboard y juegos: `06-leaderboard-y-juegos.md`, 07 Tetris + registro genérico de juegos: `07-tetris.md`, 08 Arkanoid con sonido y 5 niveles: `08-arkanoid.md`, 09 Snake con sprites de frutas: `09-snake.md`, 10 selector de skin integrado en el HUD: `10-hud-skins-integrados.md`). Leer la spec relevante y sus dependencias antes de implementar.
 
 Buenas prácticas:
 
@@ -37,7 +37,7 @@ Next.js 16.4.6 (App Router, `app/` at repo root, no `src/`), React 19.3, Tailwin
 - `/`: home con hero, juegos destacados, features, actividad, estadísticas y CTA (`components/home/`).
 - `/juegos`: biblioteca con todos los juegos de la tabla `games`, en tarjetas.
 - `/juegos/[id]`: detalle de un juego (descripción, categoría, mejor puntuación, leaderboard). `[id]` = slug de `games.id`, p. ej. `asteroids`, `tetris`, `arkanoid`, `snake`. Lista completa en `references/implemented-games.md`.
-- `/juegos/[id]/jugar`: reproductor con canvas, HUD y opciones del juego; guarda la puntuación al terminar. El `[id]` debe existir en `GAME_REGISTRY`.
+- `/juegos/[id]/jugar`: reproductor con canvas y HUD (las opciones `live`, p. ej. skin, van dentro del HUD; las `restart`, en el overlay de pausa); guarda la puntuación al terminar. El `[id]` debe existir en `GAME_REGISTRY`.
 - `/salon-de-la-fama`: mejores puntuaciones (top 12) con una pestaña por juego (`components/hall-of-fame.tsx`).
 - `/login`: formulario de acceso de jugador (`components/auth-form.tsx`).
 - `/about`: sobre la plataforma + formulario de contacto (Server Action `app/about/actions.ts`, Resend).

@@ -1249,23 +1249,20 @@ a {
   padding: 14px;
 }
 
-/* Barra de opciones del juego (declaradas en el registro) */
-.player-options {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px 28px;
-  align-items: center;
-  padding: 8px 18px;
-  margin-bottom: 14px;
-  border: 1px solid var(--line);
-  background: var(--bg-2);
-}
+/* Opciones del juego (declaradas en el registro) */
 .player-option {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 6px 10px;
   min-width: 0;
+}
+/* Opciones "en vivo": dentro del HUD, etiqueta sobre el selector como .hud-stat */
+.player-hud .player-option {
+  flex-direction: column;
+  flex-wrap: nowrap;
+  align-items: flex-start;
+  gap: 4px;
 }
 /* Opciones "al reiniciar": dentro del overlay de pausa */
 .pause-options {
