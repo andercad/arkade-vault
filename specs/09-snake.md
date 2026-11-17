@@ -1,6 +1,6 @@
 # SPEC 09 — Snake: cuarto juego real, diseño nuevo con sprites de frutas
 
-> **Estado:** Aprobado
+> **Estado:** Implementado
 > **Depende de:** SPEC 01 (reproductor y modal), SPEC 04 (migraciones de Supabase), SPEC 05 (Asteroids, patrón de motor), SPEC 06 (tablas `games` y `scores`, `submitScore`), SPEC 07 (registro genérico de juegos), SPEC 08 (migración 0006, patrón de assets en `public/games/`)
 > **Fecha:** 2026-11-16
 > **Objetivo:** Crear desde cero un motor TypeScript de Snake que use las frutas de `references/source-assets/snake-assets`, añadirlo como juego real `snake` (fila en `games`, leaderboard en `scores`) y registrarlo en el registro genérico de juegos.
