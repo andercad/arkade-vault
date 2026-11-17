@@ -12,7 +12,10 @@ export interface ArkanoidCallbacks {
   onGameOver(finalScore: number): void; // una vez por partida (derrota o victoria)
 }
 
+export type SkinName = "classic" | "retro" | "neon";
+
 export interface ArkanoidGame {
+  setSkin(name: SkinName): void;
   start(): void;
   pause(): void;
   resume(): void;

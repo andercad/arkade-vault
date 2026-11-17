@@ -3,6 +3,7 @@ import {
   BRICK_POINTS,
   CANVAS_H,
   CANVAS_W,
+  CLASSIC_BG,
   EXPLOSION_DURATION,
   INITIAL_LIVES,
   LEVEL_COUNT,
@@ -25,17 +26,14 @@ import {
   type Explosion,
   type Particle,
 } from "./entities";
-import {
-  EXPLOSION_FRAMES,
-  drawFrame,
-  drawSprite,
-  loadSpritesheet,
-} from "./sprites";
+import { loadSpritesheet } from "./sprites";
+import { DEFAULT_SKIN, SKINS, type Skin } from "./skins";
 import type {
   ArkanoidCallbacks,
   ArkanoidGame,
   ArkanoidSnapshot,
   ArkanoidStatus,
+  SkinName,
 } from "./types";
 import { ballSpeed, clamp } from "./utils";
 
@@ -77,6 +75,7 @@ export function createArkanoidGame(
       restart: noop,
       end: noop,
       destroy: noop,
+      setSkin: noop,
     };
   }
 
@@ -98,6 +97,7 @@ export function createArkanoidGame(
   let particles: Particle[] = [];
   const keys = { left: false, right: false };
 
+  let skin: Skin = SKINS[DEFAULT_SKIN];
   let sheet: CanvasImageSource | null = null;
   let cancelLoad: (() => void) | null = null;
   let started = false;
@@ -301,7 +301,7 @@ export function createArkanoidGame(
         color: b.color,
         age: 0,
       });
-      particles.push(...spawnParticles(b));
+      particles.push(...spawnParticles(b, skin.colors));
       playSound(sounds.brk);
       score += BRICK_POINTS;
       break;
@@ -341,26 +341,16 @@ export function createArkanoidGame(
 
   function draw() {
     if (!ctx || !sheet) return;
-    ctx.fillStyle = "#14142b";
+    ctx.fillStyle = skin.bg ?? CLASSIC_BG;
     ctx.fillRect(0, 0, CANVAS_W, CANVAS_H);
 
     for (const b of bricks) {
-      if (b.alive)
-        drawSprite(ctx, sheet, `block_${b.color}`, b.x, b.y, b.w, b.h);
+      if (b.alive) skin.drawBrick(ctx, sheet, b.color, b.x, b.y, b.w, b.h);
     }
     for (const ex of explosions) {
-      const frames = EXPLOSION_FRAMES[ex.color];
       const t = ex.age / EXPLOSION_DURATION;
-      if (!frames || t < 0 || t >= 1) continue;
-      drawFrame(
-        ctx,
-        sheet,
-        frames[Math.floor(t * frames.length)],
-        ex.x,
-        ex.y,
-        ex.w,
-        ex.h,
-      );
+      if (t < 0 || t >= 1) continue;
+      skin.drawExplosion(ctx, sheet, ex.color, t, ex.x, ex.y, ex.w, ex.h);
     }
     // Partículas: cuadrados centrados en (x, y) con alpha decreciente
     for (const p of particles) {
@@ -374,27 +364,19 @@ export function createArkanoidGame(
       );
     }
     ctx.globalAlpha = 1;
-    drawSprite(ctx, sheet, "paddle", paddle.x, paddle.y, paddle.w, paddle.h);
-    drawSprite(ctx, sheet, "ball", ball.x, ball.y, ball.size, ball.size);
+    skin.drawPaddle(ctx, sheet, paddle.x, paddle.y, paddle.w, paddle.h);
+    skin.drawBall(ctx, sheet, ball.x, ball.y, ball.size);
 
     // HUD del canvas: puntos, nivel y vidas (derecha). Sin RÉCORD.
     ctx.textAlign = "left";
     ctx.font = "16px monospace";
-    ctx.fillStyle = "#ffffff";
+    ctx.fillStyle = skin.text;
     ctx.fillText(`PUNTOS: ${score}`, 12, 28);
     ctx.fillText(`NIVEL: ${level}`, 200, 28);
     const lifeGap = 6;
     for (let i = 0; i < lives; i++) {
       const lx = CANVAS_W - 12 - BALL_SIZE - i * (BALL_SIZE + lifeGap);
-      drawSprite(
-        ctx,
-        sheet,
-        "ball",
-        lx,
-        28 - BALL_SIZE + 2,
-        BALL_SIZE,
-        BALL_SIZE,
-      );
+      skin.drawBall(ctx, sheet, lx, 28 - BALL_SIZE + 2, BALL_SIZE);
     }
 
     if (phase === "levelcomplete") {
@@ -554,6 +536,11 @@ export function createArkanoidGame(
     );
   }
 
+  function setSkin(name: SkinName) {
+    skin = SKINS[name] ?? SKINS[DEFAULT_SKIN];
+    if (started && !destroyed) draw();
+  }
+
   function destroy() {
     destroyed = true;
     cancelLoad?.();
@@ -567,5 +554,5 @@ export function createArkanoidGame(
     keys.right = false;
   }
 
-  return { start, pause, resume, restart, end, destroy };
+  return { start, pause, resume, restart, end, destroy, setSkin };
 }

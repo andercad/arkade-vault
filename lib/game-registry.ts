@@ -6,13 +6,27 @@ import type {
 } from "@/lib/game-engine";
 import { createAsteroidsGame } from "@/lib/asteroids/engine";
 import { H as ASTEROIDS_H, W as ASTEROIDS_W } from "@/lib/asteroids/constants";
-import type { AsteroidsSnapshot } from "@/lib/asteroids/types";
+import type {
+  AsteroidsSnapshot,
+  SkinName as AsteroidsSkinName,
+} from "@/lib/asteroids/types";
+import {
+  DEFAULT_SKIN as ASTEROIDS_DEFAULT_SKIN,
+  SKINS as ASTEROIDS_SKINS,
+} from "@/lib/asteroids/skins";
 import { createArkanoidGame } from "@/lib/arkanoid/engine";
 import {
   CANVAS_H as ARKANOID_H,
   CANVAS_W as ARKANOID_W,
 } from "@/lib/arkanoid/constants";
-import type { ArkanoidSnapshot } from "@/lib/arkanoid/types";
+import type {
+  ArkanoidSnapshot,
+  SkinName as ArkanoidSkinName,
+} from "@/lib/arkanoid/types";
+import {
+  DEFAULT_SKIN as ARKANOID_DEFAULT_SKIN,
+  SKINS as ARKANOID_SKINS,
+} from "@/lib/arkanoid/skins";
 import { createTetrisGame } from "@/lib/tetris/engine";
 import {
   H as TETRIS_H,
@@ -21,7 +35,14 @@ import {
 } from "@/lib/tetris/constants";
 import { createSnakeGame } from "@/lib/snake/engine";
 import { H as SNAKE_H, W as SNAKE_W } from "@/lib/snake/constants";
-import type { SnakeSnapshot } from "@/lib/snake/types";
+import type {
+  SkinName as SnakeSkinName,
+  SnakeSnapshot,
+} from "@/lib/snake/types";
+import {
+  DEFAULT_SKIN as SNAKE_DEFAULT_SKIN,
+  SKINS as SNAKE_SKINS,
+} from "@/lib/snake/skins";
 import { DEFAULT_SKIN, SKINS } from "@/lib/tetris/skins";
 import type { SkinName, TetrisSnapshot } from "@/lib/tetris/types";
 
@@ -50,11 +71,34 @@ const asteroids: GameDefinition = {
   width: ASTEROIDS_W,
   height: ASTEROIDS_H,
   aria: "Asteroids",
-  create: (canvas, cb) =>
-    createAsteroidsGame(canvas, {
+  options: [
+    {
+      key: "skin",
+      label: "Skin",
+      choices: (Object.keys(ASTEROIDS_SKINS) as AsteroidsSkinName[]).map(
+        (value) => ({ value, label: ASTEROIDS_SKINS[value].label }),
+      ),
+      defaultValue: ASTEROIDS_DEFAULT_SKIN,
+      appliesOn: "live",
+    },
+  ],
+  create: (canvas, cb) => {
+    const game = createAsteroidsGame(canvas, {
       onState: (s) => cb.onState(asteroidsSnapshot(s)),
       onGameOver: cb.onGameOver,
-    }),
+    });
+    return {
+      start: game.start,
+      pause: game.pause,
+      resume: game.resume,
+      restart: game.restart,
+      end: game.end,
+      destroy: game.destroy,
+      setOption: (key, value) => {
+        if (key === "skin") game.setSkin(value as AsteroidsSkinName);
+      },
+    };
+  },
 };
 
 function tetrisSnapshot(s: TetrisSnapshot): GameSnapshot {
@@ -131,11 +175,34 @@ const arkanoid: GameDefinition = {
   width: ARKANOID_W,
   height: ARKANOID_H,
   aria: "Arkanoid",
-  create: (canvas, cb) =>
-    createArkanoidGame(canvas, {
+  options: [
+    {
+      key: "skin",
+      label: "Skin",
+      choices: (Object.keys(ARKANOID_SKINS) as ArkanoidSkinName[]).map(
+        (value) => ({ value, label: ARKANOID_SKINS[value].label }),
+      ),
+      defaultValue: ARKANOID_DEFAULT_SKIN,
+      appliesOn: "live",
+    },
+  ],
+  create: (canvas, cb) => {
+    const game = createArkanoidGame(canvas, {
       onState: (s) => cb.onState(arkanoidSnapshot(s)),
       onGameOver: cb.onGameOver,
-    }),
+    });
+    return {
+      start: game.start,
+      pause: game.pause,
+      resume: game.resume,
+      restart: game.restart,
+      end: game.end,
+      destroy: game.destroy,
+      setOption: (key, value) => {
+        if (key === "skin") game.setSkin(value as ArkanoidSkinName);
+      },
+    };
+  },
 };
 
 function snakeSnapshot(s: SnakeSnapshot): GameSnapshot {
@@ -154,11 +221,35 @@ const snake: GameDefinition = {
   width: SNAKE_W,
   height: SNAKE_H,
   aria: "Snake",
-  create: (canvas, cb) =>
-    createSnakeGame(canvas, {
+  options: [
+    {
+      key: "skin",
+      label: "Skin",
+      choices: (Object.keys(SNAKE_SKINS) as SnakeSkinName[]).map((value) => ({
+        value,
+        label: SNAKE_SKINS[value].label,
+      })),
+      defaultValue: SNAKE_DEFAULT_SKIN,
+      appliesOn: "live",
+    },
+  ],
+  create: (canvas, cb) => {
+    const game = createSnakeGame(canvas, {
       onState: (s) => cb.onState(snakeSnapshot(s)),
       onGameOver: cb.onGameOver,
-    }),
+    });
+    return {
+      start: game.start,
+      pause: game.pause,
+      resume: game.resume,
+      restart: game.restart,
+      end: game.end,
+      destroy: game.destroy,
+      setOption: (key, value) => {
+        if (key === "skin") game.setSkin(value as SnakeSkinName);
+      },
+    };
+  },
 };
 
 export const GAME_REGISTRY: Record<string, GameDefinition> = {

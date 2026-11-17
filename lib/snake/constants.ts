@@ -16,4 +16,9 @@ export const BASE_STEP_MS = 140; // intervalo de paso en el nivel 1
 export const MIN_STEP_MS = 70;
 export const STEP_MS_PER_LEVEL = 10;
 
+// Paletas por skin (cabeza / cuerpo).
+export const CLASSIC_COLORS = { head: "#39ff14", body: "#22b80c" };
+export const RETRO_COLORS = { head: "#ffd23f", body: "#e8892b" };
+export const NEON_COLORS = { head: "#00f0ff", body: "#ff2bd6" };
+
 export const SPRITESHEET_SRC = "/games/snake/fruits.png";

@@ -11,9 +11,11 @@ import {
   W,
 } from "./constants";
 import { FRUIT_KEYS, drawFruit, loadSpritesheet } from "./sprites";
+import { DEFAULT_SKIN, SKINS, type Skin } from "./skins";
 import type {
   Cell,
   Direction,
+  SkinName,
   SnakeCallbacks,
   SnakeGame,
   SnakeSnapshot,
@@ -41,10 +43,7 @@ const DELTAS: Record<Direction, Cell> = {
   right: { col: 1, row: 0 },
 };
 
-const BG_COLOR = "#0b0b14";
 const GRID_COLOR = "rgba(255, 255, 255, 0.05)";
-const HEAD_COLOR = "#39ff14";
-const BODY_COLOR = "#22b80c";
 
 interface Fruit {
   cell: Cell;
@@ -65,9 +64,11 @@ export function createSnakeGame(
       restart: noop,
       end: noop,
       destroy: noop,
+      setSkin: noop,
     };
   }
   const c: CanvasRenderingContext2D = ctx;
+  let skin: Skin = SKINS[DEFAULT_SKIN];
 
   // ── Estado ────────────────────────────────────────────────────────────────
   let body: Cell[] = []; // cabeza primero
@@ -203,7 +204,7 @@ export function createSnakeGame(
 
   // ── Draw ──────────────────────────────────────────────────────────────────
   function drawGrid() {
-    c.strokeStyle = GRID_COLOR;
+    c.strokeStyle = skin.grid;
     c.lineWidth = 1;
     c.beginPath();
     for (let col = 1; col < COLS; col++) {
@@ -215,20 +216,6 @@ export function createSnakeGame(
       c.lineTo(W, row * CELL + 0.5);
     }
     c.stroke();
-  }
-
-  function drawSegment(cell: Cell, color: string) {
-    const pad = 2;
-    c.fillStyle = color;
-    c.beginPath();
-    c.roundRect(
-      cell.col * CELL + pad,
-      cell.row * CELL + pad,
-      CELL - pad * 2,
-      CELL - pad * 2,
-      7,
-    );
-    c.fill();
   }
 
   function drawEyes(head: Cell) {
@@ -277,16 +264,29 @@ export function createSnakeGame(
   // Sin overlays de pausa ni game over: los dibuja el contenedor (React).
   function draw() {
     c.clearRect(0, 0, W, H);
-    c.fillStyle = BG_COLOR;
-    c.fillRect(0, 0, W, H);
+    if (skin.bg) {
+      c.fillStyle = skin.bg;
+      c.fillRect(0, 0, W, H);
+    }
 
     // El tablero va desplazado bajo la franja del HUD.
     c.save();
     c.translate(0, HUD_H);
     drawGrid();
-    if (fruit) drawFruit(c, sheet, fruit.key, fruit.cell);
-    for (let i = body.length - 1; i >= 1; i--) drawSegment(body[i], BODY_COLOR);
-    drawSegment(body[0], HEAD_COLOR);
+    if (fruit) {
+      if (skin.glowFruit) {
+        c.save();
+        c.shadowColor = skin.glowFruit;
+        c.shadowBlur = 14;
+        drawFruit(c, sheet, fruit.key, fruit.cell);
+        c.restore();
+      } else {
+        drawFruit(c, sheet, fruit.key, fruit.cell);
+      }
+    }
+    for (let i = body.length - 1; i >= 1; i--)
+      skin.drawSegment(c, body[i], skin.colors.body, false);
+    skin.drawSegment(c, body[0], skin.colors.head, true);
     drawEyes(body[0]);
     c.restore();
 
@@ -408,5 +408,10 @@ export function createSnakeGame(
     window.removeEventListener("blur", onBlur);
   }
 
-  return { start, pause, resume, restart, end, destroy };
+  function setSkin(name: SkinName) {
+    skin = SKINS[name] ?? SKINS[DEFAULT_SKIN];
+    if (started && !destroyed && loaded) draw();
+  }
+
+  return { start, pause, resume, restart, end, destroy, setSkin };
 }

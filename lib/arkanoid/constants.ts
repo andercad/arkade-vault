@@ -38,7 +38,8 @@ export const PARTICLE_LIFE = 400; // ms de vida
 export const PARTICLE_SPEED_MIN = 60; // px/s
 export const PARTICLE_SPEED_MAX = 180; // px/s
 export const PARTICLE_GRAVITY = 900; // px/s², hacia abajo
-export const PARTICLE_COLORS: Record<string, string> = {
+// Paletas por skin (clave = color de bloque).
+export const CLASSIC_COLORS: Record<string, string> = {
   red: "#e53935",
   yellow: "#fdd835",
   cyan: "#26c6da",
@@ -46,6 +47,24 @@ export const PARTICLE_COLORS: Record<string, string> = {
   hotpink: "#ff4081",
   green: "#43a047",
 };
+export const RETRO_COLORS: Record<string, string> = {
+  red: "#e8554e",
+  yellow: "#f2d45c",
+  cyan: "#4cc9d6",
+  magenta: "#b46bd1",
+  hotpink: "#f06fa0",
+  green: "#5fb870",
+};
+export const NEON_COLORS: Record<string, string> = {
+  red: "#ff1744",
+  yellow: "#ffee00",
+  cyan: "#00f0ff",
+  magenta: "#d500f9",
+  hotpink: "#ff2d95",
+  green: "#39ff14",
+};
+export const PARTICLE_COLORS = CLASSIC_COLORS;
+export const CLASSIC_BG = "#14142b"; // fondo del canvas en classic (bg: null)
 
 export const EXPLOSION_DURATION = 150; // ms (4 frames)
 

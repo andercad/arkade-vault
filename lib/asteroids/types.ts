@@ -1,3 +1,5 @@
+export type SkinName = "classic" | "retro" | "neon";
+
 // "dead" = nave destruida esperando reaparecer (deadTimer del original)
 export type AsteroidsStatus = "playing" | "dead" | "paused" | "gameover";
 
@@ -21,4 +23,5 @@ export interface AsteroidsGame {
   restart(): void; // initGame() y status "playing"
   end(): void; // fuerza game over desde cualquier estado (botón FIN)
   destroy(): void; // cancela rAF y quita todos los listeners
+  setSkin(name: SkinName): void; // redibuja al instante
 }
