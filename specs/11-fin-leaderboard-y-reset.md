@@ -1,6 +1,6 @@
 # SPEC 11 — Botón de leaderboard en el menú de fin y reset del menú al salir
 
-> **Estado:** Aprobado
+> **Estado:** Implementado
 > **Depende de:** SPEC 01 (reproductor), SPEC 06 (leaderboard y Salón de la fama), SPEC 10 (HUD del reproductor)
 > **Fecha:** 2026-11-17
 > **Objetivo:** Añadir al menú de fin un botón que lleve al Salón de la fama con la pestaña del juego abierta y evitar que el menú de fin reaparezca abierto al volver a entrar en un juego tras salir con VOLVER AL VAULT.
@@ -65,16 +65,16 @@ Un commit por paso (`11-fin-leaderboard-y-reset: Paso N`).
 
 ## Criterios de aceptación
 
-- [ ] El modal de fin muestra un botón `VER LEADERBOARD` junto a JUGAR DE NUEVO y VOLVER AL VAULT.
-- [ ] Pulsarlo desde Tetris navega a `/salon-de-la-fama?juego=tetris` y la pestaña activa es TETRIS; igual con cada juego del registro.
-- [ ] `/salon-de-la-fama` sin parámetro y con `?juego=inexistente` abren la primera pestaña sin error.
-- [ ] Tras FIN → VOLVER AL VAULT → entrar en cualquier juego, el modal de fin no aparece y la partida arranca con puntuación 0.
-- [ ] Tras FIN → VER LEADERBOARD → Atrás del navegador, el modal no aparece abierto.
-- [ ] Tras FIN → guardar puntuación → salir → volver a entrar, el modal no muestra "PUNTUACIÓN GUARDADA" ni el nombre escrito.
-- [ ] JUGAR DE NUEVO sigue cerrando el modal y reiniciando la partida.
-- [ ] A ~390 px de ancho los tres botones del modal no desbordan horizontalmente.
-- [ ] a ~390 px GUARDAR PUNTUACIÓN queda dentro del modal, sin scroll horizontal causado por el modal.
-- [ ] `npm run lint` y `npm run build` sin errores.
+- [x] El modal de fin muestra un botón `VER LEADERBOARD` junto a JUGAR DE NUEVO y VOLVER AL VAULT.
+- [x] Pulsarlo desde Tetris navega a `/salon-de-la-fama?juego=tetris` y la pestaña activa es TETRIS; igual con cada juego del registro.
+- [x] `/salon-de-la-fama` sin parámetro y con `?juego=inexistente` abren la primera pestaña sin error.
+- [x] Tras FIN → VOLVER AL VAULT → entrar en cualquier juego, el modal de fin no aparece y la partida arranca con puntuación 0.
+- [x] Tras FIN → VER LEADERBOARD → Atrás del navegador, el modal no aparece abierto.
+- [x] Tras FIN → guardar puntuación → salir → volver a entrar, el modal no muestra "PUNTUACIÓN GUARDADA" ni el nombre escrito.
+- [x] JUGAR DE NUEVO sigue cerrando el modal y reiniciando la partida.
+- [x] A ~390 px de ancho los tres botones del modal no desbordan horizontalmente.
+- [x] a ~390 px GUARDAR PUNTUACIÓN queda dentro del modal, sin scroll horizontal causado por el modal.
+- [x] `npm run lint` y `npm run build` sin errores.
 
 ---
 
