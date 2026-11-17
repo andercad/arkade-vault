@@ -7,10 +7,12 @@ import {
   Ship,
   type Keys,
 } from "./entities";
+import { DEFAULT_SKIN, SKINS, type Skin } from "./skins";
 import type {
   AsteroidsCallbacks,
   AsteroidsGame,
   AsteroidsSnapshot,
+  SkinName,
 } from "./types";
 import { dist, rand, randInt } from "./utils";
 
@@ -40,10 +42,12 @@ export function createAsteroidsGame(
       restart: noop,
       end: noop,
       destroy: noop,
+      setSkin: noop,
     };
   }
 
   // ── Estado ────────────────────────────────────────────────────────────────
+  let skin: Skin = SKINS[DEFAULT_SKIN];
   let ship = new Ship();
   let bullets: Bullet[] = [];
   let asteroids: Asteroid[] = [];
@@ -296,8 +300,6 @@ export function createAsteroidsGame(
     c.save();
     c.translate(x, y);
     c.rotate(-Math.PI / 2);
-    c.strokeStyle = "#fff";
-    c.lineWidth = 1.2;
     c.lineJoin = "round";
     c.beginPath();
     c.moveTo(9, 0);
@@ -305,12 +307,17 @@ export function createAsteroidsGame(
     c.lineTo(-3, 0);
     c.lineTo(-6, 5);
     c.closePath();
-    c.stroke();
+    skin.paint(c, skin.colors.hud, "line", 1.2);
     c.restore();
   }
 
   function drawHUD(c: CanvasRenderingContext2D) {
-    c.fillStyle = "#fff";
+    c.save();
+    if (skin.glow > 0) {
+      c.shadowColor = skin.colors.hud;
+      c.shadowBlur = skin.glow / 2;
+    }
+    c.fillStyle = skin.colors.hud;
     c.font = "15px monospace";
 
     c.textAlign = "left";
@@ -320,24 +327,26 @@ export function createAsteroidsGame(
     c.fillText(`NIVEL ${level}`, W / 2, 26);
 
     if (ship.tripleTimer > 0) {
-      c.fillStyle = "#0ff";
+      c.fillStyle = skin.colors.hudAccent;
+      if (skin.glow > 0) c.shadowColor = skin.colors.hudAccent;
       c.textAlign = "left";
       c.fillText(`TRIPLE ${Math.ceil(ship.tripleTimer)}s`, 14, 46);
     }
+    c.restore();
 
     for (let i = 0; i < lives; i++) drawLifeIcon(c, W - 16 - i * 22, 18);
   }
 
   // Sin overlays de pausa ni game over: los dibuja el contenedor (React).
   function draw(c: CanvasRenderingContext2D) {
-    c.fillStyle = "#000";
+    c.fillStyle = skin.bg ?? "#000";
     c.fillRect(0, 0, W, H);
 
-    particles.forEach((p) => p.draw(c));
-    asteroids.forEach((a) => a.draw(c));
-    bullets.forEach((b) => b.draw(c));
-    if (powerUp) powerUp.draw(c);
-    ship.draw(c);
+    particles.forEach((p) => p.draw(c, skin));
+    asteroids.forEach((a) => a.draw(c, skin));
+    bullets.forEach((b) => b.draw(c, skin));
+    if (powerUp) powerUp.draw(c, skin);
+    ship.draw(c, skin);
 
     drawHUD(c);
   }
@@ -403,5 +412,10 @@ export function createAsteroidsGame(
     clearKeys();
   }
 
-  return { start, pause, resume, restart, end, destroy };
+  function setSkin(name: SkinName) {
+    skin = SKINS[name] ?? SKINS[DEFAULT_SKIN];
+    if (started && !destroyed) draw(ctx!);
+  }
+
+  return { start, pause, resume, restart, end, destroy, setSkin };
 }

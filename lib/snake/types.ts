@@ -19,7 +19,10 @@ export interface SnakeGame {
   restart(): void; // 0 puntos, longitud 3, nivel 1
   end(): void;
   destroy(): void;
+  setSkin(name: SkinName): void;
 }
+
+export type SkinName = "classic" | "retro" | "neon";
 
 export interface Cell {
   col: number;

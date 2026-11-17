@@ -61,7 +61,10 @@ export function createBricks(level: number): Brick[] {
 
 // Partículas de un bloque roto: nacen en su centro, dirección y velocidad aleatorias.
 // Usa Math.random: llamar solo desde el motor (dentro de useEffect).
-export function spawnParticles(brick: Brick): Particle[] {
+export function spawnParticles(
+  brick: Brick,
+  colors: Record<string, string> = PARTICLE_COLORS,
+): Particle[] {
   const cx = brick.x + brick.w / 2;
   const cy = brick.y + brick.h / 2;
   const out: Particle[] = [];
@@ -75,7 +78,7 @@ export function spawnParticles(brick: Brick): Particle[] {
       y: cy,
       vx: Math.cos(angle) * speed,
       vy: Math.sin(angle) * speed,
-      color: PARTICLE_COLORS[brick.color],
+      color: colors[brick.color],
       age: 0,
     });
   }
