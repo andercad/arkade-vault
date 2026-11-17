@@ -126,6 +126,7 @@ export function GamePlayer({ game }: { game: Game }) {
             </div>
           ))}
         </div>
+        {liveOptions.map(renderOption)}
         <div className="hud-actions">
           <button className="btn yellow" onClick={togglePause}>
             {paused ? "REANUDAR" : "PAUSA"}
@@ -138,10 +139,6 @@ export function GamePlayer({ game }: { game: Game }) {
           </Link>
         </div>
       </div>
-
-      {liveOptions.length > 0 && (
-        <div className="player-options">{liveOptions.map(renderOption)}</div>
-      )}
 
       <div className="keyboard-notice">REQUIERE TECLADO</div>
 
