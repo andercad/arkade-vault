@@ -25,13 +25,14 @@ Sustituye `<slug>`, `<Juego>` y los datos entre `<>` por los del juego.
 - Motor en `lib/<slug>/` (port fiel / diseño nuevo) con `create<Juego>Game`.
 - Fila `<slug>` en `games` por migración; portada `cover-<slug>`.
 - Integración en el reproductor (registro genérico) con HUD de plataforma: <campos>.
+- `touchControls` en el registro (d-pad + 0-2 botones de acción que emiten las teclas del juego, ver SPEC 12).
 - Pausa por botón y por `<teclas>`, FIN, game over, guardado con `submitScore`.
 - Añadir la spec a `CLAUDE.md` y `README.md` en el mismo cambio.
 
 **Fuera de alcance (specs futuras):**
 
 - <Extras del original no portados: menús, skins, sonido, selector de nivel…>
-- Controles táctiles, cambios de reglas/balance, Supabase Auth, otros juegos, tests.
+- Gestos sobre el canvas, cambios de reglas/balance, Supabase Auth, otros juegos, tests.
 
 ## Modelo de datos
 
@@ -57,7 +58,7 @@ Estructura de archivos nueva y convenciones (teclas, constantes del original con
 3. `lib/<slug>/constants.ts`, `utils.ts`, `types.ts`. Verificación: `npx tsc --noEmit`.
 4. `lib/<slug>/entities.ts` (si aplica). Verificación: `npx tsc --noEmit` y `npm run lint`.
 5. `lib/<slug>/engine.ts`: estado, update/draw, input con cleanup, `pause/resume/restart/end/destroy`, snapshot solo ante cambios. Verificación: `tsc` y `lint`.
-6. Registrar el juego en `lib/game-registry.ts`. Verificación: `/juegos/<slug>/jugar` monta el canvas.
+6. Registrar el juego en `lib/game-registry.ts`, incluido `touchControls` (solo las direcciones y acciones que usa el juego). Verificación: `/juegos/<slug>/jugar` monta el canvas y, con emulación táctil, aparece el mando.
 7. _(Solo si `cat` o `color` no están soportados hoy)_ Ampliación de CHECK de `games`, `Category`/`AccentColor`/`CATEGORIES` en `lib/games.ts` y acento CSS (ver "Categoría o color nuevo" en `checklist.md`). Verificación: `tsc`, `list_migrations`.
 8. Migración `NNNN_seed_<slug>.sql` + `apply_migration`; regenerar `database.types.ts` si hace falta. Verificación: `list_migrations`, `select id from games`, `get_advisors`.
 8. Portada `.cover-<slug>` y CSS del canvas/escalado en `app/globals.css` (`/frontend-design`). Verificación: tarjeta en `/juegos`, 375 px sin desbordar.
@@ -75,7 +76,7 @@ Cada paso = un commit `NN-<slug>: Paso N`.
 
 ## Riesgos
 
-<Tabla: StrictMode, teclas pegadas, scroll/foco, dt grande, assets (si hay), rango de score, regresión de Asteroids…>
+<Tabla: StrictMode, teclas pegadas, scroll/foco, dt grande, motor que filtra `isTrusted` (ignoraría el mando táctil), assets (si hay), rango de score, regresión de Asteroids…>
 
 ## Qué **no** está en esta spec
 

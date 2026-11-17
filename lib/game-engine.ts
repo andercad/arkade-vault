@@ -35,3 +35,15 @@ export interface GameOption {
   defaultValue: string;
   appliesOn: "live" | "restart"; // skin: live; startLevel: restart
 }
+
+export type TouchDirection = "up" | "down" | "left" | "right";
+
+export interface TouchButton {
+  code: string; // KeyboardEvent.code que emite: "Space", "ArrowUp"
+  label: string; // texto del botón: "DISPARO"
+}
+
+export interface TouchControls {
+  dpad: Partial<Record<TouchDirection, string>>; // dirección → code; solo las que usa el juego
+  actions: TouchButton[]; // 0-2 botones a la derecha
+}

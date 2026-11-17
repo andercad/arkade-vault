@@ -30,7 +30,8 @@ Reglas que toda spec generada por `/add-game` debe respetar. Si el código actua
 - Etiqueta del botón y overlay derivados de `snapshot.status` (reflejan también la pausa por teclado).
 - `GamePlayer` no se ramifica por `game.id`: el juego se registra en el registro genérico (`lib/game-registry.ts`); si no existe, la spec lo extrae primero sin cambiar el comportamiento de Asteroids.
 - Canvas lógico fijo, escalado por CSS al 100 % del ancho con `aspect-ratio` y `max-width`; sin escalado por `devicePixelRatio` salvo decisión explícita.
-- Aviso "REQUIERE TECLADO" solo con `@media (pointer: coarse)` (clase `.keyboard-notice` ya existe).
+- Mando táctil: `touchControls` en `GAME_REGISTRY` (`dpad` con las direcciones que usa el juego y `actions` de 0 a 2 botones; `components/touch-controls.tsx` los pinta solo con `@media (pointer: coarse)` y emite `KeyboardEvent` sintéticos en `window`). Sin él, el juego no es jugable en móvil.
+- Los motores **no deben filtrar `e.isTrusted`**: las teclas del mando son sintéticas. Leer `e.code`, no `e.key`.
 
 ## Datos y leaderboard
 
@@ -68,7 +69,7 @@ Si el `cat` o el `color` del juego no está soportado, la spec añade un paso **
 - [ ] La puntuación aparece en la ficha, el Salón (tab del juego) y la actividad de la home; la tarjeta muestra `best` y `plays` actualizados.
 - [ ] "SALIR" y "VOLVER AL VAULT" no dejan listeners ni bucle activos (las flechas vuelven a hacer scroll).
 - [ ] En desarrollo (StrictMode) hay una sola instancia y velocidad normal.
-- [ ] A 375 px el canvas no desborda; el aviso táctil solo aparece con `pointer: coarse`.
+- [ ] A 375 px el canvas no desborda; el mando táctil solo aparece con `pointer: coarse` y cada botón maneja el juego (sin teclas pegadas al soltar).
 - [ ] Asteroids y los demás juegos registrados siguen funcionando igual.
 - [ ] `references/started-games/` no ha cambiado.
 - [ ] Tras verificar, las filas de prueba de `scores` están borradas.

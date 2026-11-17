@@ -1,6 +1,7 @@
 "use client";
 
 import { GameCanvas, type GameControl } from "@/components/game-canvas";
+import { TouchPad } from "@/components/touch-controls";
 import { useAuth } from "@/lib/auth";
 import type { GameOption, GameSnapshot } from "@/lib/game-engine";
 import { getGameDefinition } from "@/lib/game-registry";
@@ -122,7 +123,7 @@ export function GamePlayer({ game }: { game: Game }) {
   return (
     <div className="av-player fade-in">
       <div className="player-hud">
-        <div style={{ display: "flex", gap: 24, flexWrap: "wrap" }}>
+        <div className="hud-stats">
           <div className="hud-stat">
             <div className="l">Jugador</div>
             <div className="v" style={{ color: "var(--ink)" }}>
@@ -153,8 +154,6 @@ export function GamePlayer({ game }: { game: Game }) {
           </Link>
         </div>
       </div>
-
-      <div className="keyboard-notice">REQUIERE TECLADO</div>
 
       <div
         className={
@@ -211,6 +210,13 @@ export function GamePlayer({ game }: { game: Game }) {
           <span>CARGA · 1MB</span>
         </div>
       </div>
+
+      {definition.touchControls && (
+        <TouchPad
+          controls={definition.touchControls}
+          disabled={paused || over}
+        />
+      )}
 
       {over && (
         <div className="modal-bd">

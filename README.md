@@ -27,7 +27,7 @@ Lista detallada de juegos (desde la BD): `references/implemented-games.md`.
 
 ## Código compartido
 
-Contrato de motores `lib/game-engine.ts`, registro `lib/game-registry.ts`, reproductor `components/game-player.tsx` / `game-canvas.tsx` (las opciones `live`, p. ej. skin, van en el HUD; las `restart`, en el overlay de pausa), UI de scores (`leaderboard`, `hall-of-fame`), acceso a datos `lib/games*`/`lib/scores*` y clientes `lib/supabase/`. Reutilizar antes de crear código nuevo.
+Contrato de motores `lib/game-engine.ts`, registro `lib/game-registry.ts`, reproductor `components/game-player.tsx` / `game-canvas.tsx` (las opciones `live`, p. ej. skin, van en el HUD; las `restart`, en el overlay de pausa), mando táctil `components/touch-controls.tsx` (configurado por `touchControls` en el registro; emite teclas virtuales, solo con `pointer: coarse`), UI de scores (`leaderboard`, `hall-of-fame`), acceso a datos `lib/games*`/`lib/scores*` y clientes `lib/supabase/`. Reutilizar antes de crear código nuevo.
 
 ## Tooling de Claude
 
@@ -44,21 +44,35 @@ Contrato de motores `lib/game-engine.ts`, registro `lib/game-registry.ts`, repro
 - `npm run lint` — ESLint (flat config, `eslint.config.mjs`)
 - No test runner configured.
 
+### Probar en el móvil por LAN
+
+Para abrir `npm run dev` desde un móvil en la misma red, Next bloquea por defecto los orígenes que no son `localhost`. Permite la IP de tu equipo con `ALLOWED_DEV_ORIGINS` (lista separada por comas; vacío por defecto, sin cambios de comportamiento):
+
+```bash
+# PowerShell
+$env:ALLOWED_DEV_ORIGINS = "192.168.1.50"; npm run dev
+# bash
+ALLOWED_DEV_ORIGINS=192.168.1.50 npm run dev
+```
+
+Luego abre `http://192.168.1.50:3000` en el móvil (la IP sale de `ipconfig`). Reinicia el servidor si cambias la variable.
+
 ## Specs (`specs/`)
 
-| Spec                            | Contenido                                                                                  |
-| ------------------------------- | ------------------------------------------------------------------------------------------ |
-| `01-mvp-pantallas.md`           | MVP visual: 5 pantallas con datos mock                                                     |
-| `02-homepage.md`                | Home en `/`, Biblioteca movida a `/juegos`, nav completa                                   |
-| `03-about-contacto.md`          | `/about` + formulario de contacto (Resend, Server Action)                                  |
-| `04-supabase-cimientos.md`      | Supabase: clientes, migraciones, tipos generados                                           |
-| `05-asteroids.md`               | Asteroids: primer juego real jugable (motor TS en `lib/asteroids/`)                        |
-| `06-leaderboard-y-juegos.md`    | Tablas `games` y `scores` en Supabase; leaderboard real (solo Asteroids)                   |
-| `07-tetris.md`                  | Tetris (motor TS en `lib/tetris/`) y registro genérico de juegos                           |
-| `08-arkanoid.md`                | Arkanoid (motor TS en `lib/arkanoid/`) con sonido y 5 niveles                              |
-| `09-snake.md`                   | Snake (motor TS en `lib/snake/`) con sprites de frutas y niveles                           |
-| `10-hud-skins-integrados.md`    | Selector de skin (opciones `live`) integrado en el HUD del reproductor                     |
-| `11-fin-leaderboard-y-reset.md` | Botón del menú de fin al Salón de la fama (`?juego=<id>`) y reset del reproductor al salir |
+| Spec                            | Contenido                                                                                      |
+| ------------------------------- | ---------------------------------------------------------------------------------------------- |
+| `01-mvp-pantallas.md`           | MVP visual: 5 pantallas con datos mock                                                         |
+| `02-homepage.md`                | Home en `/`, Biblioteca movida a `/juegos`, nav completa                                       |
+| `03-about-contacto.md`          | `/about` + formulario de contacto (Resend, Server Action)                                      |
+| `04-supabase-cimientos.md`      | Supabase: clientes, migraciones, tipos generados                                               |
+| `05-asteroids.md`               | Asteroids: primer juego real jugable (motor TS en `lib/asteroids/`)                            |
+| `06-leaderboard-y-juegos.md`    | Tablas `games` y `scores` en Supabase; leaderboard real (solo Asteroids)                       |
+| `07-tetris.md`                  | Tetris (motor TS en `lib/tetris/`) y registro genérico de juegos                               |
+| `08-arkanoid.md`                | Arkanoid (motor TS en `lib/arkanoid/`) con sonido y 5 niveles                                  |
+| `09-snake.md`                   | Snake (motor TS en `lib/snake/`) con sprites de frutas y niveles                               |
+| `10-hud-skins-integrados.md`    | Selector de skin (opciones `live`) integrado en el HUD del reproductor                         |
+| `11-fin-leaderboard-y-reset.md` | Botón del menú de fin al Salón de la fama (`?juego=<id>`) y reset del reproductor al salir     |
+| `12-controles-tactiles.md`      | Mando táctil bajo el canvas (`touchControls` por juego en el registro) y HUD compacto en móvil |
 
 ### Buenas prácticas
 
