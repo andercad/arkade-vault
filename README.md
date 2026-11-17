@@ -36,6 +36,7 @@ Contrato de motores `lib/game-engine.ts`, registro `lib/game-registry.ts`, repro
 - Subagente `game-planner` (`.claude/agents/game-planner.md`): planifica qué juego encaja, con memoria persistente en `.claude/agent-memory/game-planner/` y To-Do en `references/game-suggestions-todo.md`. Usar antes de `/add-game`.
 - Subagente `game-jam` (`.claude/agents/game-jam.md`): dado un tema, diseña un juego original y escribe ≥2 specs (motor, plataforma, extra opcional) en `specs/game-jam/<game-id>/`, formato SPEC 07-09. Precarga el skill `/add-game` (`skills:` en el frontmatter) y genera con él el spec core en modo game-jam. Se implementan después con `/spec-impl`.
 - Subagente `skin-designer` (`.claude/agents/skin-designer.md`): aplica ≥3 skins (`classic` default, `retro`, `neon`, legibles en modo oscuro) solo al juego que se le indique, siguiendo el patrón de Tetris (SPEC 07). Estado por juego en `references/games-with-themes.md`.
+- Subagente `mobile-porter` (`.claude/agents/mobile-porter.md`): porta/revisa un juego para móvil siguiendo la SPEC 12 (`touchControls` en el registro, CSS móvil acotado, verificación táctil 390×844 con Playwright). Estado por juego en `references/games-mobile-status.md`.
 
 ## Commands
 
