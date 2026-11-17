@@ -1,13 +1,13 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import Link from "next/link";
-import type { Game } from "@/lib/games";
-import { submitScore } from "@/lib/scores";
+import { GameCanvas, type GameControl } from "@/components/game-canvas";
 import { useAuth } from "@/lib/auth";
 import type { GameOption, GameSnapshot } from "@/lib/game-engine";
 import { getGameDefinition } from "@/lib/game-registry";
-import { GameCanvas, type GameControl } from "@/components/game-canvas";
+import type { Game } from "@/lib/games";
+import { submitScore } from "@/lib/scores";
+import Link from "next/link";
+import { useEffect, useRef, useState } from "react";
 
 const INITIAL_SNAPSHOT: GameSnapshot = {
   score: 0,
@@ -247,6 +247,12 @@ export function GamePlayer({ game }: { game: Game }) {
               <button className="btn" onClick={restart}>
                 JUGAR DE NUEVO
               </button>
+              <Link
+                href={`/salon-de-la-fama?juego=${game.id}`}
+                className="btn yellow"
+              >
+                VER SALÓN DE LA FAMA
+              </Link>
               <Link href="/juegos" className="btn magenta">
                 VOLVER AL VAULT
               </Link>
