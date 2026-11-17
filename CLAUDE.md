@@ -75,4 +75,5 @@ Reutilizar antes de crear código nuevo:
 - Hook `PostToolUse` (`.claude/settings.json` → `.claude/hooks/format-lint.mjs`): tras Write/Edit/MultiEdit ejecuta Prettier y ESLint `--fix`; ignora `references/`, `.claude/`, `.agents/`, `.next/`, `node_modules/`. Si falla, corregir antes de seguir.
 - MCP (`.mcp.json`): Supabase (docs, database, migraciones, tipos). Playwright MCP para validar UI; screenshots en `.playwright-screenshots/` (gitignored).
 - Subagente `game-planner` (`.claude/agents/game-planner.md`, `memory: project`): decide qué juego encaja; usar antes de `/add-game`. Memoria en `.claude/agent-memory/game-planner/` (`MEMORY.md`, `suggestions.md`); vuelca sugerencias en `references/game-suggestions-todo.md` (excepción: única escritura del agente en `references/`).
+- Subagente `game-jam` (`.claude/agents/game-jam.md`): dado un tema, diseña un juego original y escribe ≥2 specs (motor, plataforma, extra opcional) en `specs/game-jam/<game-id>/`, formato SPEC 07-09. Solo escribe specs; se implementan después con `/spec-impl`.
 - Mantener README.md sincronizado cuando cambie este archivo.
