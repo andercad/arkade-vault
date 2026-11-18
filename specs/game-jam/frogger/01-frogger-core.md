@@ -1,6 +1,6 @@
 # SPEC — Frogger: motor TypeScript (carretera, río, casas, vidas, tiempo)
 
-> **Estado:** Aprobado
+> **Estado:** Implementado
 > **Depende de:** 06-games-table-leaderboard-supabase (SPEC 06), 07-tetris (registro genérico), 09-snake (patrón de motor `lib/<juego>/`)
 > **Fecha:** 2026-11-17
 > **Objetivo:** Crear el motor `lib/frogger/` con `createFroggerGame`: una rana que cruza una carretera y un río saltando por celdas hasta llenar 5 casas, con 3 vidas, límite de tiempo y niveles progresivos.
@@ -138,23 +138,23 @@ Cada paso = un commit `frogger-core: Paso N`.
 
 ## Acceptance criteria
 
-- [ ] `npx tsc --noEmit`, `npm run lint` y `npm run build` terminan sin errores.
-- [ ] `lib/frogger/` no usa `window`, `document` ni `localStorage` fuera de `createFroggerGame` (solo `canvas`, `requestAnimationFrame` y listeners con cleanup).
-- [ ] Al iniciar: rana en `(7,12)`, 3 vidas, nivel 1, 0 casas, 30 s, objetos en movimiento, HUD del canvas con PUNTOS, VIDAS, NIVEL y TIEMPO.
-- [ ] Una pulsación = un salto de 1 celda; mantener pulsada no repite; en los bordes el salto se ignora.
-- [ ] Tocar un coche o camión mata a la rana; esquivar entre vehículos permite cruzar.
-- [ ] En el río, estar sobre tronco o tortuga es seguro y arrastra a la rana; caer al agua o salir del tablero arrastrada mata.
-- [ ] Las tortugas avisan 1,2 s antes de sumergirse y sumergidas equivalen a agua.
-- [ ] Llegar a un hueco libre suma 50 + 10 × segundos restantes y lo marca lleno; llegar a un hueco lleno o al muro de la fila 0 mata.
-- [ ] Tras morir, reaparece en `(7,12)` con el tiempo reiniciado y la fila más alta reiniciada, sin tocar las casas llenas.
-- [ ] +10 por fila nueva alcanzada una sola vez por vida; no se puntúa subir y bajar repetidamente.
-- [ ] Agotar los 30 s mata a la rana.
-- [ ] Llenar las 5 casas suma 1000, sube el nivel, vacía las casas y aumenta la velocidad (tope ×2,2).
-- [ ] Vida extra a 10.000 y luego cada 20.000 puntos, máximo 5 vidas.
-- [ ] Al perder la tercera vida se emite `lives = 0` y después `onGameOver(score)` una sola vez.
-- [ ] `restart()` deja 0 puntos, 3 vidas, nivel 1, casas vacías y sin teclas pegadas.
-- [ ] Pausar congela objetos, rana y temporizador; al reanudar no hay salto de tiempo.
-- [ ] `destroy()` cancela el rAF y quita listeners (las flechas vuelven a hacer scroll); en StrictMode hay una sola instancia.
+- [x] `npx tsc --noEmit`, `npm run lint` y `npm run build` terminan sin errores.
+- [x] `lib/frogger/` no usa `window`, `document` ni `localStorage` fuera de `createFroggerGame` (solo `canvas`, `requestAnimationFrame` y listeners con cleanup).
+- [x] Al iniciar: rana en `(7,12)`, 3 vidas, nivel 1, 0 casas, 30 s, objetos en movimiento, HUD del canvas con PUNTOS, VIDAS, NIVEL y TIEMPO.
+- [x] Una pulsación = un salto de 1 celda; mantener pulsada no repite; en los bordes el salto se ignora.
+- [x] Tocar un coche o camión mata a la rana; esquivar entre vehículos permite cruzar.
+- [x] En el río, estar sobre tronco o tortuga es seguro y arrastra a la rana; caer al agua o salir del tablero arrastrada mata.
+- [x] Las tortugas avisan 1,2 s antes de sumergirse y sumergidas equivalen a agua.
+- [x] Llegar a un hueco libre suma 50 + 10 × segundos restantes y lo marca lleno; llegar a un hueco lleno o al muro de la fila 0 mata.
+- [x] Tras morir, reaparece en `(7,12)` con el tiempo reiniciado y la fila más alta reiniciada, sin tocar las casas llenas.
+- [x] +10 por fila nueva alcanzada una sola vez por vida; no se puntúa subir y bajar repetidamente.
+- [x] Agotar los 30 s mata a la rana.
+- [x] Llenar las 5 casas suma 1000, sube el nivel, vacía las casas y aumenta la velocidad (tope ×2,2).
+- [x] Vida extra a 10.000 y luego cada 20.000 puntos, máximo 5 vidas.
+- [x] Al perder la tercera vida se emite `lives = 0` y después `onGameOver(score)` una sola vez.
+- [x] `restart()` deja 0 puntos, 3 vidas, nivel 1, casas vacías y sin teclas pegadas.
+- [x] Pausar congela objetos, rana y temporizador; al reanudar no hay salto de tiempo.
+- [x] `destroy()` cancela el rAF y quita listeners (las flechas vuelven a hacer scroll); en StrictMode hay una sola instancia.
 
 ## Decisions
 

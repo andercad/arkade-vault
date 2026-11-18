@@ -6,7 +6,6 @@
 
 | ID | Título | Categoría | Color | Descripción breve | Justificación | Fecha |
 | --- | ------ | --------- | ----- | ----------------- | ------------- | ----- |
-| `frogger` | FROGGER | PLATFORMER | lime | Cruza la carretera y el río sin ser atropellado ni ahogarte. | Género de cruce/esquiva no cubierto; carriles con rectángulos y colisión AABB, muy factible en canvas 2D. | 2026-11-17 |
 | `pong` | PONG | SPORTS | blue | Devuelve la pelota y supera a la IA hasta llegar a 11 puntos. | Primer juego SPORTS; mecánica mínima, reconocimiento máximo, riesgo técnico bajo. | 2026-11-17 |
 | `pacman` | PAC-MAN | MAZE | orange | Come todos los puntos del laberinto esquivando a los fantasmas. | Primer MAZE; icónico y factible con rejilla de tiles, aunque la IA de fantasmas añade complejidad. | 2026-11-17 |
 | `space-invaders` | SPACE INVADERS | SHOOTER | green | Destruye la formación alienígena con escudos y UFO bonus. | Icono del género; formación fija distinta a Asteroids. Dif. M. | 2026-11-17 |
@@ -43,6 +42,7 @@
 | `tetris` | TETRIS | PUZZLE | — |
 | `arkanoid` | ARKANOID | ARCADE | — |
 | `snake` | SNAKE | ARCADE | — |
+| `frogger` | FROGGER | ARCADE | 2026-11-18 |
 
 ## ❌ Descartados
 
