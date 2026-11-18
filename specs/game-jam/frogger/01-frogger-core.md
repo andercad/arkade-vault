@@ -1,6 +1,6 @@
 # SPEC — Frogger: motor TypeScript (carretera, río, casas, vidas, tiempo)
 
-> **Estado:** Propuesto
+> **Estado:** Aprobado
 > **Depende de:** 06-games-table-leaderboard-supabase (SPEC 06), 07-tetris (registro genérico), 09-snake (patrón de motor `lib/<juego>/`)
 > **Fecha:** 2026-11-17
 > **Objetivo:** Crear el motor `lib/frogger/` con `createFroggerGame`: una rana que cruza una carretera y un río saltando por celdas hasta llenar 5 casas, con 3 vidas, límite de tiempo y niveles progresivos.
