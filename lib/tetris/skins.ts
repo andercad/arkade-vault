@@ -12,6 +12,7 @@ export interface Skin {
   colors: (string | null)[]; // índice = tipo de pieza
   bg: string | null; // fondo del canvas; null = transparente
   grid: string | null; // color de rejilla; null = GRID_COLOR por defecto
+  glow: number; // shadowBlur del bloque (px); > 0 = se cachea como sprite
   // dibuja un bloque en píxeles
   draw(
     c: CanvasRenderingContext2D,
@@ -22,12 +23,15 @@ export interface Skin {
   ): void;
 }
 
+const NEON_GLOW = 12;
+
 export const SKINS: Record<SkinName, Skin> = {
   retro: {
     label: "Retro",
     colors: RETRO_COLORS,
     bg: null,
     grid: null,
+    glow: 0,
     draw(c, px, py, s, color) {
       c.fillStyle = color;
       c.fillRect(px + 1, py + 1, s - 2, s - 2);
@@ -40,10 +44,11 @@ export const SKINS: Record<SkinName, Skin> = {
     colors: NEON_COLORS,
     bg: "#000000",
     grid: "#14141f",
+    glow: NEON_GLOW,
     draw(c, px, py, s, color) {
       c.save();
       c.shadowColor = color;
-      c.shadowBlur = 12;
+      c.shadowBlur = NEON_GLOW;
       c.strokeStyle = color;
       c.lineWidth = 2;
       c.strokeRect(px + 3, py + 3, s - 6, s - 6);
@@ -58,6 +63,7 @@ export const SKINS: Record<SkinName, Skin> = {
     colors: PASTEL_COLORS,
     bg: null,
     grid: null,
+    glow: 0,
     draw(c, px, py, s, color) {
       roundRectPath(c, px + 1.5, py + 1.5, s - 3, s - 3, s * 0.3);
       c.fillStyle = color;
@@ -72,6 +78,7 @@ export const SKINS: Record<SkinName, Skin> = {
     colors: PIXEL_COLORS,
     bg: null,
     grid: null,
+    glow: 0,
     draw(c, px, py, s, color) {
       const u = Math.max(2, Math.floor(s / 6)); // "pixel" de la textura
       c.fillStyle = color;
