@@ -48,6 +48,10 @@ export class Asteroid {
   rotSpeed: number;
   rot: number;
   verts: [number, number][] = [];
+  // Sprite con glow (SPEC 14): se crea al primer draw con skin con glow y vive
+  // con la entidad; se rehace si cambia el skin.
+  private sprite: HTMLCanvasElement | null = null;
+  private spriteSkin = "";
 
   constructor(x: number, y: number, size = 3) {
     this.x = x;
@@ -85,18 +89,48 @@ export class Asteroid {
     ];
   }
 
-  draw(ctx: CanvasRenderingContext2D, skin: Skin) {
-    ctx.save();
-    ctx.translate(this.x, this.y);
-    ctx.rotate(this.rot);
-    ctx.lineJoin = "round";
+  private path(ctx: CanvasRenderingContext2D) {
     ctx.beginPath();
     ctx.moveTo(this.verts[0][0], this.verts[0][1]);
     for (let i = 1; i < this.verts.length; i++) {
       ctx.lineTo(this.verts[i][0], this.verts[i][1]);
     }
     ctx.closePath();
-    skin.paint(ctx, skin.colors.asteroid, "shape");
+  }
+
+  // Pinta el asteroide sin rotar en un canvas con margen 2 × glow para el halo.
+  private buildSprite(skin: Skin): HTMLCanvasElement {
+    const half = Math.ceil(this.radius + skin.glow * 2);
+    const canvas = document.createElement("canvas");
+    canvas.width = canvas.height = half * 2;
+    const sc = canvas.getContext("2d")!;
+    sc.translate(half, half);
+    sc.lineJoin = "round";
+    this.path(sc);
+    skin.paint(sc, skin.colors.asteroid, "shape");
+    return canvas;
+  }
+
+  draw(ctx: CanvasRenderingContext2D, skin: Skin) {
+    ctx.save();
+    ctx.translate(this.x, this.y);
+    ctx.rotate(this.rot);
+    if (skin.glow > 0) {
+      if (!this.sprite || this.spriteSkin !== skin.label) {
+        this.sprite = this.buildSprite(skin);
+        this.spriteSkin = skin.label;
+      }
+      ctx.drawImage(
+        this.sprite,
+        -this.sprite.width / 2,
+        -this.sprite.height / 2,
+      );
+    } else {
+      this.sprite = null;
+      ctx.lineJoin = "round";
+      this.path(ctx);
+      skin.paint(ctx, skin.colors.asteroid, "shape");
+    }
     ctx.restore();
   }
 }
