@@ -1,9 +1,15 @@
 // Mide FPS y JS/frame de cada juego y skin con CPU x1 y x6 (SPEC 14).
-// Uso: con `npm run dev` activo, `npm run perf`. URL base: PERF_URL; PERF_HEADLESS=1 sin ventana.
+// Uso: con `npm run dev` activo, `npm run perf`. URL base: PERF_URL; PERF_GAMES=a,b limita juegos; PERF_HEADLESS=1 sin ventana.
 import { chromium } from "playwright";
 
 const BASE = process.env.PERF_URL ?? "http://localhost:3000";
-const GAMES = ["asteroids", "tetris", "arkanoid", "snake", "frogger"];
+const GAMES = process.env.PERF_GAMES?.split(",") ?? [
+  "asteroids",
+  "tetris",
+  "arkanoid",
+  "snake",
+  "frogger",
+];
 const RATES = [1, 6];
 const MIN_FPS = 58;
 const WARMUP_MS = 1000;

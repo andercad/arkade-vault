@@ -16,6 +16,7 @@ import {
   TIME_LIMIT,
   W,
 } from "./constants";
+import { createLayerCache, createSpriteCache } from "@/lib/canvas-cache";
 import { frogDrawPos, isJumping, type Frog } from "./frog";
 import { turtleState, type LaneObject, type LaneState } from "./lanes";
 import { DEFAULT_SKIN, SKINS, type Skin } from "./skins";
@@ -25,6 +26,36 @@ import type { Direction } from "./types";
 // Skin activo: se fija en cada drawGame (el dibujo es síncrono).
 let skin: Skin = SKINS[DEFAULT_SKIN];
 let COLORS = skin.colors;
+
+// Cachés (SPEC 14): fondo estático y sprites con glow (neon). Se limpian con
+// clearDrawCache() al cambiar de skin y en destroy.
+const background = createLayerCache();
+const sprites = createSpriteCache();
+
+export function clearDrawCache() {
+  background.clear();
+  sprites.clear();
+}
+
+// Vuelca un objeto con glow desde su sprite; `paint` lo dibuja en (0,0)-(w,h).
+function blit(
+  c: CanvasRenderingContext2D,
+  key: string,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  paint: (c: CanvasRenderingContext2D) => void,
+) {
+  const sp = sprites.get(
+    `${skin.label}:${key}:${w}x${h}`,
+    w,
+    h,
+    skin.glow * 2,
+    paint,
+  );
+  c.drawImage(sp.canvas, x - sp.pad, y - sp.pad);
+}
 
 // Activa el glow del skin (neon) con el color dado; requiere c.save() previo.
 function glow(c: CanvasRenderingContext2D, color: string) {
@@ -229,19 +260,14 @@ function drawBackground(c: CanvasRenderingContext2D, filled: boolean[]) {
 }
 
 // ── Objetos ─────────────────────────────────────────────────────────────────
-function drawVehicle(
+// Cuerpo del vehículo (la parte con glow); (x, y) = esquina sup. izq. de la celda.
+function paintVehicleBody(
   c: CanvasRenderingContext2D,
-  lane: LaneState,
-  o: LaneObject,
+  x: number,
+  y: number,
+  w: number,
+  color: string,
 ) {
-  const { objLen, dir, row } = lane.def;
-  const x = o.x * CELL;
-  const y = rowY(row);
-  const w = o.len * CELL;
-  const idx = row % COLORS.cars.length;
-  const truck = objLen > 1;
-  const color = truck ? COLORS.trucks[idx] : COLORS.cars[idx];
-
   c.save();
   glow(c, color);
   roundRect(c, x + 3, y + 6, w - 6, CELL - 12, 6);
@@ -256,6 +282,26 @@ function drawVehicle(
   c.fillStyle = color;
   c.fill();
   c.restore();
+}
+
+function drawVehicle(
+  c: CanvasRenderingContext2D,
+  lane: LaneState,
+  o: LaneObject,
+) {
+  const { objLen, dir, row } = lane.def;
+  const x = o.x * CELL;
+  const y = rowY(row);
+  const w = o.len * CELL;
+  const idx = row % COLORS.cars.length;
+  const truck = objLen > 1;
+  const color = truck ? COLORS.trucks[idx] : COLORS.cars[idx];
+
+  if (skin.glow > 0) {
+    blit(c, `veh:${color}`, x, y, w, CELL, (sc) =>
+      paintVehicleBody(sc, 0, 0, w, color),
+    );
+  } else paintVehicleBody(c, x, y, w, color);
   highlight(c, x + 5, y + 7, w - 10);
 
   // Cabina / parabrisas y faros hacia el sentido de la marcha
@@ -279,10 +325,13 @@ function drawVehicle(
   }
 }
 
-function drawLog(c: CanvasRenderingContext2D, lane: LaneState, o: LaneObject) {
-  const x = o.x * CELL;
-  const y = rowY(lane.def.row);
-  const w = o.len * CELL;
+// Cuerpo del tronco (la parte con glow); los nudos se pintan aparte, sin glow.
+function paintLogBody(
+  c: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  w: number,
+) {
   c.save();
   glow(c, COLORS.log);
   c.fillStyle = COLORS.log;
@@ -294,6 +343,15 @@ function drawLog(c: CanvasRenderingContext2D, lane: LaneState, o: LaneObject) {
   c.lineWidth = 2;
   c.stroke();
   c.restore();
+}
+
+function drawLog(c: CanvasRenderingContext2D, lane: LaneState, o: LaneObject) {
+  const x = o.x * CELL;
+  const y = rowY(lane.def.row);
+  const w = o.len * CELL;
+  if (skin.glow > 0) {
+    blit(c, "log", x, y, w, CELL, (sc) => paintLogBody(sc, 0, 0, w));
+  } else paintLogBody(c, x, y, w);
   highlight(c, x + 8, y + 7, w - 16);
   c.beginPath();
   for (let k = 14; k < w - 10; k += 22) {
@@ -303,6 +361,36 @@ function drawLog(c: CanvasRenderingContext2D, lane: LaneState, o: LaneObject) {
     c.lineTo(x + k + 14, y + CELL - 13);
   }
   c.stroke();
+}
+
+function paintTurtle(
+  c: CanvasRenderingContext2D,
+  cx: number,
+  cy: number,
+  warn: boolean,
+  dir: number,
+) {
+  c.save();
+  glow(c, COLORS.shell);
+  c.fillStyle = warn ? COLORS.shellWarn : COLORS.shell;
+  c.beginPath();
+  c.arc(cx, cy, 14, 0, Math.PI * 2);
+  c.fill();
+  c.strokeStyle = COLORS.shellEdge;
+  c.lineWidth = 2;
+  c.stroke();
+  c.beginPath();
+  c.moveTo(cx - 8, cy);
+  c.lineTo(cx + 8, cy);
+  c.moveTo(cx, cy - 8);
+  c.lineTo(cx, cy + 8);
+  c.stroke();
+  // Cabeza hacia el sentido de la marcha
+  c.fillStyle = COLORS.shell;
+  c.beginPath();
+  c.arc(cx + dir * 15, cy, 4, 0, Math.PI * 2);
+  c.fill();
+  c.restore();
 }
 
 function drawTurtles(
@@ -325,27 +413,19 @@ function drawTurtles(
       c.stroke();
       continue;
     }
-    c.save();
-    glow(c, COLORS.shell);
-    c.fillStyle = state === "warn" ? COLORS.shellWarn : COLORS.shell;
-    c.beginPath();
-    c.arc(cx, cy, 14, 0, Math.PI * 2);
-    c.fill();
-    c.strokeStyle = COLORS.shellEdge;
-    c.lineWidth = 2;
-    c.stroke();
-    c.beginPath();
-    c.moveTo(cx - 8, cy);
-    c.lineTo(cx + 8, cy);
-    c.moveTo(cx, cy - 8);
-    c.lineTo(cx, cy + 8);
-    c.stroke();
-    // Cabeza hacia el sentido de la marcha
-    c.fillStyle = COLORS.shell;
-    c.beginPath();
-    c.arc(cx + lane.def.dir * 15, cy, 4, 0, Math.PI * 2);
-    c.fill();
-    c.restore();
+    const warn = state === "warn";
+    const dir = lane.def.dir;
+    if (skin.glow > 0) {
+      blit(
+        c,
+        `turtle:${warn ? "w" : "u"}:${dir}`,
+        cx - CELL / 2,
+        cy - CELL / 2,
+        CELL,
+        CELL,
+        (sc) => paintTurtle(sc, CELL / 2, CELL / 2, warn, dir),
+      );
+    } else paintTurtle(c, cx, cy, warn, dir);
   }
 }
 
@@ -453,9 +533,22 @@ export function drawGame(
   c.fillStyle = skin.bg ?? COLORS.bg;
   c.fillRect(0, 0, W, H);
 
+  // Fondo cacheado: se repinta solo si cambia el skin o las casas llenas.
+  background.draw(
+    c,
+    `${skin.label}:${s.filled.map((f) => (f ? 1 : 0)).join("")}`,
+    (lc) => {
+      lc.translate(0, HUD_H);
+      drawBackground(lc, s.filled);
+    },
+  );
+
+  // Los nudos de los troncos usan el trazo que dejaba el fondo (carretera).
+  c.strokeStyle = COLORS.roadLine;
+  c.lineWidth = 2;
+
   c.save();
   c.translate(0, HUD_H);
-  drawBackground(c, s.filled);
   drawLanes(c, s.lanes);
   drawFrog(c, s.frog);
   c.restore();
