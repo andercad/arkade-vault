@@ -1,6 +1,6 @@
 # SPEC 14 — Revisión de performance de los juegos
 
-> **Estado:** Aprobado
+> **Estado:** Implementado
 > **Depende de:** SPEC 05 (Asteroids), SPEC 07 (Tetris), SPEC 08 (Arkanoid), SPEC 09 (Snake), SPEC 10 (skins en el HUD), game-jam Frogger 01-03
 > **Fecha:** 2026-11-18
 > **Objetivo:** Que los 5 juegos mantengan ≥58 FPS en todos sus skins con CPU ×6, cacheando fondos estáticos y sprites con glow sin cambiar su aspecto.
@@ -118,14 +118,14 @@ Un commit por paso (`14-revision-performance: Paso N`).
 
 ## Criterios de aceptación
 
-- [ ] `npm run perf` existe, mide los 5 juegos en todos sus skins con CPU ×1 y ×6 y falla si algún caso queda <58 FPS.
-- [ ] Con CPU ×6 los 5 juegos dan ≥58 FPS en todos sus skins (`npm run perf` con código 0).
-- [ ] El JS medio por frame no sube respecto a la línea base en ningún juego/skin.
-- [ ] Capturas antes/después de cada juego y skin muestran el mismo aspecto (colores, glow, rejillas, fondos).
-- [ ] Cambiar de skin en vivo repinta fondo y sprites con el skin nuevo, sin restos del anterior.
-- [ ] Frogger: llenar una casa la pinta con la rana; al pasar de nivel las casas se vacían.
-- [ ] Sin errores en consola en los 5 reproductores.
-- [ ] `npm run lint` y `npm run build` sin errores.
+- [x] `npm run perf` existe, mide los 5 juegos en todos sus skins con CPU ×1 y ×6 y falla si algún caso queda <58 FPS.
+- [x] Con CPU ×6 los 5 juegos dan ≥58 FPS en todos sus skins (`npm run perf` con código 0).
+- [x] El JS medio por frame no sube respecto a la línea base en ningún juego/skin.
+- [x] Capturas antes/después de cada juego y skin muestran el mismo aspecto (colores, glow, rejillas, fondos).
+- [x] Cambiar de skin en vivo repinta fondo y sprites con el skin nuevo, sin restos del anterior.
+- [x] Frogger: llenar una casa la pinta con la rana; al pasar de nivel las casas se vacían.
+- [x] Sin errores en consola en los 5 reproductores.
+- [x] `npm run lint` y `npm run build` sin errores.
 
 ---
 
