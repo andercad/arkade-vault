@@ -1,5 +1,5 @@
 import { MAX_DT } from "./constants";
-import { drawGame } from "./draw";
+import { clearDrawCache, drawGame } from "./draw";
 import { DEFAULT_SKIN, SKINS, type Skin } from "./skins";
 import { createState, endGame, jump, snapshotOf, stepState } from "./state";
 import type {
@@ -175,6 +175,7 @@ export function createFroggerGame(
 
   function destroy() {
     destroyed = true;
+    clearDrawCache();
     cancelAnimationFrame(rafId);
     window.removeEventListener("keydown", onKeyDown);
     window.removeEventListener("keyup", onKeyUp);
@@ -183,6 +184,7 @@ export function createFroggerGame(
   // El bucle redibuja cada frame (también en pausa), así que basta con fijar el skin.
   function setSkin(name: SkinName) {
     skin = SKINS[name] ?? SKINS[DEFAULT_SKIN];
+    clearDrawCache();
     if (started && !destroyed) drawGame(c, state, skin);
   }
 

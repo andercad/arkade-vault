@@ -10,6 +10,9 @@ import {
   ROWS,
   W,
 } from "./constants";
+
+const FRUIT_GLOW = 14; // shadowBlur de la fruta en neon
+import { createLayerCache, createSpriteCache } from "@/lib/canvas-cache";
 import { FRUIT_KEYS, drawFruit, loadSpritesheet } from "./sprites";
 import { DEFAULT_SKIN, SKINS, type Skin } from "./skins";
 import type {
@@ -69,6 +72,13 @@ export function createSnakeGame(
   }
   const c: CanvasRenderingContext2D = ctx;
   let skin: Skin = SKINS[DEFAULT_SKIN];
+  // Cachés (SPEC 14): rejilla estática y sprites con glow (neon).
+  const gridLayer = createLayerCache();
+  const sprites = createSpriteCache();
+  function clearCaches() {
+    gridLayer.clear();
+    sprites.clear();
+  }
 
   // ── Estado ────────────────────────────────────────────────────────────────
   let body: Cell[] = []; // cabeza primero
@@ -203,7 +213,23 @@ export function createSnakeGame(
   }
 
   // ── Draw ──────────────────────────────────────────────────────────────────
-  function drawGrid() {
+  // Segmento: con glow (neon) sale de un sprite por color; sin glow, directo.
+  function drawSegment(cell: Cell, color: string, isHead: boolean) {
+    if (!skin.glowSegment) {
+      skin.drawSegment(c, cell, color, isHead);
+      return;
+    }
+    const sp = sprites.get(
+      `${skin.label}:seg:${color}:${isHead ? "h" : "b"}`,
+      CELL,
+      CELL,
+      skin.glowSegment * 2,
+      (sc) => skin.drawSegment(sc, { col: 0, row: 0 }, color, isHead),
+    );
+    c.drawImage(sp.canvas, cell.col * CELL - sp.pad, cell.row * CELL - sp.pad);
+  }
+
+  function drawGrid(c: CanvasRenderingContext2D) {
     c.strokeStyle = skin.grid;
     c.lineWidth = 1;
     c.beginPath();
@@ -269,24 +295,42 @@ export function createSnakeGame(
       c.fillRect(0, 0, W, H);
     }
 
+    // Rejilla cacheada: solo se repinta al cambiar de skin.
+    gridLayer.draw(c, skin.label, (lc) => {
+      lc.translate(0, HUD_H);
+      drawGrid(lc);
+    });
+
     // El tablero va desplazado bajo la franja del HUD.
     c.save();
     c.translate(0, HUD_H);
-    drawGrid();
     if (fruit) {
       if (skin.glowFruit) {
-        c.save();
-        c.shadowColor = skin.glowFruit;
-        c.shadowBlur = 14;
-        drawFruit(c, sheet, fruit.key, fruit.cell);
-        c.restore();
+        const glowColor = skin.glowFruit;
+        const { key, cell } = fruit;
+        const sp = sprites.get(
+          `${skin.label}:fruit:${key}`,
+          CELL,
+          CELL,
+          FRUIT_GLOW * 2,
+          (sc) => {
+            sc.shadowColor = glowColor;
+            sc.shadowBlur = FRUIT_GLOW;
+            drawFruit(sc, sheet, key, { col: 0, row: 0 });
+          },
+        );
+        c.drawImage(
+          sp.canvas,
+          cell.col * CELL - sp.pad,
+          cell.row * CELL - sp.pad,
+        );
       } else {
         drawFruit(c, sheet, fruit.key, fruit.cell);
       }
     }
     for (let i = body.length - 1; i >= 1; i--)
-      skin.drawSegment(c, body[i], skin.colors.body, false);
-    skin.drawSegment(c, body[0], skin.colors.head, true);
+      drawSegment(body[i], skin.colors.body, false);
+    drawSegment(body[0], skin.colors.head, true);
     drawEyes(body[0]);
     c.restore();
 
@@ -401,6 +445,7 @@ export function createSnakeGame(
 
   function destroy() {
     destroyed = true;
+    clearCaches();
     cancelLoad?.();
     cancelAnimationFrame(rafId);
     window.removeEventListener("keydown", onKeyDown);
@@ -410,6 +455,7 @@ export function createSnakeGame(
 
   function setSkin(name: SkinName) {
     skin = SKINS[name] ?? SKINS[DEFAULT_SKIN];
+    clearCaches();
     if (started && !destroyed && loaded) draw();
   }
 

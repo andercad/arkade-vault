@@ -1,3 +1,4 @@
+import { createLayerCache, createSpriteCache } from "@/lib/canvas-cache";
 import {
   BLOCK,
   BOARD_W,
@@ -96,6 +97,13 @@ export function createTetrisGame(
   let started = false;
   let destroyed = false;
   let skin: Skin = SKINS[DEFAULT_SKIN];
+  // Cachés (SPEC 14): rejilla estática y bloques con glow (neon).
+  const gridLayer = createLayerCache();
+  const sprites = createSpriteCache();
+  function clearCaches() {
+    gridLayer.clear();
+    sprites.clear();
+  }
   let lastTime: number | null = null;
   let rafId = 0;
   let lastSnap: TetrisSnapshot | null = null;
@@ -246,11 +254,21 @@ export function createTetrisGame(
     const color = skin.colors[colorIndex];
     if (!color) return;
     c.globalAlpha = alpha;
-    skin.draw(c, px, py, BLOCK, color);
+    if (skin.glow > 0) {
+      // Sprite por color; el fantasma lo vuelca con globalAlpha.
+      const sp = sprites.get(
+        `${skin.label}:block:${color}`,
+        BLOCK,
+        BLOCK,
+        skin.glow * 2,
+        (sc) => skin.draw(sc, 0, 0, BLOCK, color),
+      );
+      c.drawImage(sp.canvas, px - sp.pad, py - sp.pad);
+    } else skin.draw(c, px, py, BLOCK, color);
     c.globalAlpha = 1;
   }
 
-  function drawGrid(gridColor: string) {
+  function drawGrid(c: CanvasRenderingContext2D, gridColor: string) {
     c.strokeStyle = gridColor;
     c.lineWidth = 0.5;
     for (let col = 1; col < COLS; col++) {
@@ -316,7 +334,8 @@ export function createTetrisGame(
       c.fillRect(0, 0, W, H);
     }
     const gridColor = skin.grid ?? GRID_COLOR;
-    drawGrid(gridColor);
+    // Rejilla cacheada: solo se repinta al cambiar de skin.
+    gridLayer.draw(c, skin.label, (lc) => drawGrid(lc, gridColor));
 
     for (let r = 0; r < ROWS; r++)
       for (let col = 0; col < COLS; col++)
@@ -447,6 +466,7 @@ export function createTetrisGame(
 
   function destroy() {
     destroyed = true;
+    clearCaches();
     cancelAnimationFrame(rafId);
     window.removeEventListener("keydown", onKeyDown);
     window.removeEventListener("keyup", onKeyUp);
@@ -454,6 +474,7 @@ export function createTetrisGame(
 
   function setSkin(name: SkinName) {
     skin = SKINS[name] ?? SKINS[DEFAULT_SKIN];
+    clearCaches();
     if (started && !destroyed) draw();
   }
 
