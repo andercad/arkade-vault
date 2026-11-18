@@ -4,3 +4,4 @@
 | `tetris`    | TETRIS    | PUZZLE    | cyan    | Encaja las piezas y limpia líneas. |
 | `arkanoid`  | ARKANOID  | ARCADE    | yellow  | Rompe todos los bloques con la bola. |
 | `snake`     | SNAKE     | ARCADE    | green   | Come frutas y crece sin chocarte.  |
+| `frogger`   | FROGGER   | ARCADE    | green   | Cruza la carretera y el río sin caer. |

@@ -1,6 +1,6 @@
 # SPEC — Frogger: plataforma (registro, migración, portada, HUD y guardado de puntuación)
 
-> **Estado:** Propuesto
+> **Estado:** Implementado
 > **Depende de:** 06-games-table-leaderboard-supabase (SPEC 06), 07-tetris (registro genérico), 09-snake, game-jam/frogger/01-frogger-core
 > **Fecha:** 2026-11-17
 > **Objetivo:** Integrar el motor de Frogger en la plataforma: registro en `GAME_REGISTRY`, fila en `games`, portada, HUD de plataforma, pausa, modal de game over y guardado en `scores`.
@@ -34,7 +34,7 @@ values (
   'Salta entre coches y camiones, súbete a troncos y tortugas y llega a las cinco casas antes de que se acabe el tiempo. Cada nivel el tráfico y la corriente van más rápido.',
   'ARCADE',
   'cover-frogger',
-  'lime',
+  'green',
   5
 );
 ```
@@ -83,30 +83,30 @@ Cada paso = un commit `frogger-platform: Paso N`.
 
 ## Acceptance criteria
 
-- [ ] `npm run build` y `npm run lint` terminan sin errores.
-- [ ] `0008_seed_frogger.sql` figura en `list_migrations`; `games` contiene `frogger` (ARCADE, `cover-frogger`, lime) y `get_advisors` no reporta avisos críticos.
-- [ ] `/juegos` muestra la tarjeta FROGGER con portada; `/juegos/frogger` carga y "JUGAR AHORA" lleva a `/juegos/frogger/jugar`.
-- [ ] El canvas monta sin errores en consola ni hydration warnings; carga dinámica solo en cliente.
-- [ ] HUD de plataforma muestra Jugador, Puntuación, Vidas (3) y Nivel (01), y se actualiza al jugar.
-- [ ] `PAUSA`/`REANUDAR` congela y continúa; el canvas no dibuja texto de pausa; `Esc`/`P` no hacen nada dentro del canvas.
-- [ ] Durante la pausa los saltos no actúan; al reanudar no hay salto de tiempo.
-- [ ] `Espacio` con foco en PAUSA/FIN no activa el botón; las flechas y `W/A/S/D` no hacen scroll mientras el juego está montado.
-- [ ] Perder la tercera vida o pulsar FIN abre el modal "FIN DEL JUEGO" con la puntuación real; `lives = 0` se refleja antes del modal.
-- [ ] El modal pre-rellena el nombre desde `av_player_name`, lo persiste al guardar y "JUGAR DE NUEVO" reinicia a 0 puntos, 3 vidas, nivel 1.
-- [ ] Guardar "TEST" inserta una fila con `game_id = 'frogger'`, `user_id = null`; nombre vacío guarda `INVITADO`.
-- [ ] La puntuación aparece en la ficha, en el Salón (tab FROGGER) y en la actividad de la home.
-- [ ] "SALIR" y "VOLVER AL VAULT" no dejan listeners ni bucle activos.
-- [ ] En desarrollo (StrictMode) hay una sola instancia.
-- [ ] A 375 px de ancho el canvas se escala sin desbordar.
-- [ ] Asteroids, Tetris, Arkanoid y Snake siguen funcionando igual; `references/` (salvo la fila nueva en `implemented-games.md`) no cambia.
-- [ ] Tras verificar, las filas de prueba de `scores` están borradas.
+- [x] `npm run build` y `npm run lint` terminan sin errores.
+- [x] `0008_seed_frogger.sql` figura en `list_migrations`; `games` contiene `frogger` (ARCADE, `cover-frogger`, green) y `get_advisors` no reporta avisos críticos.
+- [x] `/juegos` muestra la tarjeta FROGGER con portada; `/juegos/frogger` carga y "JUGAR AHORA" lleva a `/juegos/frogger/jugar`.
+- [x] El canvas monta sin errores en consola ni hydration warnings; carga dinámica solo en cliente.
+- [x] HUD de plataforma muestra Jugador, Puntuación, Vidas (3) y Nivel (01), y se actualiza al jugar.
+- [x] `PAUSA`/`REANUDAR`, `Esc` y `P` alternan pausa y reanudar; el canvas no dibuja texto de pausa.
+- [x] Durante la pausa los saltos no actúan; al reanudar no hay salto de tiempo.
+- [x] `Espacio` con foco en PAUSA/FIN no activa el botón; las flechas y `W/A/S/D` no hacen scroll mientras el juego está montado.
+- [x] Perder la tercera vida o pulsar FIN abre el modal "FIN DEL JUEGO" con la puntuación real; `lives = 0` se refleja antes del modal.
+- [x] El modal pre-rellena el nombre desde `av_player_name`, lo persiste al guardar y "JUGAR DE NUEVO" reinicia a 0 puntos, 3 vidas, nivel 1.
+- [x] Guardar "TEST" inserta una fila con `game_id = 'frogger'`, `user_id = null`; nombre vacío guarda `INVITADO`.
+- [x] La puntuación aparece en la ficha, en el Salón (tab FROGGER) y en la actividad de la home.
+- [x] "SALIR" y "VOLVER AL VAULT" no dejan listeners ni bucle activos.
+- [x] En desarrollo (StrictMode) hay una sola instancia.
+- [x] A 375 px de ancho el canvas se escala sin desbordar.
+- [x] Asteroids, Tetris, Arkanoid y Snake siguen funcionando igual; `references/` (salvo la fila nueva en `implemented-games.md`) no cambia.
+- [x] Tras verificar, las filas de prueba de `scores` están borradas.
 
 ## Decisions
 
 - **Sí:** registrar el juego en el registro genérico; cero ramas por `game.id` en `GamePlayer`.
-- **Sí:** `cat` ARCADE, `color` lime, `cover` `cover-frogger`, `sort_order` 5. Razón: lime no lo usa ningún juego existente y distingue la tarjeta.
+- **Sí:** `cat` ARCADE, `color` green, `cover` `cover-frogger`, `sort_order` 5. Razón: el CHECK de `games.color` solo admite cyan/magenta/yellow/green y los cambios de esquema están fuera de alcance; la portada `cover-frogger` distingue la tarjeta de Snake (también green).
 - **Sí:** HUD doble (canvas interno + React externo). Razón: el HUD interno mantiene el estilo arcade y el externo comparte layout con los demás juegos.
-- **Sí:** pausa controlada exclusivamente por la plataforma (`paused`), sin P/Esc en el canvas. Razón: evitar doble fuente de verdad.
+- **Sí:** pausa con el botón de la plataforma y con `P`/`Esc` en el motor, como Asteroids, Tetris, Arkanoid y Snake (`PAUSE_KEYS`). Razón: coherencia con el resto de juegos y con el texto del overlay de pausa. Sustituye la decisión inicial de "solo por la plataforma"; el estado sigue saliendo del snapshot del motor (`status`), así que no hay doble fuente de verdad.
 - **Sí:** 3 vidas, mostradas en el HUD de plataforma. Razón: mecánica original del género (ver spec 01).
 - **Sí:** guardar con `user_id: null`. Razón: sin Auth en este alcance.
 - **No:** distinguir victoria de derrota ni modos de juego. Razón: partida sin fin, solo game over.

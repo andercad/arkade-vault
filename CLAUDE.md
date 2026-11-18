@@ -6,13 +6,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project
 
-Arcade Vault: online games platform to compete for points. App funcional: home, biblioteca, detalle, reproductor, salón de la fama, login, about + contacto, 4 juegos jugables (Asteroids, Tetris, Arkanoid, Snake) con leaderboard real en Supabase. Course project (Udemy, Section 8: Skills + Playwright MCP).
+Arcade Vault: online games platform to compete for points. App funcional: home, biblioteca, detalle, reproductor, salón de la fama, login, about + contacto, 5 juegos jugables (Asteroids, Tetris, Arkanoid, Snake, Frogger) con leaderboard real en Supabase. Course project (Udemy, Section 8: Skills + Playwright MCP).
 
 Workflow is Spec Driven Design using `/spec` and `/spec-impl` skills, installed via `npx skills@latest add Klerith/fernando-skills` (see README.md). Sibling project `../../Section 7.../arkanoid` used the same flow (specs in `specs/`).
 
 ## Specs
 
-Specs en `specs/` (01 MVP pantallas, 02 homepage, 03 about/contacto, 04 Supabase cimientos, 05 Asteroids, 06 leaderboard y juegos: `06-leaderboard-y-juegos.md`, 07 Tetris + registro genérico de juegos: `07-tetris.md`, 08 Arkanoid con sonido y 5 niveles: `08-arkanoid.md`, 09 Snake con sprites de frutas: `09-snake.md`, 10 selector de skin integrado en el HUD: `10-hud-skins-integrados.md`, 11 botón de fin al Salón de la fama y reset del reproductor: `11-fin-leaderboard-y-reset.md`, 12 mando táctil para jugar en móvil: `12-controles-tactiles.md`, 13 aspecto Gamepad MK-II del mando (carcasa neón, cruz con hub, botones A/B): `13-gamepad-mk2.md`). Leer la spec relevante y sus dependencias antes de implementar.
+Specs en `specs/` (01 MVP pantallas, 02 homepage, 03 about/contacto, 04 Supabase cimientos, 05 Asteroids, 06 leaderboard y juegos: `06-leaderboard-y-juegos.md`, 07 Tetris + registro genérico de juegos: `07-tetris.md`, 08 Arkanoid con sonido y 5 niveles: `08-arkanoid.md`, 09 Snake con sprites de frutas: `09-snake.md`, 10 selector de skin integrado en el HUD: `10-hud-skins-integrados.md`, 11 botón de fin al Salón de la fama y reset del reproductor: `11-fin-leaderboard-y-reset.md`, 12 mando táctil para jugar en móvil: `12-controles-tactiles.md`, 13 aspecto Gamepad MK-II del mando (carcasa neón, cruz con hub, botones A/B): `13-gamepad-mk2.md`). Game-jam Frogger en `specs/game-jam/frogger/` (01 motor TS en `lib/frogger/`: `01-frogger-core.md`; 02 plataforma, migración `0008`, portada, pausa botón + `P`/`Esc` y guardado: `02-frogger-platform.md`; 03 peligros y audio: `03-frogger-hazards-audio.md`). Leer la spec relevante y sus dependencias antes de implementar.
 
 Buenas prácticas:
 
@@ -37,7 +37,7 @@ Next.js 16.4.6 (App Router, `app/` at repo root, no `src/`), React 19.3, Tailwin
 
 - `/`: home con hero, juegos destacados, features, actividad, estadísticas y CTA (`components/home/`).
 - `/juegos`: biblioteca con todos los juegos de la tabla `games`, en tarjetas.
-- `/juegos/[id]`: detalle de un juego (descripción, categoría, mejor puntuación, leaderboard). `[id]` = slug de `games.id`, p. ej. `asteroids`, `tetris`, `arkanoid`, `snake`. Lista completa en `references/implemented-games.md`.
+- `/juegos/[id]`: detalle de un juego (descripción, categoría, mejor puntuación, leaderboard). `[id]` = slug de `games.id`, p. ej. `asteroids`, `tetris`, `arkanoid`, `snake`, `frogger`. Lista completa en `references/implemented-games.md`.
 - `/juegos/[id]/jugar`: reproductor con canvas y HUD (las opciones `live`, p. ej. skin, van dentro del HUD; las `restart`, en el overlay de pausa); guarda la puntuación al terminar. El `[id]` debe existir en `GAME_REGISTRY`. El menú de fin enlaza a `/salon-de-la-fama?juego=<id>`. Pinta el mando táctil con aspecto Gamepad MK-II (`components/touch-controls.tsx`, solo `@media (pointer: coarse)`; en móvil vertical va fijo al borde inferior para que el canvas ocupe el alto libre; direcciones sin tecla atenuadas, A/B con rótulo del registro, `.on` con teclado físico `isTrusted`) según `touchControls` del registro; emite `KeyboardEvent` sintéticos en `window` y se desactiva en pausa/fin. Con `cacheComponents` Next oculta la página en vez de desmontarla (Activity), por eso `GamePlayer` resetea su estado en el cleanup de un efecto.
 - `/salon-de-la-fama`: mejores puntuaciones (top 12) con una pestaña por juego (`components/hall-of-fame.tsx`). `?juego=<id>` elige la pestaña inicial (desconocido → la primera).
 - `/login`: formulario de acceso de jugador (`components/auth-form.tsx`).
