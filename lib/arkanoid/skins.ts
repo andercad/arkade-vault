@@ -9,6 +9,7 @@ export interface Skin {
   colors: Record<string, string>; // color de bloque -> color del skin
   bg: string | null; // fondo del canvas; null = fondo por defecto (CLASSIC_BG)
   text: string; // color del HUD del canvas
+  glow: number; // mayor shadowBlur de ladrillo/pala/bola (px); > 0 = se cachean como sprites
   drawBrick(
     c: Ctx,
     sheet: CanvasImageSource,
@@ -68,6 +69,7 @@ export const SKINS: Record<SkinName, Skin> = {
     colors: CLASSIC_COLORS,
     bg: null,
     text: "#ffffff",
+    glow: 0,
     drawBrick(c, sheet, color, x, y, w, h) {
       drawSprite(c, sheet, `block_${color}`, x, y, w, h);
     },
@@ -88,6 +90,7 @@ export const SKINS: Record<SkinName, Skin> = {
     colors: RETRO_COLORS,
     bg: null,
     text: "#f2d45c",
+    glow: 0,
     drawBrick(c, _sheet, color, x, y, w, h) {
       c.fillStyle = RETRO_COLORS[color] ?? "#ffffff";
       c.fillRect(x + 1, y + 1, w - 2, h - 2);
@@ -113,6 +116,7 @@ export const SKINS: Record<SkinName, Skin> = {
     colors: NEON_COLORS,
     bg: "#000000",
     text: "#00f0ff",
+    glow: 14,
     drawBrick(c, _sheet, color, x, y, w, h) {
       const col = NEON_COLORS[color] ?? "#ffffff";
       c.save();
