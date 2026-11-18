@@ -88,7 +88,7 @@ Cada paso = un commit `frogger-platform: Paso N`.
 - [ ] `/juegos` muestra la tarjeta FROGGER con portada; `/juegos/frogger` carga y "JUGAR AHORA" lleva a `/juegos/frogger/jugar`.
 - [ ] El canvas monta sin errores en consola ni hydration warnings; carga dinámica solo en cliente.
 - [ ] HUD de plataforma muestra Jugador, Puntuación, Vidas (3) y Nivel (01), y se actualiza al jugar.
-- [ ] `PAUSA`/`REANUDAR` congela y continúa; el canvas no dibuja texto de pausa; `Esc`/`P` no hacen nada dentro del canvas.
+- [ ] `PAUSA`/`REANUDAR`, `Esc` y `P` alternan pausa y reanudar; el canvas no dibuja texto de pausa.
 - [ ] Durante la pausa los saltos no actúan; al reanudar no hay salto de tiempo.
 - [ ] `Espacio` con foco en PAUSA/FIN no activa el botón; las flechas y `W/A/S/D` no hacen scroll mientras el juego está montado.
 - [ ] Perder la tercera vida o pulsar FIN abre el modal "FIN DEL JUEGO" con la puntuación real; `lives = 0` se refleja antes del modal.
@@ -106,7 +106,7 @@ Cada paso = un commit `frogger-platform: Paso N`.
 - **Sí:** registrar el juego en el registro genérico; cero ramas por `game.id` en `GamePlayer`.
 - **Sí:** `cat` ARCADE, `color` green, `cover` `cover-frogger`, `sort_order` 5. Razón: el CHECK de `games.color` solo admite cyan/magenta/yellow/green y los cambios de esquema están fuera de alcance; la portada `cover-frogger` distingue la tarjeta de Snake (también green).
 - **Sí:** HUD doble (canvas interno + React externo). Razón: el HUD interno mantiene el estilo arcade y el externo comparte layout con los demás juegos.
-- **Sí:** pausa controlada exclusivamente por la plataforma (`paused`), sin P/Esc en el canvas. Razón: evitar doble fuente de verdad.
+- **Sí:** pausa con el botón de la plataforma y con `P`/`Esc` en el motor, como Asteroids, Tetris, Arkanoid y Snake (`PAUSE_KEYS`). Razón: coherencia con el resto de juegos y con el texto del overlay de pausa. Sustituye la decisión inicial de "solo por la plataforma"; el estado sigue saliendo del snapshot del motor (`status`), así que no hay doble fuente de verdad.
 - **Sí:** 3 vidas, mostradas en el HUD de plataforma. Razón: mecánica original del género (ver spec 01).
 - **Sí:** guardar con `user_id: null`. Razón: sin Auth en este alcance.
 - **No:** distinguir victoria de derrota ni modos de juego. Razón: partida sin fin, solo game over.

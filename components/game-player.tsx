@@ -8,7 +8,37 @@ import { getGameDefinition } from "@/lib/game-registry";
 import type { Game } from "@/lib/games";
 import { submitScore } from "@/lib/scores";
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
+
+// Último nombre guardado por el jugador (invitado), para pre-rellenar el modal.
+const NAME_KEY = "av_player_name";
+const nameListeners = new Set<() => void>();
+
+function subscribeName(cb: () => void) {
+  nameListeners.add(cb);
+  window.addEventListener("storage", cb);
+  return () => {
+    nameListeners.delete(cb);
+    window.removeEventListener("storage", cb);
+  };
+}
+
+function readStoredName(): string | null {
+  try {
+    return localStorage.getItem(NAME_KEY);
+  } catch {
+    return null;
+  }
+}
+
+function writeStoredName(name: string) {
+  try {
+    localStorage.setItem(NAME_KEY, name);
+  } catch {
+    return;
+  }
+  nameListeners.forEach((cb) => cb());
+}
 
 const INITIAL_SNAPSHOT: GameSnapshot = {
   score: 0,
@@ -51,7 +81,12 @@ export function GamePlayer({ game }: { game: Game }) {
     };
   }, []);
 
-  const name = typedName ?? user?.name ?? "INVITADO";
+  const storedName = useSyncExternalStore(
+    subscribeName,
+    readStoredName,
+    () => null,
+  );
+  const name = typedName ?? user?.name ?? storedName ?? "INVITADO";
   const { score } = snap;
   // "live" se ven siempre en la barra; "restart" solo en el overlay de pausa.
   const liveOptions = (definition.options ?? []).filter(
@@ -116,8 +151,10 @@ export function GamePlayer({ game }: { game: Game }) {
       score: Math.min(score, 1_000_000),
     });
     setSaving(false);
-    if (ok) setSaved(true);
-    else setSaveError(true);
+    if (ok) {
+      writeStoredName(finalName);
+      setSaved(true);
+    } else setSaveError(true);
   };
 
   return (

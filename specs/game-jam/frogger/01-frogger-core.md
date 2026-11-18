@@ -103,7 +103,7 @@ Conceptos de diseño (valores nuevos decididos aquí):
 - Salto: una pulsación mueve 1 celda (arriba/abajo/izq/der) con animación 80 ms; sin movimiento fuera del tablero (los saltos laterales y hacia abajo en los límites se ignoran).
 - Puntuación: +10 al alcanzar por primera vez una fila más alta en la vida actual; +50 al llenar una casa; +10 × segundos restantes al llenar una casa; +1000 al completar las 5 casas. Vida extra a los 10.000 puntos y luego cada 20.000 (máximo 5 vidas).
 - Máximo teórico muy por debajo de 1.000.000; `GamePlayer` ya acota al guardar.
-- Teclas (`event.code`): `ArrowUp/KeyW`, `ArrowDown/KeyS`, `ArrowLeft/KeyA`, `ArrowRight/KeyD`. Pausa por la plataforma (spec 02), no por teclas dentro del canvas. `preventDefault` sobre flechas y `W/A/S/D` mientras el juego está montado; se ignoran eventos con `target` `input/textarea/select` y `event.repeat`.
+- Teclas (`event.code`): `ArrowUp/KeyW`, `ArrowDown/KeyS`, `ArrowLeft/KeyA`, `ArrowRight/KeyD`. Pausa también con `P`/`Esc` dentro del motor (ver spec 02), además del botón de la plataforma. `preventDefault` sobre flechas y `W/A/S/D` mientras el juego está montado; se ignoran eventos con `target` `input/textarea/select` y `event.repeat`.
 - Entrada ignorada en pausa, muerte en animación y game over. Se vacía la entrada pendiente en `blur`.
 - Bucle rAF con `dt` limitado a 0,05 s; `lastTime` reiniciado en `resume()`.
 - Orden de eventos al morir la última vida: `onState({lives: 0, status: "gameover"})` y luego `onGameOver(score)`; `lives = 0` se emite siempre antes.
@@ -164,7 +164,7 @@ Cada paso = un commit `frogger-core: Paso N`.
 - **Sí:** HUD doble: HUD interno del canvas (PUNTOS, VIDAS, NIVEL, TIEMPO) y HUD React externo (Jugador, Puntuación, Vidas, Nivel) derivado del snapshot. Razón: coherencia con los demás juegos y legibilidad en pantallas escaladas.
 - **Sí:** arquitectura del repo real (`lib/<juego>/engine.ts` + adaptador en `GAME_REGISTRY`) en lugar de un componente `components/games/FroggerGame.tsx`. Razón: así funcionan Asteroids, Tetris, Arkanoid y Snake; el contrato de callbacks `onScoreChange/onLivesChange/onLevelChange/onGameOver` se cubre con `onState(snapshot)` + `onGameOver`, que el adaptador traduce al HUD.
 - **Sí:** salto discreto y carriles con velocidad constante. Razón: patrones legibles y verificables; sin física.
-- **Sí:** pausa solo por la plataforma (prop/botón), sin P/Esc en el canvas (spec 02 la conecta).
+- **Sí:** pausa por el botón de la plataforma y por `P`/`Esc` en el motor, como los demás juegos (ver spec 02).
 - **Sí:** puntuación por fila nueva y bonus de tiempo. Razón: premia avanzar rápido sin permitir farmear subiendo y bajando.
 - **No:** moscas, cocodrilos, serpientes y sonido en este spec. Razón: alcance delimitado; van en spec 03.
 - **No:** `devicePixelRatio`; canvas lógico escalado por CSS como los demás juegos.

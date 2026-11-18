@@ -19,6 +19,8 @@ const KEY_DIRECTIONS: Record<string, Direction> = {
   KeyD: "right",
 };
 
+const PAUSE_KEYS = ["Escape", "KeyP"];
+
 export function createFroggerGame(
   canvas: HTMLCanvasElement,
   callbacks: FroggerCallbacks,
@@ -92,6 +94,17 @@ export function createFroggerGame(
 
   function onKeyDown(e: KeyboardEvent) {
     if (destroyed || isFormTarget(e)) return;
+    // Espacio no hace nada en el juego, pero no debe hacer scroll ni activar el botón con foco.
+    if (e.code === "Space") {
+      e.preventDefault();
+      return;
+    }
+    if (PAUSE_KEYS.includes(e.code)) {
+      if (e.repeat || state.over) return;
+      if (paused) resume();
+      else pause();
+      return;
+    }
     const dir = KEY_DIRECTIONS[e.code];
     if (!dir) return;
     e.preventDefault();
@@ -99,10 +112,10 @@ export function createFroggerGame(
     jump(state, dir);
   }
 
-  // Evita el scroll de las flechas también al soltarlas.
+  // Evita el scroll de las flechas y que Espacio active el botón con foco al soltarse.
   function onKeyUp(e: KeyboardEvent) {
     if (destroyed || isFormTarget(e)) return;
-    if (KEY_DIRECTIONS[e.code]) e.preventDefault();
+    if (e.code === "Space" || KEY_DIRECTIONS[e.code]) e.preventDefault();
   }
 
   // ── Bucle principal ───────────────────────────────────────────────────────
