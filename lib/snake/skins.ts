@@ -7,6 +7,7 @@ export interface Skin {
   bg: string | null; // fondo del canvas; null = transparente
   grid: string; // color de rejilla
   glowFruit: string | null; // glow alrededor de la fruta; null = sin glow
+  glowSegment: number; // shadowBlur de los segmentos (px); 0 = sin glow
   // dibuja un segmento de la serpiente (coordenadas de tablero)
   drawSegment(
     c: CanvasRenderingContext2D,
@@ -16,6 +17,8 @@ export interface Skin {
   ): void;
 }
 
+const NEON_GLOW = 12;
+
 export const SKINS: Record<SkinName, Skin> = {
   classic: {
     label: "Classic",
@@ -23,6 +26,7 @@ export const SKINS: Record<SkinName, Skin> = {
     bg: null,
     grid: "rgba(255, 255, 255, 0.05)",
     glowFruit: null,
+    glowSegment: 0,
     drawSegment(c, cell, color) {
       const pad = 2;
       c.fillStyle = color;
@@ -43,6 +47,7 @@ export const SKINS: Record<SkinName, Skin> = {
     bg: null,
     grid: "rgba(255, 255, 255, 0.06)",
     glowFruit: null,
+    glowSegment: 0,
     drawSegment(c, cell, color) {
       const x = cell.col * CELL + 1;
       const y = cell.row * CELL + 1;
@@ -58,13 +63,14 @@ export const SKINS: Record<SkinName, Skin> = {
     bg: "#000000",
     grid: "#14141f",
     glowFruit: "#ffffff",
+    glowSegment: NEON_GLOW,
     drawSegment(c, cell, color) {
       const x = cell.col * CELL + 3;
       const y = cell.row * CELL + 3;
       const s = CELL - 6;
       c.save();
       c.shadowColor = color;
-      c.shadowBlur = 12;
+      c.shadowBlur = NEON_GLOW;
       c.strokeStyle = color;
       c.lineWidth = 2;
       c.strokeRect(x, y, s, s);

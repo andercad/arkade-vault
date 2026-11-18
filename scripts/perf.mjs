@@ -10,6 +10,10 @@ const GAMES = process.env.PERF_GAMES?.split(",") ?? [
   "snake",
   "frogger",
 ];
+// Teclas que mantienen viva la partida (Snake muere solo contra la pared).
+const KEEP_ALIVE = {
+  snake: ["ArrowRight", "ArrowDown", "ArrowLeft", "ArrowUp"],
+};
 const RATES = [1, 6];
 const MIN_FPS = 58;
 const WARMUP_MS = 1000;
@@ -31,8 +35,19 @@ const INIT = () => {
     });
 };
 
-async function measure(page, cdp, rate) {
+// Si salió el modal de fin de partida, reinicia: el modal con blur falsea el FPS.
+async function ensurePlaying(page) {
+  const again = page.getByRole("button", { name: "JUGAR DE NUEVO" });
+  if (await again.isVisible()) await again.click();
+}
+
+async function measure(page, cdp, rate, keys) {
   await cdp.send("Emulation.setCPUThrottlingRate", { rate });
+  await ensurePlaying(page);
+  let k = 0;
+  const turn = keys
+    ? setInterval(() => page.keyboard.press(keys[k++ % keys.length]), 500)
+    : null;
   await page.waitForTimeout(WARMUP_MS);
   await page.evaluate(() => {
     window.__perf.frames = 0;
@@ -40,6 +55,7 @@ async function measure(page, cdp, rate) {
     window.__perf.on = true;
   });
   await page.waitForTimeout(SAMPLE_MS);
+  if (turn) clearInterval(turn);
   const r = await page.evaluate(() => {
     window.__perf.on = false;
     return { frames: window.__perf.frames, js: window.__perf.js };
@@ -84,7 +100,7 @@ for (const game of GAMES) {
     await select.selectOption(skin);
     const row = { game, skin };
     for (const rate of RATES) {
-      const m = await measure(page, cdp, rate);
+      const m = await measure(page, cdp, rate, KEEP_ALIVE[game]);
       row[`fps${rate}`] = m.fps.toFixed(0);
       row[`js${rate}`] = m.js.toFixed(2);
       if (rate === 6 && m.fps < MIN_FPS) {
