@@ -44,6 +44,9 @@ import {
   DEFAULT_SKIN as SNAKE_DEFAULT_SKIN,
   SKINS as SNAKE_SKINS,
 } from "@/lib/snake/skins";
+import { createFroggerGame } from "@/lib/frogger/engine";
+import { H as FROGGER_H, W as FROGGER_W } from "@/lib/frogger/constants";
+import type { FroggerSnapshot } from "@/lib/frogger/types";
 import { DEFAULT_SKIN, SKINS } from "@/lib/tetris/skins";
 import type { SkinName, TetrisSnapshot } from "@/lib/tetris/types";
 
@@ -278,11 +281,44 @@ const snake: GameDefinition = {
   },
 };
 
+function froggerSnapshot(s: FroggerSnapshot): GameSnapshot {
+  return {
+    score: s.score,
+    status: s.status,
+    hud: [
+      { key: "lives", label: "Vidas", value: "♥ ".repeat(s.lives).trim() },
+      { key: "level", label: "Nivel", value: String(s.level).padStart(2, "0") },
+    ],
+  };
+}
+
+const frogger: GameDefinition = {
+  id: "frogger",
+  width: FROGGER_W,
+  height: FROGGER_H,
+  aria: "Frogger",
+  create: (canvas, cb) => {
+    const game = createFroggerGame(canvas, {
+      onState: (s) => cb.onState(froggerSnapshot(s)),
+      onGameOver: cb.onGameOver,
+    });
+    return {
+      start: game.start,
+      pause: game.pause,
+      resume: game.resume,
+      restart: game.restart,
+      end: game.end,
+      destroy: game.destroy,
+    };
+  },
+};
+
 export const GAME_REGISTRY: Record<string, GameDefinition> = {
   asteroids,
   tetris,
   arkanoid,
   snake,
+  frogger,
 };
 
 export function getGameDefinition(id: string): GameDefinition | null {

@@ -1,6 +1,6 @@
 # SPEC — Frogger: plataforma (registro, migración, portada, HUD y guardado de puntuación)
 
-> **Estado:** Propuesto
+> **Estado:** Aprobado
 > **Depende de:** 06-games-table-leaderboard-supabase (SPEC 06), 07-tetris (registro genérico), 09-snake, game-jam/frogger/01-frogger-core
 > **Fecha:** 2026-11-17
 > **Objetivo:** Integrar el motor de Frogger en la plataforma: registro en `GAME_REGISTRY`, fila en `games`, portada, HUD de plataforma, pausa, modal de game over y guardado en `scores`.
