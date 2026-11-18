@@ -29,9 +29,9 @@ export const DEATH_MS = 800;
 export const MAX_DT = 0.05; // límite de delta time por frame (s)
 
 // Tortugas: ciclo de inmersión (s).
-export const TURTLE_SURFACE_S = 3.4;
-export const TURTLE_WARN_S = 0.6;
-export const TURTLE_SUBMERGED_S = 2;
+export const TURTLE_SURFACE_S = 6;
+export const TURTLE_WARN_S = 1.2;
+export const TURTLE_SUBMERGED_S = 1.5;
 export const TURTLE_CYCLE_S =
   TURTLE_SURFACE_S + TURTLE_WARN_S + TURTLE_SUBMERGED_S;
 

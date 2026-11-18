@@ -29,7 +29,7 @@
 - Carriles con objetos que se mueven a velocidad constante y envuelven (wrap) al salir por un lado.
   - Carretera: coches y camiones; solapar con la rana = muerte.
   - Río: troncos y tortugas; la rana debe estar sobre uno, y se desplaza con él; caer al agua o ser arrastrada fuera del tablero = muerte.
-  - Tortugas en grupos que se sumergen cíclicamente (2 s sumergida, aviso visual 0,6 s antes): sumergida = agua.
+  - Tortugas en grupos que se sumergen cíclicamente (6 s en superficie, aviso visual 1,2 s antes, 1,5 s sumergida): sumergida = agua.
 - Casas: llegar a un hueco libre lo llena; llegar a la fila 0 fuera de un hueco o a un hueco ocupado = muerte.
 - Tiempo por vida: 30 s; al agotarse = muerte.
 - 3 vidas; tras muerte, 0,8 s de animación y reaparición en `(7,12)`.
@@ -144,7 +144,7 @@ Cada paso = un commit `frogger-core: Paso N`.
 - [ ] Una pulsación = un salto de 1 celda; mantener pulsada no repite; en los bordes el salto se ignora.
 - [ ] Tocar un coche o camión mata a la rana; esquivar entre vehículos permite cruzar.
 - [ ] En el río, estar sobre tronco o tortuga es seguro y arrastra a la rana; caer al agua o salir del tablero arrastrada mata.
-- [ ] Las tortugas avisan 0,6 s antes de sumergirse y sumergidas equivalen a agua.
+- [ ] Las tortugas avisan 1,2 s antes de sumergirse y sumergidas equivalen a agua.
 - [ ] Llegar a un hueco libre suma 50 + 10 × segundos restantes y lo marca lleno; llegar a un hueco lleno o al muro de la fila 0 mata.
 - [ ] Tras morir, reaparece en `(7,12)` con el tiempo reiniciado y la fila más alta reiniciada, sin tocar las casas llenas.
 - [ ] +10 por fila nueva alcanzada una sola vez por vida; no se puntúa subir y bajar repetidamente.
