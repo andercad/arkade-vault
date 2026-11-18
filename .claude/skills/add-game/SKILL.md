@@ -1,6 +1,7 @@
 ---
 name: add-game
 description: Genera la spec para añadir un juego real jugable a Arcade Vault (motor TS en canvas, fila en la tabla games, leaderboard en scores), portado desde references/started-games o diseñado desde cero. Se implementa después con /spec-impl.
+disable-model-invocation: true
 argument-hint: <carpeta de references/started-games o descripción del juego>
 allowed-tools: Read, Glob, Grep, Write, AskUserQuestion, Bash(ls:*), Bash(cat:*), Bash(date:*), Bash(git status:*)
 ---
@@ -87,7 +88,7 @@ No preguntes lo que ya dicta `checklist.md`.
 
 ## Modo game-jam
 
-Aplica cuando lo sigue el subagente `game-jam` (`.claude/agents/game-jam.md`), que lo tiene precargado vía `skills:`, o cuando `$ARGUMENTS` empieza por `game-jam:`. Un subagente no puede usar `AskUserQuestion`, y un skill precargado no recibe `$ARGUMENTS` ni garantiza que se ejecuten los comandos `!`. El subagente decide antes `id`, título, `cat`, `color`, `sort_order`, mecánica, controles y canvas; si llegan por `$ARGUMENTS`, úsalos. No los preguntes. Aplica estas diferencias:
+Aplica cuando lo sigue el subagente `game-jam` (`.claude/agents/game-jam.md`), que lo lee con Read (no puede invocarlo ni precargarlo: `disable-model-invocation`), o cuando `$ARGUMENTS` empieza por `game-jam:`. Un subagente no puede usar `AskUserQuestion`, y leído con Read no recibe `$ARGUMENTS` ni expande los comandos `!`. El subagente decide antes `id`, título, `cat`, `color`, `sort_order`, mecánica, controles y canvas; si llegan por `$ARGUMENTS`, úsalos. No los preguntes. Aplica estas diferencias:
 
 - Sin preguntas: usa lo recibido en `$ARGUMENTS`; lo que falte, decídelo tú y regístralo en Decisiones.
 - Juego siempre nuevo y original (Fase 2, rama "descripción"); no se lee `references/started-games/`.

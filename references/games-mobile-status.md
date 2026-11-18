@@ -10,5 +10,6 @@
 | tetris    | ✅            | ✅                | ✅                 | ✅            | SPEC 12 | 2026-11-17           |
 | arkanoid  | ✅            | ✅                | ✅                 | ✅            | SPEC 12 | 2026-11-17           |
 | snake     | ✅            | ✅                | ✅                 | ✅            | SPEC 12 | 2026-11-17           |
+| frogger   | ✅            | ✅                | ✅                 | ✅            | SPEC 12; d-pad 4 dir, sin acciones; pausa por botón PAUSA; horizontal 844×390 sin desbordar | 2026-11-18 |
 
 Leyenda: `✅` aplicado y verificado · `🟡` en progreso · `—` pendiente

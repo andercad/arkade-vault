@@ -53,16 +53,38 @@ Estructura de archivos nueva y convenciones (teclas, constantes del original con
 
 ## Plan de implementación
 
-1. Leer en `node_modules/next/dist/docs/` lo relativo a Client Components y `useEffect`/refs (AGENTS.md). Revisar `components/game-player.tsx` y CSS de `.crt-screen`.
-2. _(Solo si `lib/game-registry.ts` no existe)_ Contrato común (`lib/game-engine.ts`: `GameEngine`, `GameSnapshot` con `score`, `status` y `hud` de pares etiqueta/valor, `GameCallbacks`), `lib/game-registry.ts` (id → `create`, ancho, alto, `aria`), `components/game-canvas.tsx` genérico y `GamePlayer` sin ramas por id. Adaptar Asteroids sin cambiar su comportamiento. Verificación: Asteroids pasa los criterios de SPEC 05.
-3. `lib/<slug>/constants.ts`, `utils.ts`, `types.ts`. Verificación: `npx tsc --noEmit`.
-4. `lib/<slug>/entities.ts` (si aplica). Verificación: `npx tsc --noEmit` y `npm run lint`.
-5. `lib/<slug>/engine.ts`: estado, update/draw, input con cleanup, `pause/resume/restart/end/destroy`, snapshot solo ante cambios. Verificación: `tsc` y `lint`.
-6. Registrar el juego en `lib/game-registry.ts`, incluido `touchControls` (solo las direcciones y acciones que usa el juego). Verificación: `/juegos/<slug>/jugar` monta el canvas y, con emulación táctil, aparece el mando.
-7. _(Solo si `cat` o `color` no están soportados hoy)_ Ampliación de CHECK de `games`, `Category`/`AccentColor`/`CATEGORIES` en `lib/games.ts` y acento CSS (ver "Categoría o color nuevo" en `checklist.md`). Verificación: `tsc`, `list_migrations`.
-8. Migración `NNNN_seed_<slug>.sql` + `apply_migration`; regenerar `database.types.ts` si hace falta. Verificación: `list_migrations`, `select id from games`, `get_advisors`.
-8. Portada `.cover-<slug>` y CSS del canvas/escalado en `app/globals.css` (`/frontend-design`). Verificación: tarjeta en `/juegos`, 375 px sin desbordar.
-9. Verificación en navegador con Playwright (guardar score "TEST", ver leaderboard), borrar filas de prueba de `scores`, actualizar `CLAUDE.md` y `README.md`. Verificación: ambos mencionan la spec; `npm run lint` y `npm run build` pasan.
+1. **Lectura previa.**
+   - Leer en `node_modules/next/dist/docs/` lo relativo a Client Components y `useEffect`/refs (AGENTS.md).
+   - Revisar `components/game-player.tsx` y el CSS de `.crt-screen`.
+   - Verificación: sin cambios de código; `git status` limpio.
+2. **Contrato común** _(solo si `lib/game-registry.ts` no existe)_.
+   - Crear `lib/game-engine.ts` (`GameEngine`, `GameSnapshot` con `score`, `status` y `hud` de pares etiqueta/valor, `GameCallbacks`) y `lib/game-registry.ts` (id → `create`, ancho, alto, `aria`).
+   - Crear `components/game-canvas.tsx` genérico y dejar `GamePlayer` sin ramas por id; adaptar Asteroids sin cambiar su comportamiento.
+   - Verificación: Asteroids pasa los criterios de SPEC 05.
+3. **Constantes, utils y tipos.**
+   - Crear `lib/<slug>/constants.ts`, `utils.ts` y `types.ts`.
+   - Verificación: `npx tsc --noEmit`.
+4. **Entidades** _(si aplica)_.
+   - Crear `lib/<slug>/entities.ts`.
+   - Verificación: `npx tsc --noEmit` y `npm run lint`.
+5. **Motor.**
+   - Crear `lib/<slug>/engine.ts`: estado, update/draw, input con cleanup, `pause/resume/restart/end/destroy`, snapshot solo ante cambios.
+   - Verificación: `npx tsc --noEmit` y `npm run lint`.
+6. **Registro del juego.**
+   - Registrar el juego en `lib/game-registry.ts`, incluido `touchControls` (solo las direcciones y acciones que usa el juego).
+   - Verificación: `/juegos/<slug>/jugar` monta el canvas y, con emulación táctil, aparece el mando.
+7. **Categoría o color nuevo** _(solo si `cat` o `color` no están soportados hoy)_.
+   - Ampliar el CHECK de `games`, `Category`/`AccentColor`/`CATEGORIES` en `lib/games.ts` y el acento CSS (ver "Categoría o color nuevo" en `checklist.md`).
+   - Verificación: `npx tsc --noEmit` y `list_migrations`.
+8. **Migración seed.**
+   - Crear `supabase/migrations/NNNN_seed_<slug>.sql`, aplicarla con `apply_migration` y regenerar `database.types.ts` si hace falta.
+   - Verificación: `list_migrations`, `select id from games` y `get_advisors`.
+9. **Portada y CSS.**
+   - Añadir `.cover-<slug>` y el CSS del canvas/escalado en `app/globals.css` (`/frontend-design`).
+   - Verificación: tarjeta visible en `/juegos` y sin desbordar a 375 px.
+10. **Verificación en navegador y documentación.**
+    - Probar con Playwright (guardar score "TEST", ver leaderboard), borrar las filas de prueba de `scores` y actualizar `CLAUDE.md` y `README.md`.
+    - Verificación: ambos mencionan la spec; `npm run lint` y `npm run build` pasan.
 
 Cada paso = un commit `NN-<slug>: Paso N`.
 

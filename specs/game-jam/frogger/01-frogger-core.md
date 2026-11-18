@@ -1,6 +1,6 @@
 # SPEC — Frogger: motor TypeScript (carretera, río, casas, vidas, tiempo)
 
-> **Estado:** Propuesto
+> **Estado:** Implementado
 > **Depende de:** 06-games-table-leaderboard-supabase (SPEC 06), 07-tetris (registro genérico), 09-snake (patrón de motor `lib/<juego>/`)
 > **Fecha:** 2026-11-17
 > **Objetivo:** Crear el motor `lib/frogger/` con `createFroggerGame`: una rana que cruza una carretera y un río saltando por celdas hasta llenar 5 casas, con 3 vidas, límite de tiempo y niveles progresivos.
@@ -29,7 +29,7 @@
 - Carriles con objetos que se mueven a velocidad constante y envuelven (wrap) al salir por un lado.
   - Carretera: coches y camiones; solapar con la rana = muerte.
   - Río: troncos y tortugas; la rana debe estar sobre uno, y se desplaza con él; caer al agua o ser arrastrada fuera del tablero = muerte.
-  - Tortugas en grupos que se sumergen cíclicamente (2 s sumergida, aviso visual 0,6 s antes): sumergida = agua.
+  - Tortugas en grupos que se sumergen cíclicamente (6 s en superficie, aviso visual 1,2 s antes, 1,5 s sumergida): sumergida = agua.
 - Casas: llegar a un hueco libre lo llena; llegar a la fila 0 fuera de un hueco o a un hueco ocupado = muerte.
 - Tiempo por vida: 30 s; al agotarse = muerte.
 - 3 vidas; tras muerte, 0,8 s de animación y reaparición en `(7,12)`.
@@ -103,7 +103,7 @@ Conceptos de diseño (valores nuevos decididos aquí):
 - Salto: una pulsación mueve 1 celda (arriba/abajo/izq/der) con animación 80 ms; sin movimiento fuera del tablero (los saltos laterales y hacia abajo en los límites se ignoran).
 - Puntuación: +10 al alcanzar por primera vez una fila más alta en la vida actual; +50 al llenar una casa; +10 × segundos restantes al llenar una casa; +1000 al completar las 5 casas. Vida extra a los 10.000 puntos y luego cada 20.000 (máximo 5 vidas).
 - Máximo teórico muy por debajo de 1.000.000; `GamePlayer` ya acota al guardar.
-- Teclas (`event.code`): `ArrowUp/KeyW`, `ArrowDown/KeyS`, `ArrowLeft/KeyA`, `ArrowRight/KeyD`. Pausa por la plataforma (spec 02), no por teclas dentro del canvas. `preventDefault` sobre flechas y `W/A/S/D` mientras el juego está montado; se ignoran eventos con `target` `input/textarea/select` y `event.repeat`.
+- Teclas (`event.code`): `ArrowUp/KeyW`, `ArrowDown/KeyS`, `ArrowLeft/KeyA`, `ArrowRight/KeyD`. Pausa también con `P`/`Esc` dentro del motor (ver spec 02), además del botón de la plataforma. `preventDefault` sobre flechas y `W/A/S/D` mientras el juego está montado; se ignoran eventos con `target` `input/textarea/select` y `event.repeat`.
 - Entrada ignorada en pausa, muerte en animación y game over. Se vacía la entrada pendiente en `blur`.
 - Bucle rAF con `dt` limitado a 0,05 s; `lastTime` reiniciado en `resume()`.
 - Orden de eventos al morir la última vida: `onState({lives: 0, status: "gameover"})` y luego `onGameOver(score)`; `lives = 0` se emite siempre antes.
@@ -138,23 +138,23 @@ Cada paso = un commit `frogger-core: Paso N`.
 
 ## Acceptance criteria
 
-- [ ] `npx tsc --noEmit`, `npm run lint` y `npm run build` terminan sin errores.
-- [ ] `lib/frogger/` no usa `window`, `document` ni `localStorage` fuera de `createFroggerGame` (solo `canvas`, `requestAnimationFrame` y listeners con cleanup).
-- [ ] Al iniciar: rana en `(7,12)`, 3 vidas, nivel 1, 0 casas, 30 s, objetos en movimiento, HUD del canvas con PUNTOS, VIDAS, NIVEL y TIEMPO.
-- [ ] Una pulsación = un salto de 1 celda; mantener pulsada no repite; en los bordes el salto se ignora.
-- [ ] Tocar un coche o camión mata a la rana; esquivar entre vehículos permite cruzar.
-- [ ] En el río, estar sobre tronco o tortuga es seguro y arrastra a la rana; caer al agua o salir del tablero arrastrada mata.
-- [ ] Las tortugas avisan 0,6 s antes de sumergirse y sumergidas equivalen a agua.
-- [ ] Llegar a un hueco libre suma 50 + 10 × segundos restantes y lo marca lleno; llegar a un hueco lleno o al muro de la fila 0 mata.
-- [ ] Tras morir, reaparece en `(7,12)` con el tiempo reiniciado y la fila más alta reiniciada, sin tocar las casas llenas.
-- [ ] +10 por fila nueva alcanzada una sola vez por vida; no se puntúa subir y bajar repetidamente.
-- [ ] Agotar los 30 s mata a la rana.
-- [ ] Llenar las 5 casas suma 1000, sube el nivel, vacía las casas y aumenta la velocidad (tope ×2,2).
-- [ ] Vida extra a 10.000 y luego cada 20.000 puntos, máximo 5 vidas.
-- [ ] Al perder la tercera vida se emite `lives = 0` y después `onGameOver(score)` una sola vez.
-- [ ] `restart()` deja 0 puntos, 3 vidas, nivel 1, casas vacías y sin teclas pegadas.
-- [ ] Pausar congela objetos, rana y temporizador; al reanudar no hay salto de tiempo.
-- [ ] `destroy()` cancela el rAF y quita listeners (las flechas vuelven a hacer scroll); en StrictMode hay una sola instancia.
+- [x] `npx tsc --noEmit`, `npm run lint` y `npm run build` terminan sin errores.
+- [x] `lib/frogger/` no usa `window`, `document` ni `localStorage` fuera de `createFroggerGame` (solo `canvas`, `requestAnimationFrame` y listeners con cleanup).
+- [x] Al iniciar: rana en `(7,12)`, 3 vidas, nivel 1, 0 casas, 30 s, objetos en movimiento, HUD del canvas con PUNTOS, VIDAS, NIVEL y TIEMPO.
+- [x] Una pulsación = un salto de 1 celda; mantener pulsada no repite; en los bordes el salto se ignora.
+- [x] Tocar un coche o camión mata a la rana; esquivar entre vehículos permite cruzar.
+- [x] En el río, estar sobre tronco o tortuga es seguro y arrastra a la rana; caer al agua o salir del tablero arrastrada mata.
+- [x] Las tortugas avisan 1,2 s antes de sumergirse y sumergidas equivalen a agua.
+- [x] Llegar a un hueco libre suma 50 + 10 × segundos restantes y lo marca lleno; llegar a un hueco lleno o al muro de la fila 0 mata.
+- [x] Tras morir, reaparece en `(7,12)` con el tiempo reiniciado y la fila más alta reiniciada, sin tocar las casas llenas.
+- [x] +10 por fila nueva alcanzada una sola vez por vida; no se puntúa subir y bajar repetidamente.
+- [x] Agotar los 30 s mata a la rana.
+- [x] Llenar las 5 casas suma 1000, sube el nivel, vacía las casas y aumenta la velocidad (tope ×2,2).
+- [x] Vida extra a 10.000 y luego cada 20.000 puntos, máximo 5 vidas.
+- [x] Al perder la tercera vida se emite `lives = 0` y después `onGameOver(score)` una sola vez.
+- [x] `restart()` deja 0 puntos, 3 vidas, nivel 1, casas vacías y sin teclas pegadas.
+- [x] Pausar congela objetos, rana y temporizador; al reanudar no hay salto de tiempo.
+- [x] `destroy()` cancela el rAF y quita listeners (las flechas vuelven a hacer scroll); en StrictMode hay una sola instancia.
 
 ## Decisions
 
@@ -164,7 +164,7 @@ Cada paso = un commit `frogger-core: Paso N`.
 - **Sí:** HUD doble: HUD interno del canvas (PUNTOS, VIDAS, NIVEL, TIEMPO) y HUD React externo (Jugador, Puntuación, Vidas, Nivel) derivado del snapshot. Razón: coherencia con los demás juegos y legibilidad en pantallas escaladas.
 - **Sí:** arquitectura del repo real (`lib/<juego>/engine.ts` + adaptador en `GAME_REGISTRY`) en lugar de un componente `components/games/FroggerGame.tsx`. Razón: así funcionan Asteroids, Tetris, Arkanoid y Snake; el contrato de callbacks `onScoreChange/onLivesChange/onLevelChange/onGameOver` se cubre con `onState(snapshot)` + `onGameOver`, que el adaptador traduce al HUD.
 - **Sí:** salto discreto y carriles con velocidad constante. Razón: patrones legibles y verificables; sin física.
-- **Sí:** pausa solo por la plataforma (prop/botón), sin P/Esc en el canvas (spec 02 la conecta).
+- **Sí:** pausa por el botón de la plataforma y por `P`/`Esc` en el motor, como los demás juegos (ver spec 02).
 - **Sí:** puntuación por fila nueva y bonus de tiempo. Razón: premia avanzar rápido sin permitir farmear subiendo y bajando.
 - **No:** moscas, cocodrilos, serpientes y sonido en este spec. Razón: alcance delimitado; van en spec 03.
 - **No:** `devicePixelRatio`; canvas lógico escalado por CSS como los demás juegos.
