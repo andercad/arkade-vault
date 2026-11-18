@@ -34,7 +34,7 @@ values (
   'Salta entre coches y camiones, súbete a troncos y tortugas y llega a las cinco casas antes de que se acabe el tiempo. Cada nivel el tráfico y la corriente van más rápido.',
   'ARCADE',
   'cover-frogger',
-  'lime',
+  'green',
   5
 );
 ```
@@ -84,7 +84,7 @@ Cada paso = un commit `frogger-platform: Paso N`.
 ## Acceptance criteria
 
 - [ ] `npm run build` y `npm run lint` terminan sin errores.
-- [ ] `0008_seed_frogger.sql` figura en `list_migrations`; `games` contiene `frogger` (ARCADE, `cover-frogger`, lime) y `get_advisors` no reporta avisos críticos.
+- [ ] `0008_seed_frogger.sql` figura en `list_migrations`; `games` contiene `frogger` (ARCADE, `cover-frogger`, green) y `get_advisors` no reporta avisos críticos.
 - [ ] `/juegos` muestra la tarjeta FROGGER con portada; `/juegos/frogger` carga y "JUGAR AHORA" lleva a `/juegos/frogger/jugar`.
 - [ ] El canvas monta sin errores en consola ni hydration warnings; carga dinámica solo en cliente.
 - [ ] HUD de plataforma muestra Jugador, Puntuación, Vidas (3) y Nivel (01), y se actualiza al jugar.
@@ -104,7 +104,7 @@ Cada paso = un commit `frogger-platform: Paso N`.
 ## Decisions
 
 - **Sí:** registrar el juego en el registro genérico; cero ramas por `game.id` en `GamePlayer`.
-- **Sí:** `cat` ARCADE, `color` lime, `cover` `cover-frogger`, `sort_order` 5. Razón: lime no lo usa ningún juego existente y distingue la tarjeta.
+- **Sí:** `cat` ARCADE, `color` green, `cover` `cover-frogger`, `sort_order` 5. Razón: el CHECK de `games.color` solo admite cyan/magenta/yellow/green y los cambios de esquema están fuera de alcance; la portada `cover-frogger` distingue la tarjeta de Snake (también green).
 - **Sí:** HUD doble (canvas interno + React externo). Razón: el HUD interno mantiene el estilo arcade y el externo comparte layout con los demás juegos.
 - **Sí:** pausa controlada exclusivamente por la plataforma (`paused`), sin P/Esc en el canvas. Razón: evitar doble fuente de verdad.
 - **Sí:** 3 vidas, mostradas en el HUD de plataforma. Razón: mecánica original del género (ver spec 01).
