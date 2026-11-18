@@ -20,7 +20,10 @@ export interface FroggerGame {
   restart(): void; // 0 puntos, 3 vidas, nivel 1
   end(): void; // termina con la puntuación actual
   destroy(): void;
+  setSkin(name: SkinName): void;
 }
+
+export type SkinName = "classic" | "retro" | "neon";
 
 export interface Cell {
   col: number;

@@ -46,7 +46,14 @@ import {
 } from "@/lib/snake/skins";
 import { createFroggerGame } from "@/lib/frogger/engine";
 import { H as FROGGER_H, W as FROGGER_W } from "@/lib/frogger/constants";
-import type { FroggerSnapshot } from "@/lib/frogger/types";
+import type {
+  FroggerSnapshot,
+  SkinName as FroggerSkinName,
+} from "@/lib/frogger/types";
+import {
+  DEFAULT_SKIN as FROGGER_DEFAULT_SKIN,
+  SKINS as FROGGER_SKINS,
+} from "@/lib/frogger/skins";
 import { DEFAULT_SKIN, SKINS } from "@/lib/tetris/skins";
 import type { SkinName, TetrisSnapshot } from "@/lib/tetris/types";
 
@@ -297,6 +304,26 @@ const frogger: GameDefinition = {
   width: FROGGER_W,
   height: FROGGER_H,
   aria: "Frogger",
+  options: [
+    {
+      key: "skin",
+      label: "Skin",
+      choices: (Object.keys(FROGGER_SKINS) as FroggerSkinName[]).map(
+        (value) => ({ value, label: FROGGER_SKINS[value].label }),
+      ),
+      defaultValue: FROGGER_DEFAULT_SKIN,
+      appliesOn: "live",
+    },
+  ],
+  touchControls: {
+    dpad: {
+      up: "ArrowUp",
+      down: "ArrowDown",
+      left: "ArrowLeft",
+      right: "ArrowRight",
+    },
+    actions: [],
+  },
   create: (canvas, cb) => {
     const game = createFroggerGame(canvas, {
       onState: (s) => cb.onState(froggerSnapshot(s)),
@@ -309,6 +336,9 @@ const frogger: GameDefinition = {
       restart: game.restart,
       end: game.end,
       destroy: game.destroy,
+      setOption: (key, value) => {
+        if (key === "skin") game.setSkin(value as FroggerSkinName);
+      },
     };
   },
 };

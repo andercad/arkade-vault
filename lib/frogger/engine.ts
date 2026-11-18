@@ -1,11 +1,13 @@
 import { MAX_DT } from "./constants";
 import { drawGame } from "./draw";
+import { DEFAULT_SKIN, SKINS, type Skin } from "./skins";
 import { createState, endGame, jump, snapshotOf, stepState } from "./state";
 import type {
   Direction,
   FroggerCallbacks,
   FroggerGame,
   FroggerSnapshot,
+  SkinName,
 } from "./types";
 
 const KEY_DIRECTIONS: Record<string, Direction> = {
@@ -35,11 +37,13 @@ export function createFroggerGame(
       restart: noop,
       end: noop,
       destroy: noop,
+      setSkin: noop,
     };
   }
   const c: CanvasRenderingContext2D = ctx;
 
   // ── Estado ────────────────────────────────────────────────────────────────
+  let skin: Skin = SKINS[DEFAULT_SKIN];
   let state = createState();
   let paused = false;
   let overReported = false;
@@ -127,7 +131,7 @@ export function createFroggerGame(
       stepState(state, dt);
       if (state.over) reportOver();
     }
-    drawGame(c, state);
+    drawGame(c, state, skin);
     notify();
     rafId = requestAnimationFrame(loop);
   }
@@ -176,5 +180,11 @@ export function createFroggerGame(
     window.removeEventListener("keyup", onKeyUp);
   }
 
-  return { start, pause, resume, restart, end, destroy };
+  // El bucle redibuja cada frame (también en pausa), así que basta con fijar el skin.
+  function setSkin(name: SkinName) {
+    skin = SKINS[name] ?? SKINS[DEFAULT_SKIN];
+    if (started && !destroyed) drawGame(c, state, skin);
+  }
+
+  return { start, pause, resume, restart, end, destroy, setSkin };
 }

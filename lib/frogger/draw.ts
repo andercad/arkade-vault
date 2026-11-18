@@ -18,34 +18,33 @@ import {
 } from "./constants";
 import { frogDrawPos, isJumping, type Frog } from "./frog";
 import { turtleState, type LaneObject, type LaneState } from "./lanes";
+import { DEFAULT_SKIN, SKINS, type Skin } from "./skins";
 import type { GameState } from "./state";
 import type { Direction } from "./types";
 
-const COLORS = {
-  bg: "#0b0b14",
-  hud: "#12121f",
-  hudLine: "rgba(255, 255, 255, 0.08)",
-  text: "#f0f0f8",
-  wall: "#14532d",
-  wallEdge: "#0d3b20",
-  water: "#0b3d91",
-  waterWave: "rgba(120, 190, 255, 0.18)",
-  road: "#3a3a42",
-  roadLine: "rgba(255, 255, 255, 0.55)",
-  safe: "#2e7d32",
-  safeEdge: "#1f5c24",
-  log: "#7a4a21",
-  logEdge: "#4f2f12",
-  shell: "#2f9e44",
-  shellEdge: "#1b6b2c",
-  frog: "#7CFC00",
-  frogDark: "#3fa800",
-  frogDeadRoad: "#d94040",
-  frogDeadWater: "#8ec9ff",
-};
+// Skin activo: se fija en cada drawGame (el dibujo es síncrono).
+let skin: Skin = SKINS[DEFAULT_SKIN];
+let COLORS = skin.colors;
 
-const CAR_COLORS = ["#ff4d6d", "#ffd23f", "#00f0ff", "#ff9f1c", "#c77dff"];
-const TRUCK_COLORS = ["#e5e5ef", "#ff8c42", "#8ecae6", "#ffb703", "#d0d0dc"];
+// Activa el glow del skin (neon) con el color dado; requiere c.save() previo.
+function glow(c: CanvasRenderingContext2D, color: string) {
+  if (skin.glow > 0) {
+    c.shadowColor = color;
+    c.shadowBlur = skin.glow;
+  }
+}
+
+// Línea de luz de 4px al tope de un bloque (retro).
+function highlight(
+  c: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  w: number,
+) {
+  if (!skin.highlight) return;
+  c.fillStyle = "rgba(255, 255, 255, 0.28)";
+  c.fillRect(x, y, w, 4);
+}
 
 const ANGLES: Record<Direction, number> = {
   up: 0,
@@ -207,6 +206,26 @@ function drawBackground(c: CanvasRenderingContext2D, filled: boolean[]) {
   }
   c.stroke();
   c.setLineDash([]);
+
+  // Retro: línea de luz en el tope de cada franja. Neon: contornos con glow.
+  const bands: [number, number, string][] = [
+    [HOME_ROW, 1, COLORS.wallEdge],
+    [RIVER_FIRST_ROW, RIVER_LAST_ROW - RIVER_FIRST_ROW + 1, COLORS.waterWave],
+    [MEDIAN_ROW, 1, COLORS.safeEdge],
+    [ROAD_FIRST_ROW, ROAD_LAST_ROW - ROAD_FIRST_ROW + 1, COLORS.roadLine],
+    [START_ROW, 1, COLORS.safeEdge],
+  ];
+  for (const [row, n, color] of bands) {
+    highlight(c, 0, rowY(row), W);
+    if (skin.glow > 0) {
+      c.save();
+      glow(c, color);
+      c.strokeStyle = color;
+      c.lineWidth = 2;
+      c.strokeRect(1, rowY(row) + 1, W - 2, n * CELL - 2);
+      c.restore();
+    }
+  }
 }
 
 // ── Objetos ─────────────────────────────────────────────────────────────────
@@ -219,13 +238,25 @@ function drawVehicle(
   const x = o.x * CELL;
   const y = rowY(row);
   const w = o.len * CELL;
-  const idx = row % CAR_COLORS.length;
+  const idx = row % COLORS.cars.length;
   const truck = objLen > 1;
-  const color = truck ? TRUCK_COLORS[idx] : CAR_COLORS[idx];
+  const color = truck ? COLORS.trucks[idx] : COLORS.cars[idx];
 
-  c.fillStyle = color;
+  c.save();
+  glow(c, color);
   roundRect(c, x + 3, y + 6, w - 6, CELL - 12, 6);
+  if (skin.glow > 0) {
+    c.fillStyle = "#000000";
+    c.fill();
+    c.strokeStyle = color;
+    c.lineWidth = 2;
+    c.stroke();
+    c.globalAlpha = 0.35;
+  }
+  c.fillStyle = color;
   c.fill();
+  c.restore();
+  highlight(c, x + 5, y + 7, w - 10);
 
   // Cabina / parabrisas y faros hacia el sentido de la marcha
   const front = dir === 1 ? x + w - 3 : x + 3;
@@ -252,12 +283,18 @@ function drawLog(c: CanvasRenderingContext2D, lane: LaneState, o: LaneObject) {
   const x = o.x * CELL;
   const y = rowY(lane.def.row);
   const w = o.len * CELL;
+  c.save();
+  glow(c, COLORS.log);
   c.fillStyle = COLORS.log;
   roundRect(c, x + 1, y + 6, w - 2, CELL - 12, 9);
+  if (skin.glow > 0) c.globalAlpha = 0.35;
   c.fill();
+  c.globalAlpha = 1;
   c.strokeStyle = COLORS.logEdge;
   c.lineWidth = 2;
   c.stroke();
+  c.restore();
+  highlight(c, x + 8, y + 7, w - 16);
   c.beginPath();
   for (let k = 14; k < w - 10; k += 22) {
     c.moveTo(x + k, y + 12);
@@ -288,7 +325,9 @@ function drawTurtles(
       c.stroke();
       continue;
     }
-    c.fillStyle = state === "warn" ? "#7fd18f" : COLORS.shell;
+    c.save();
+    glow(c, COLORS.shell);
+    c.fillStyle = state === "warn" ? COLORS.shellWarn : COLORS.shell;
     c.beginPath();
     c.arc(cx, cy, 14, 0, Math.PI * 2);
     c.fill();
@@ -306,6 +345,7 @@ function drawTurtles(
     c.beginPath();
     c.arc(cx + lane.def.dir * 15, cy, 4, 0, Math.PI * 2);
     c.fill();
+    c.restore();
   }
 }
 
@@ -353,7 +393,10 @@ function drawFrog(c: CanvasRenderingContext2D, frog: Frog) {
   const lift = isJumping(frog)
     ? Math.sin(Math.min(1, frog.jumpMs / JUMP_MS) * Math.PI)
     : 0;
+  c.save();
+  glow(c, COLORS.frog);
   drawFrogSprite(c, cx, cy, frog.dir, 0.9 + lift * 0.25, COLORS.frog, false);
+  c.restore();
 }
 
 // ── HUD ─────────────────────────────────────────────────────────────────────
@@ -399,9 +442,15 @@ function drawHud(c: CanvasRenderingContext2D, s: GameState) {
 }
 
 // Sin overlays de pausa ni game over: los dibuja el contenedor (React).
-export function drawGame(c: CanvasRenderingContext2D, s: GameState) {
+export function drawGame(
+  c: CanvasRenderingContext2D,
+  s: GameState,
+  activeSkin: Skin = SKINS[DEFAULT_SKIN],
+) {
+  skin = activeSkin;
+  COLORS = skin.colors;
   c.clearRect(0, 0, W, H);
-  c.fillStyle = COLORS.bg;
+  c.fillStyle = skin.bg ?? COLORS.bg;
   c.fillRect(0, 0, W, H);
 
   c.save();
