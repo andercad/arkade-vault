@@ -34,8 +34,7 @@ Solo escribes specs en `specs/game-jam/`. No tocas código, migraciones, `refere
    - `game-id`: kebab-case único, no presente en `references/implemented-games.md`, ni en `specs/game-jam/`, ni en `GAME_REGISTRY`
    - `title`: mayúsculas, nombre corto reconocible
    - `cat`: una de: ARCADE, PUZZLE, SHOOTER, VERSUS, RACING, FIGHTING, PLATFORMER, MAZE, RHYTHM, SPORTS, STRATEGY
-   - `color`: una de: `cyan`, `magenta`, `yellow`, `green`, `orange`, `violet`, `red`
-   - Si `cat` o `color` no están soportados hoy por BD y código, aplica "Categoría o color nuevo" de `checklist.md`.
+   - `color`: no se elige; es `CATEGORY_COLOR[cat]` (SPEC 15, tabla "Color por categoría" de `checklist.md`). BD, tipos y CSS ya admiten las 11 categorías y colores: sin paso de ampliación de CHECK.
    - `cover`: `cover-<game-id>` (clase CSS en `app/globals.css`)
    - `sort_order`: siguiente libre (comprobar migraciones seed existentes; único en `games`)
    - Mecánica core, controles (teclado; es "REQUIERE TECLADO"), condición de derrota/victoria, dimensiones del canvas lógico
@@ -100,7 +99,7 @@ Solo escribes specs en `specs/game-jam/`. No tocas código, migraciones, `refere
    - Cada spec debe ser autocontenido y ejecutable por `/spec-impl` sin más contexto
    - No inventar dependencias ni archivos fuera de la arquitectura anterior
    - Si el tema sugiere una mecánica ya implementada (Asteroids, Tetris, Arkanoid, Snake), variar la mecánica o elegir un género diferente
-   - "Fuera de alcance" siempre incluye: controles táctiles/mobile, Supabase Auth, cambios de esquema en `games`/`scores` (salvo ampliar los CHECK de `cat`/`color`), tests automatizados
+   - "Fuera de alcance" siempre incluye: controles táctiles/mobile, Supabase Auth, cambios de esquema en `games`/`scores`, tests automatizados
    - El número de vidas debe estar justificado en Decisiones (sin vidas = mecánica clásica de una sola oportunidad; N vidas = mecánica original). Si hay vidas, van en `hud` como item `lives`, y el snapshot con 0 vidas precede a `onGameOver`
    - Cada spec incluye `Riesgos` y `Qué no está en esta spec`
 
