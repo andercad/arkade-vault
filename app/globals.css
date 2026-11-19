@@ -541,6 +541,24 @@ a {
     0 0 14px rgba(0, 245, 255, 0.55),
     inset 0 0 8px rgba(0, 245, 255, 0.35);
 }
+.btn.magenta {
+  border-color: var(--magenta);
+}
+.btn.magenta:hover {
+  color: var(--magenta);
+  box-shadow:
+    0 0 14px rgba(255, 0, 110, 0.55),
+    inset 0 0 8px rgba(255, 0, 110, 0.35);
+}
+.btn.yellow {
+  border-color: var(--yellow);
+}
+.btn.yellow:hover {
+  color: var(--yellow);
+  box-shadow:
+    0 0 14px rgba(245, 255, 0, 0.6),
+    inset 0 0 8px rgba(245, 255, 0, 0.35);
+}
 .btn.ghost {
   border-color: var(--ink-faint);
   color: var(--ink-dim);

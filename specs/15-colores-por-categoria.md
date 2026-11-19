@@ -145,14 +145,14 @@ export const CATEGORY_COLOR: Record<Category, AccentColor> = {
 
 ## Criterios de aceptación
 
-- [ ] BD admite las 11 categorías y 11 colores y rechaza cualquier par (cat, color) fuera del mapa.
-- [ ] `games` tiene los 5 juegos con color del mapa (arkanoid `green`).
-- [ ] `lib/games.ts` exporta `CATEGORIES`, `CATEGORY_COLOR` con los 11 pares; `tsc`, `lint` y `build` limpios.
-- [ ] En `/juegos` el botón JUGAR de cada tarjeta usa el color de su categoría; chips solo de categorías con juegos.
-- [ ] `globals.css` define `--<color>`, `.btn.<color>` y `.neon-<color>` para los 11 colores.
-- [ ] `/add-game`, `game-jam` y `game-planner` derivan el color de la categoría y no contienen el paso "Categoría o color nuevo" ni colores fuera del mapa.
-- [ ] `references/game-suggestions-todo.md` y `crater-rally/01` usan solo colores del mapa.
-- [ ] CLAUDE.md y README.md actualizados.
+- [x] BD admite las 11 categorías y 11 colores y rechaza cualquier par (cat, color) fuera del mapa.
+- [x] `games` tiene los 5 juegos con color del mapa (arkanoid `green`).
+- [x] `lib/games.ts` exporta `CATEGORIES`, `CATEGORY_COLOR` con los 11 pares; `tsc`, `lint` y `build` limpios.
+- [x] En `/juegos` el botón JUGAR de cada tarjeta usa el color de su categoría; chips solo de categorías con juegos.
+- [x] `globals.css` define `--<color>`, `.btn.<color>` y `.neon-<color>` para los 11 colores.
+- [x] `/add-game`, `game-jam` y `game-planner` derivan el color de la categoría y no contienen el paso "Categoría o color nuevo" ni colores fuera del mapa.
+- [x] `references/game-suggestions-todo.md` y `crater-rally/01` usan solo colores del mapa.
+- [x] CLAUDE.md y README.md actualizados.
 
 ---
 
