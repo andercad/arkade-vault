@@ -15,6 +15,7 @@ import { createClient } from "@/lib/supabase/client";
 export interface User {
   id: string;
   name: string; // profiles.username
+  avatarUrl: string | null; // foto de la red social; null → iniciales
 }
 
 interface AuthContextValue {
@@ -33,7 +34,14 @@ async function toUser(authUser: SupabaseUser): Promise<User> {
     .select("username")
     .eq("id", authUser.id)
     .maybeSingle();
-  return { id: authUser.id, name: data?.username ?? "PLAYER" };
+  const meta = authUser.user_metadata ?? {};
+  const photo = meta.avatar_url ?? meta.picture;
+  return {
+    id: authUser.id,
+    name: data?.username ?? "PLAYER",
+    avatarUrl:
+      typeof photo === "string" && /^https:\/\//.test(photo) ? photo : null,
+  };
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {

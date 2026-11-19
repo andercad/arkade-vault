@@ -334,9 +334,99 @@ a {
 }
 .av-nav .auth-btn {
   margin-left: 16px;
+  white-space: nowrap;
+}
+/* SPEC 16: avatar circular (foto o iniciales sobre fondo neón tintado) */
+.av-avatar {
+  --c: var(--cyan);
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: 50%;
+  border: 1px solid var(--c);
+  background: color-mix(in srgb, var(--c) 16%, var(--bg));
+  box-shadow: 0 0 8px color-mix(in srgb, var(--c) 45%, transparent);
+  color: var(--c);
+  font-family: var(--pixel);
+  letter-spacing: 0;
+  line-height: 1;
+}
+.av-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.av-avatar.tone-cyan {
+  --c: var(--cyan);
+}
+.av-avatar.tone-magenta {
+  --c: var(--magenta);
+}
+.av-avatar.tone-violet {
+  --c: var(--violet);
+}
+.av-avatar.tone-green {
+  --c: var(--green);
+}
+.av-avatar.tone-yellow {
+  --c: var(--yellow);
+}
+.av-avatar.tone-orange {
+  --c: var(--orange);
+}
+.av-nav .nav-avatar {
+  display: inline-flex;
+  margin-left: 16px;
+  border-radius: 50%;
+}
+.av-nav .nav-avatar:focus-visible {
+  outline: 2px solid var(--cyan);
+  outline-offset: 2px;
+}
+/* usuario con sesión: avatar + nombre + botón de cerrar sesión */
+.av-nav .nav-user {
+  margin-left: 10px;
+  font-family: var(--pixel);
+  font-size: 10px;
+  color: var(--cyan);
+  letter-spacing: 0.08em;
+}
+.av-nav .nav-user + .auth-btn {
+  margin-left: 12px;
+}
+.av-nav .so-short {
+  display: none;
 }
 .av-nav .hamburger {
   display: none;
+}
+
+/* Con sesión, avatar + nombre + botón no caben junto a enlaces y monedas hasta ~1240px:
+   se oculta el nombre (el avatar enlaza al perfil) y el botón pasa a "SALIR". */
+@media (max-width: 1240px) {
+  .av-nav .nav-user {
+    display: none;
+  }
+  .av-nav .nav-avatar {
+    margin-left: 16px;
+  }
+  .av-nav .so-full {
+    display: none;
+  }
+  .av-nav .so-short {
+    display: inline;
+  }
+  .av-nav .nav-user + .auth-btn {
+    margin-left: 10px;
+  }
+}
+/* Justo por encima del breakpoint móvil, con sesión tampoco caben las monedas. */
+@media (min-width: 961px) and (max-width: 1010px) {
+  .av-nav:has(.nav-avatar) .coin-counter {
+    display: none;
+  }
 }
 
 /* 960px: con enlaces + monedas + botón de sesión la barra desbordaba en móviles apaisados (~844px) */
@@ -364,6 +454,21 @@ a {
     padding: 10px 12px;
     font-size: 9px;
     white-space: nowrap;
+  }
+  .av-nav .nav-user {
+    display: none; /* el nombre se ve en el panel del menú */
+  }
+  .av-nav .nav-avatar {
+    margin-left: 0;
+  }
+  .av-nav .nav-user + .auth-btn {
+    margin-left: 0;
+  }
+  .av-nav .so-full {
+    display: none;
+  }
+  .av-nav .so-short {
+    display: inline;
   }
   .av-nav .hamburger {
     padding: 10px 12px;
@@ -396,6 +501,24 @@ a {
 }
 .av-mobile-panel a.active {
   color: var(--cyan);
+}
+.av-mobile-panel a.panel-user {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 12px;
+  color: var(--cyan);
+}
+.av-mobile-panel .signout {
+  padding: 14px 12px;
+  text-align: left;
+  font-family: var(--pixel);
+  font-size: 11px;
+  color: var(--magenta);
+  background: none;
+  border: 0;
+  border-bottom: 1px dashed var(--line-2);
+  cursor: pointer;
 }
 .av-mobile-backdrop {
   position: fixed;
@@ -3642,6 +3765,19 @@ a {
   line-height: 1.6;
   color: var(--magenta);
   text-shadow: 0 0 6px rgba(255, 0, 110, 0.45);
+}
+/* login: aviso informativo (p. ej. email confirmado) */
+.terminal-notice {
+  margin-bottom: 14px;
+  padding: 10px 12px;
+  background: #000;
+  border: 1px solid var(--green);
+  box-shadow: 0 0 14px rgba(0, 255, 136, 0.25);
+  font-family: var(--mono);
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--green);
+  text-shadow: 0 0 6px rgba(0, 255, 136, 0.45);
 }
 /* honeypot: fuera de pantalla, no display:none para que los bots simples lo rellenen */
 .hp-field {

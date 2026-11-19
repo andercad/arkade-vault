@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, useSyncExternalStore } from "react";
 import { useAuth } from "@/lib/auth";
+import { Avatar } from "@/components/avatar";
 
 // false durante SSR/hidratación, true después. El Nav se hidrata dentro de un
 // Suspense, cuando AuthProvider ya puede haber resuelto `loading`.
@@ -63,9 +64,24 @@ export function Nav() {
           <span>CRÉDITOS · 03</span>
         </div>
         {loading ? null : user ? (
-          <button className="btn ghost auth-btn" onClick={signOut}>
-            {user.name} ▾
-          </button>
+          <>
+            <Link
+              href="/perfil"
+              className="nav-avatar"
+              aria-label={`Perfil de ${user.name}`}
+            >
+              <Avatar name={user.name} avatarUrl={user.avatarUrl} />
+            </Link>
+            <span className="nav-user">{user.name}</span>
+            <button
+              className="btn ghost auth-btn"
+              onClick={signOut}
+              aria-label="Cerrar sesión"
+            >
+              <span className="so-full">CERRAR SESIÓN</span>
+              <span className="so-short">SALIR</span>
+            </button>
+          </>
         ) : (
           <Link href="/login" className="btn auth-btn">
             Iniciar Sesión
@@ -103,9 +119,26 @@ export function Nav() {
         <Link href="/about" className={cls("about")} onClick={close}>
           Acerca de
         </Link>
-        {loading ? null : (
+        {loading ? null : user ? (
+          <>
+            <Link href="/perfil" className="panel-user" onClick={close}>
+              <Avatar name={user.name} avatarUrl={user.avatarUrl} size={36} />
+              <span>{user.name}</span>
+            </Link>
+            <button
+              type="button"
+              className="signout"
+              onClick={() => {
+                close();
+                signOut();
+              }}
+            >
+              Cerrar sesión
+            </button>
+          </>
+        ) : (
           <Link href="/login" className={cls("auth")} onClick={close}>
-            {user ? "Cuenta" : "Iniciar Sesión"}
+            Iniciar Sesión
           </Link>
         )}
         <div style={{ flex: 1 }}></div>

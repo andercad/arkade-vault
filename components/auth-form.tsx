@@ -10,8 +10,10 @@ import { ForgotPassword } from "@/components/forgot-password";
 
 export function AuthForm({
   initialError = null,
+  initialNotice = null,
 }: {
   initialError?: string | null;
+  initialNotice?: string | null;
 }) {
   const router = useRouter();
   const { user: session, loading } = useAuth();
@@ -173,10 +175,16 @@ export function AuthForm({
         </div>
 
         <form onSubmit={submit} noValidate>
-          {error && (
+          {error ? (
             <div className="terminal-error" role="alert">
               {error}
             </div>
+          ) : (
+            initialNotice && (
+              <div className="terminal-notice" role="status">
+                {initialNotice}
+              </div>
+            )
           )}
           <div className="field">
             <label>{tab === "in" ? "Usuario o correo" : "Usuario"}</label>
