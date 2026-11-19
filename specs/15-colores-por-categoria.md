@@ -1,6 +1,6 @@
 # SPEC 15 — Un color por categoría de juego
 
-> **Estado:** Aprobado
+> **Estado:** Implementado
 > **Depende de:** SPEC 04 (Supabase cimientos), SPEC 06 (leaderboard y juegos), SPEC 07 (registro de juegos)
 > **Fecha:** 2026-11-19
 > **Objetivo:** Que cada categoría tenga un color de acento fijo y único, aplicado en BD, código, UI y en los agentes/skills que dan de alta o proponen juegos.
