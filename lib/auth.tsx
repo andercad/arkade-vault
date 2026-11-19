@@ -11,6 +11,11 @@ import {
 } from "react";
 import type { User as SupabaseUser } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/client";
+import {
+  USERNAME_ERROR,
+  USERNAME_RE,
+  type AuthResult,
+} from "@/lib/auth-validation";
 
 export interface User {
   id: string;
@@ -22,6 +27,8 @@ interface AuthContextValue {
   user: User | null;
   loading: boolean;
   signOut: () => Promise<void>;
+  // Valida, actualiza profiles y refresca user.name (nav, reproductor, Salón).
+  updateUsername: (name: string) => Promise<AuthResult>;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -78,9 +85,46 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(null);
   }, []);
 
+  const userId = user?.id;
+  const updateUsername = useCallback(
+    async (raw: string): Promise<AuthResult> => {
+      const name = raw.trim();
+      if (!userId) return { ok: false, error: "Inicia sesión para continuar." };
+      if (!USERNAME_RE.test(name)) return { ok: false, error: USERNAME_ERROR };
+
+      const username = name.toUpperCase();
+      const { data, error } = await supabase
+        .from("profiles")
+        .update({ username })
+        .eq("id", userId)
+        .select("username")
+        .maybeSingle();
+      if (error) {
+        // 23505: el índice único profiles_username_key rechaza el duplicado.
+        if (error.code === "23505") {
+          return { ok: false, error: "Ese usuario ya existe." };
+        }
+        console.error("[auth] Error al cambiar el usuario:", error);
+        return {
+          ok: false,
+          error: "No se pudo cambiar el usuario. Inténtalo de nuevo.",
+        };
+      }
+      if (!data) {
+        return {
+          ok: false,
+          error: "No se pudo cambiar el usuario. Inténtalo de nuevo.",
+        };
+      }
+      setUser((prev) => (prev ? { ...prev, name: data.username } : prev));
+      return { ok: true };
+    },
+    [userId],
+  );
+
   const value = useMemo(
-    () => ({ user, loading, signOut }),
-    [user, loading, signOut],
+    () => ({ user, loading, signOut, updateUsername }),
+    [user, loading, signOut, updateUsername],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
