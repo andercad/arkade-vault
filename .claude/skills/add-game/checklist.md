@@ -35,24 +35,33 @@ Reglas que toda spec generada por `/add-game` debe respetar. Si el código actua
 
 ## Datos y leaderboard
 
-- El juego entra al catálogo **solo por migración**: `supabase/migrations/NNNN_seed_<slug>.sql` con `insert into public.games` (`id` = slug, `cat` y `color` dentro de los CHECKs, `cover` = `cover-<slug>`, `sort_order` = siguiente libre). Aplicar con `apply_migration`; comprobar con `list_migrations` y `get_advisors`.
-- Sin cambios de esquema en `games`/`scores`/`game_stats` (salvo ampliar los CHECK de `cat`/`color`, ver abajo); si hace falta otro, es otra spec.
+- El juego entra al catálogo **solo por migración**: `supabase/migrations/NNNN_seed_<slug>.sql` con `insert into public.games` (`id` = slug, `cat` y `color` = el par del mapa "Color por categoría" (`games_cat_color_check`), `cover` = `cover-<slug>`, `sort_order` = siguiente libre). Aplicar con `apply_migration`; comprobar con `list_migrations` y `get_advisors`.
+- Sin cambios de esquema en `games`/`scores`/`game_stats`; si hace falta otro, es otra spec.
 - Guardado con `submitScore({ gameId, name, score })` (`lib/scores.ts`); nombre vacío → `"INVITADO"`, máx. 10 caracteres, mayúsculas; fallo → "NO SE PUDO GUARDAR · REINTENTA".
 - Puntuación entera entre 0 y 1.000.000 (CHECK de BD); si el juego puede superar ese rango, decidirlo en la spec.
 - Biblioteca, home, ficha, Salón y actividad leen de BD (`getGames`, `getGame`, `getTopScores`…) y no necesitan código nuevo.
 - Portada `.cover-<slug>` en `app/globals.css`, distinguible de las existentes; aplicar `/frontend-design`.
 - Sin service role key ni secretos en el repo.
 
-## Categoría o color nuevo
+## Color por categoría (SPEC 15)
 
-Valores permitidos en una spec: `cat` ∈ `ARCADE, PUZZLE, SHOOTER, VERSUS, RACING, FIGHTING, PLATFORMER, MAZE, RHYTHM, SPORTS, STRATEGY`; `color` ∈ `cyan, magenta, yellow, green, orange, violet, red`. Hoy BD y código solo admiten `ARCADE|PUZZLE|SHOOTER|VERSUS` y `cyan|magenta|yellow|green` (comprobar `Category`/`AccentColor` en `lib/games.ts` y los CHECK de `games`).
+El color no se elige: se deriva de `cat` con este mapa (fuente única en código: `CATEGORY_COLOR` de `lib/games.ts`; en BD lo impone `games_cat_color_check`). BD, tipos y CSS ya admiten las 11 categorías y colores, así que **no hay paso de ampliación de CHECK/tipos/CSS** por juego.
 
-Si el `cat` o el `color` del juego no está soportado, la spec añade un paso **antes** de la migración seed:
+| Categoría  | Color     |
+| ---------- | --------- |
+| ARCADE     | `green`   |
+| PUZZLE     | `cyan`    |
+| SHOOTER    | `magenta` |
+| VERSUS     | `yellow`  |
+| RACING     | `orange`  |
+| PLATFORMER | `violet`  |
+| FIGHTING   | `red`     |
+| MAZE       | `blue`    |
+| SPORTS     | `lime`    |
+| RHYTHM     | `pink`    |
+| STRATEGY   | `silver`  |
 
-- Migración `NNNN_extend_games_checks.sql`: `drop constraint` de `games_cat_check` y/o `games_color_check` y `add constraint … check (… in (lista completa de valores soportados))`. Aplicar con `apply_migration`; regenerar `lib/supabase/database.types.ts`.
-- Actualizar `Category`, `AccentColor` y `CATEGORIES` en `lib/games.ts`.
-- Estilos de acento del color nuevo en `app/globals.css` (mismas variantes que `cyan|magenta|yellow|green`; aplicar `/frontend-design`).
-- Criterio de aceptación: la fila se inserta; la tarjeta, la ficha y el chip de filtro de `/juegos` muestran el acento y la categoría correctos.
+Criterio de aceptación: la tarjeta de `/juegos` muestra el botón JUGAR con el color de su categoría.
 
 ## Criterios de aceptación genéricos (copiar y adaptar)
 
