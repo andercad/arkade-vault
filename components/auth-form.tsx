@@ -5,15 +5,20 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth";
 import { signIn, signUp } from "@/app/login/actions";
 import { validateSignIn, validateSignUp } from "@/lib/auth-validation";
+import { createClient } from "@/lib/supabase/client";
 
-export function AuthForm() {
+export function AuthForm({
+  initialError = null,
+}: {
+  initialError?: string | null;
+}) {
   const router = useRouter();
   const { user: session, loading } = useAuth();
   const [tab, setTab] = useState<"in" | "up">("in");
   const [user, setUser] = useState("");
   const [pass, setPass] = useState("");
   const [email, setEmail] = useState("");
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(initialError);
   const [pending, setPending] = useState(false);
   const [sentTo, setSentTo] = useState<string | null>(null);
 
@@ -73,6 +78,21 @@ export function AuthForm() {
     } catch {
       setError("No se pudo completar la operación. Inténtalo de nuevo.");
     } finally {
+      setPending(false);
+    }
+  };
+
+  const oauth = async (provider: "google" | "github") => {
+    if (pending) return;
+    setError(null);
+    setPending(true);
+    const { error } = await createClient().auth.signInWithOAuth({
+      provider,
+      options: { redirectTo: `${window.location.origin}/auth/callback` },
+    });
+    // Si va bien, el navegador sale hacia el proveedor.
+    if (error) {
+      setError("No se pudo iniciar el acceso con ese proveedor.");
       setPending(false);
     }
   };
@@ -215,10 +235,20 @@ export function AuthForm() {
 
         <div className="auth-divider">O CONTINÚA CON</div>
         <div className="social">
-          <button className="btn ghost" type="button">
+          <button
+            className="btn ghost"
+            type="button"
+            disabled={pending}
+            onClick={() => oauth("google")}
+          >
             ◆ GOOGLE
           </button>
-          <button className="btn ghost" type="button">
+          <button
+            className="btn ghost"
+            type="button"
+            disabled={pending}
+            onClick={() => oauth("github")}
+          >
             ▣ GITHUB
           </button>
         </div>
