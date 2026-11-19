@@ -1,12 +1,21 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { CATS, type Game } from "@/lib/games";
+import { CATEGORIES, type Category, type Game } from "@/lib/games";
 import { GameCard } from "./game-card";
 
 export function Library({ games }: { games: Game[] }) {
   const [q, setQ] = useState("");
-  const [cat, setCat] = useState<(typeof CATS)[number]>("TODOS");
+  const [cat, setCat] = useState<"TODOS" | Category>("TODOS");
+
+  // Solo categorías con al menos un juego, en el orden de CATEGORIES.
+  const chips = useMemo(
+    () => [
+      "TODOS" as const,
+      ...CATEGORIES.filter((c) => games.some((g) => g.cat === c)),
+    ],
+    [games],
+  );
 
   const filtered = useMemo(
     () =>
@@ -37,7 +46,7 @@ export function Library({ games }: { games: Game[] }) {
           />
         </div>
         <div className="av-chips">
-          {CATS.map((c) => (
+          {chips.map((c) => (
             <button
               key={c}
               className={"chip" + (cat === c ? " active" : "")}
