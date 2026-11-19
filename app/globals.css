@@ -376,55 +376,110 @@ a {
 .av-avatar.tone-orange {
   --c: var(--orange);
 }
-.av-nav .nav-avatar {
-  display: inline-flex;
+/* Usuario con sesión: avatar + nombre en un solo bloque que abre el menú de cuenta */
+.av-nav .account {
+  position: relative;
   margin-left: 16px;
-  border-radius: 50%;
 }
-.av-nav .nav-avatar:focus-visible {
+.av-nav .account-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px 3px 3px;
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--cyan);
+  font-family: var(--pixel);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    border-color 150ms,
+    background 150ms;
+}
+.av-nav .account-trigger:hover,
+.av-nav .account-trigger[aria-expanded="true"] {
+  border-color: var(--cyan);
+  background: rgba(0, 245, 255, 0.07);
+}
+.av-nav .account-trigger:focus-visible {
   outline: 2px solid var(--cyan);
   outline-offset: 2px;
 }
-/* usuario con sesión: avatar + nombre + botón de cerrar sesión */
-.av-nav .nav-user {
-  margin-left: 10px;
+/* triángulo en CSS: la fuente pixel no trae ▾ */
+.av-nav .account-caret {
+  display: block;
+  width: 0;
+  height: 0;
+  margin: 1px 0 0 2px;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 5px solid var(--ink-dim);
+  transition: transform 150ms;
+}
+.av-nav .account-trigger[aria-expanded="true"] .account-caret {
+  transform: rotate(180deg);
+}
+.av-nav .account-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 70;
+  display: flex;
+  min-width: 190px;
+  flex-direction: column;
+  background: var(--bg-2);
+  border: 1px solid var(--line);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.55);
+}
+.av-nav .account-menu a,
+.av-nav .account-menu button {
+  padding: 14px 16px;
+  background: none;
+  border: 0;
+  border-bottom: 1px dashed var(--line-2);
+  text-align: left;
   font-family: var(--pixel);
   font-size: 10px;
-  color: var(--cyan);
   letter-spacing: 0.08em;
+  color: var(--ink-dim);
+  cursor: pointer;
 }
-.av-nav .nav-user + .auth-btn {
-  margin-left: 12px;
+.av-nav .account-menu > :last-child {
+  border-bottom: 0;
 }
-.av-nav .so-short {
-  display: none;
+.av-nav .account-menu a:hover,
+.av-nav .account-menu a:focus-visible {
+  color: var(--cyan);
+  background: rgba(0, 245, 255, 0.07);
+}
+.av-nav .account-menu .out {
+  color: var(--magenta);
+}
+.av-nav .account-menu .out:hover,
+.av-nav .account-menu .out:focus-visible {
+  background: rgba(255, 0, 110, 0.08);
 }
 .av-nav .hamburger {
   display: none;
 }
 
-/* Con sesión, avatar + nombre + botón no caben junto a enlaces y monedas hasta ~1240px:
-   se oculta el nombre (el avatar enlaza al perfil) y el botón pasa a "SALIR". */
+/* Con sesión, avatar + nombre no caben junto a enlaces y monedas hasta ~1240px:
+   se oculta el nombre y queda solo el avatar (el menú de cuenta sigue igual). */
 @media (max-width: 1240px) {
-  .av-nav .nav-user {
+  .av-nav .account-name,
+  .av-nav .account-caret {
     display: none;
   }
-  .av-nav .nav-avatar {
-    margin-left: 16px;
-  }
-  .av-nav .so-full {
-    display: none;
-  }
-  .av-nav .so-short {
-    display: inline;
-  }
-  .av-nav .nav-user + .auth-btn {
-    margin-left: 10px;
+  .av-nav .account-trigger {
+    padding: 3px;
   }
 }
 /* Justo por encima del breakpoint móvil, con sesión tampoco caben las monedas. */
 @media (min-width: 961px) and (max-width: 1010px) {
-  .av-nav:has(.nav-avatar) .coin-counter {
+  .av-nav:has(.account) .coin-counter {
     display: none;
   }
 }
@@ -455,20 +510,8 @@ a {
     font-size: 9px;
     white-space: nowrap;
   }
-  .av-nav .nav-user {
-    display: none; /* el nombre se ve en el panel del menú */
-  }
-  .av-nav .nav-avatar {
+  .av-nav .account {
     margin-left: 0;
-  }
-  .av-nav .nav-user + .auth-btn {
-    margin-left: 0;
-  }
-  .av-nav .so-full {
-    display: none;
-  }
-  .av-nav .so-short {
-    display: inline;
   }
   .av-nav .hamburger {
     padding: 10px 12px;

@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useState, useSyncExternalStore } from "react";
 import { useAuth } from "@/lib/auth";
 import { Avatar } from "@/components/avatar";
+import { AccountMenu } from "@/components/account-menu";
 
 // false durante SSR/hidratación, true después. El Nav se hidrata dentro de un
 // Suspense, cuando AuthProvider ya puede haber resuelto `loading`.
@@ -64,24 +65,7 @@ export function Nav() {
           <span>CRÉDITOS · 03</span>
         </div>
         {loading ? null : user ? (
-          <>
-            <Link
-              href="/perfil"
-              className="nav-avatar"
-              aria-label={`Perfil de ${user.name}`}
-            >
-              <Avatar name={user.name} avatarUrl={user.avatarUrl} />
-            </Link>
-            <span className="nav-user">{user.name}</span>
-            <button
-              className="btn ghost auth-btn"
-              onClick={signOut}
-              aria-label="Cerrar sesión"
-            >
-              <span className="so-full">CERRAR SESIÓN</span>
-              <span className="so-short">SALIR</span>
-            </button>
-          </>
+          <AccountMenu />
         ) : (
           <Link href="/login" className="btn auth-btn">
             Iniciar Sesión

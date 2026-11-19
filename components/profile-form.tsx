@@ -46,6 +46,15 @@ export function ProfileForm() {
     setSaved(true);
   };
 
+  // Hay cambios sin guardar en el campo de usuario.
+  const dirty = value.trim().toUpperCase() !== user.name;
+
+  // Sale sin guardar: vuelve a la página anterior (o a la home si no hay).
+  const leave = () => {
+    if (window.history.length > 1) router.back();
+    else router.push("/");
+  };
+
   const logout = async () => {
     await signOut();
     router.push("/");
@@ -102,7 +111,7 @@ export function ProfileForm() {
           <button
             className="btn lg"
             type="submit"
-            disabled={pending || value.trim().toUpperCase() === user.name}
+            disabled={pending || !dirty}
             style={{ width: "100%", marginTop: 8 }}
           >
             {pending ? "GUARDANDO…" : "GUARDAR USUARIO"}
@@ -113,6 +122,16 @@ export function ProfileForm() {
           type="button"
           className="btn ghost"
           style={{ width: "100%", marginTop: 10 }}
+          disabled={pending}
+          onClick={leave}
+        >
+          {dirty ? "SALIR SIN GUARDAR" : "SALIR"}
+        </button>
+        <button
+          type="button"
+          className="btn ghost"
+          style={{ width: "100%", marginTop: 10 }}
+          disabled={pending}
           onClick={logout}
         >
           CERRAR SESIÓN
