@@ -4,6 +4,8 @@ export const USERNAME_RE = /^[A-Za-z0-9_]{3,10}$/;
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 export const MIN_PASSWORD = 6;
 
+export const isValidEmail = (email: string) => EMAIL_RE.test(email);
+
 export const USERNAME_ERROR =
   "Usuario: 3 a 10 caracteres (letras, números o _).";
 export const EMAIL_ERROR = "Introduce un correo electrónico válido.";

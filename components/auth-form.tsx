@@ -6,6 +6,7 @@ import { useAuth } from "@/lib/auth";
 import { signIn, signUp } from "@/app/login/actions";
 import { validateSignIn, validateSignUp } from "@/lib/auth-validation";
 import { createClient } from "@/lib/supabase/client";
+import { ForgotPassword } from "@/components/forgot-password";
 
 export function AuthForm({
   initialError = null,
@@ -21,6 +22,7 @@ export function AuthForm({
   const [error, setError] = useState<string | null>(initialError);
   const [pending, setPending] = useState(false);
   const [sentTo, setSentTo] = useState<string | null>(null);
+  const [forgot, setForgot] = useState(false);
 
   // Con sesión iniciada, /login no tiene sentido: a la home.
   useEffect(() => {
@@ -100,6 +102,10 @@ export function AuthForm({
   const guest = () => {
     router.push("/");
   };
+
+  if (forgot) {
+    return <ForgotPassword onBack={() => setForgot(false)} />;
+  }
 
   if (sentTo) {
     return (
@@ -209,6 +215,21 @@ export function AuthForm({
               disabled={pending}
             />
           </div>
+
+          {tab === "in" && (
+            <button
+              type="button"
+              className="btn ghost"
+              style={{ width: "100%", marginTop: 4, fontSize: 11 }}
+              disabled={pending}
+              onClick={() => {
+                setError(null);
+                setForgot(true);
+              }}
+            >
+              ¿OLVIDASTE TU CONTRASEÑA?
+            </button>
+          )}
 
           <button
             className="btn lg"
