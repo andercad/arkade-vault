@@ -152,7 +152,8 @@ export function GamePlayer({ game }: { game: Game }) {
     });
     setSaving(false);
     if (ok) {
-      writeStoredName(finalName);
+      // Solo invitados: el nombre de un usuario con sesión es su username.
+      if (!user) writeStoredName(finalName);
       setSaved(true);
     } else setSaveError(true);
   };

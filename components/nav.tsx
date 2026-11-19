@@ -2,8 +2,20 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useState, useSyncExternalStore } from "react";
 import { useAuth } from "@/lib/auth";
+import { Avatar } from "@/components/avatar";
+import { AccountMenu } from "@/components/account-menu";
+
+// false durante SSR/hidratación, true después. El Nav se hidrata dentro de un
+// Suspense, cuando AuthProvider ya puede haber resuelto `loading`.
+const noopSubscribe = () => () => {};
+const useHydrated = () =>
+  useSyncExternalStore(
+    noopSubscribe,
+    () => true,
+    () => false,
+  );
 
 type NavKey = "inicio" | "biblioteca" | "salon" | "about" | "auth";
 
@@ -17,7 +29,9 @@ function isActive(pathname: string, key: NavKey): boolean {
 
 export function Nav() {
   const pathname = usePathname();
-  const { user, signOut } = useAuth();
+  const { user, loading: authLoading, signOut } = useAuth();
+  const hydrated = useHydrated();
+  const loading = authLoading || !hydrated;
   const [open, setOpen] = useState(false);
   const close = () => setOpen(false);
   const cls = (key: NavKey) => (isActive(pathname, key) ? "active" : "");
@@ -50,10 +64,8 @@ export function Nav() {
           <span className="coin"></span>
           <span>CRÉDITOS · 03</span>
         </div>
-        {user ? (
-          <button className="btn ghost auth-btn" onClick={signOut}>
-            {user.name} ▾
-          </button>
+        {loading ? null : user ? (
+          <AccountMenu />
         ) : (
           <Link href="/login" className="btn auth-btn">
             Iniciar Sesión
@@ -73,7 +85,10 @@ export function Nav() {
         onClick={close}
       ></div>
       <aside className={"av-mobile-panel" + (open ? " open" : "")}>
-        <div className="pixel neon-cyan" style={{ fontSize: 11, marginBottom: 16 }}>
+        <div
+          className="pixel neon-cyan"
+          style={{ fontSize: 11, marginBottom: 16 }}
+        >
           MENÚ
         </div>
         <Link href="/" className={cls("inicio")} onClick={close}>
@@ -88,13 +103,36 @@ export function Nav() {
         <Link href="/about" className={cls("about")} onClick={close}>
           Acerca de
         </Link>
-        <Link href="/login" className={cls("auth")} onClick={close}>
-          {user ? "Cuenta" : "Iniciar Sesión"}
-        </Link>
+        {loading ? null : user ? (
+          <>
+            <Link href="/perfil" className="panel-user" onClick={close}>
+              <Avatar name={user.name} avatarUrl={user.avatarUrl} size={36} />
+              <span>{user.name}</span>
+            </Link>
+            <button
+              type="button"
+              className="signout"
+              onClick={() => {
+                close();
+                signOut();
+              }}
+            >
+              Cerrar sesión
+            </button>
+          </>
+        ) : (
+          <Link href="/login" className={cls("auth")} onClick={close}>
+            Iniciar Sesión
+          </Link>
+        )}
         <div style={{ flex: 1 }}></div>
         <div
           className="pixel"
-          style={{ fontSize: 9, color: "var(--ink-faint)", letterSpacing: "0.16em" }}
+          style={{
+            fontSize: 9,
+            color: "var(--ink-faint)",
+            letterSpacing: "0.16em",
+          }}
         >
           CRÉDITOS · 03
         </div>
