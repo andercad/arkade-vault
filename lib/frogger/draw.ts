@@ -30,10 +30,12 @@ let COLORS = skin.colors;
 // Cachés (SPEC 14): fondo estático y sprites con glow (neon). Se limpian con
 // clearDrawCache() al cambiar de skin y en destroy.
 const background = createLayerCache();
+const hudLayer = createLayerCache();
 const sprites = createSpriteCache();
 
 export function clearDrawCache() {
   background.clear();
+  hudLayer.clear();
   sprites.clear();
 }
 
@@ -297,32 +299,30 @@ function drawVehicle(
   const truck = objLen > 1;
   const color = truck ? COLORS.trucks[idx] : COLORS.cars[idx];
 
-  if (skin.glow > 0) {
-    blit(c, `veh:${color}`, x, y, w, CELL, (sc) =>
-      paintVehicleBody(sc, 0, 0, w, color),
-    );
-  } else paintVehicleBody(c, x, y, w, color);
-  highlight(c, x + 5, y + 7, w - 10);
-
-  // Cabina / parabrisas y faros hacia el sentido de la marcha
-  const front = dir === 1 ? x + w - 3 : x + 3;
-  c.fillStyle = "rgba(20, 30, 60, 0.75)";
-  const cabW = truck ? 10 : 12;
-  c.fillRect(dir === 1 ? front - cabW - 3 : front + 3, y + 10, cabW, CELL - 20);
-  c.fillStyle = "#fff6c2";
-  const lightX = dir === 1 ? front - 3 : front;
-  c.fillRect(lightX, y + 9, 3, 5);
-  c.fillRect(lightX, y + CELL - 14, 3, 5);
-  if (truck) {
-    c.strokeStyle = "rgba(0, 0, 0, 0.25)";
-    c.lineWidth = 1;
-    c.beginPath();
-    for (let k = 1; k < o.len; k++) {
-      c.moveTo(x + k * CELL, y + 8);
-      c.lineTo(x + k * CELL, y + CELL - 8);
+  // Vehículo completo cacheado (cuerpo, cabina y faros), con o sin glow.
+  blit(c, `veh:${color}:${dir}:${o.len}`, x, y, w, CELL, (sc) => {
+    paintVehicleBody(sc, 0, 0, w, color);
+    highlight(sc, 5, 7, w - 10);
+    // Cabina / parabrisas y faros hacia el sentido de la marcha
+    const front = dir === 1 ? w - 3 : 3;
+    sc.fillStyle = "rgba(20, 30, 60, 0.75)";
+    const cabW = truck ? 10 : 12;
+    sc.fillRect(dir === 1 ? front - cabW - 3 : front + 3, 10, cabW, CELL - 20);
+    sc.fillStyle = "#fff6c2";
+    const lightX = dir === 1 ? front - 3 : front;
+    sc.fillRect(lightX, 9, 3, 5);
+    sc.fillRect(lightX, CELL - 14, 3, 5);
+    if (truck) {
+      sc.strokeStyle = "rgba(0, 0, 0, 0.25)";
+      sc.lineWidth = 1;
+      sc.beginPath();
+      for (let k = 1; k < o.len; k++) {
+        sc.moveTo(k * CELL, 8);
+        sc.lineTo(k * CELL, CELL - 8);
+      }
+      sc.stroke();
     }
-    c.stroke();
-  }
+  });
 }
 
 // Cuerpo del tronco (la parte con glow); los nudos se pintan aparte, sin glow.
@@ -349,18 +349,21 @@ function drawLog(c: CanvasRenderingContext2D, lane: LaneState, o: LaneObject) {
   const x = o.x * CELL;
   const y = rowY(lane.def.row);
   const w = o.len * CELL;
-  if (skin.glow > 0) {
-    blit(c, "log", x, y, w, CELL, (sc) => paintLogBody(sc, 0, 0, w));
-  } else paintLogBody(c, x, y, w);
-  highlight(c, x + 8, y + 7, w - 16);
-  c.beginPath();
-  for (let k = 14; k < w - 10; k += 22) {
-    c.moveTo(x + k, y + 12);
-    c.lineTo(x + k + 8, y + 12);
-    c.moveTo(x + k + 6, y + CELL - 13);
-    c.lineTo(x + k + 14, y + CELL - 13);
-  }
-  c.stroke();
+  blit(c, "log", x, y, w, CELL, (sc) => {
+    paintLogBody(sc, 0, 0, w);
+    highlight(sc, 8, 7, w - 16);
+    // Nudos: usan el trazo de la carretera (como antes).
+    sc.strokeStyle = COLORS.roadLine;
+    sc.lineWidth = 2;
+    sc.beginPath();
+    for (let k = 14; k < w - 10; k += 22) {
+      sc.moveTo(k, 12);
+      sc.lineTo(k + 8, 12);
+      sc.moveTo(k + 6, CELL - 13);
+      sc.lineTo(k + 14, CELL - 13);
+    }
+    sc.stroke();
+  });
 }
 
 function paintTurtle(
@@ -415,17 +418,15 @@ function drawTurtles(
     }
     const warn = state === "warn";
     const dir = lane.def.dir;
-    if (skin.glow > 0) {
-      blit(
-        c,
-        `turtle:${warn ? "w" : "u"}:${dir}`,
-        cx - CELL / 2,
-        cy - CELL / 2,
-        CELL,
-        CELL,
-        (sc) => paintTurtle(sc, CELL / 2, CELL / 2, warn, dir),
-      );
-    } else paintTurtle(c, cx, cy, warn, dir);
+    blit(
+      c,
+      `turtle:${warn ? "w" : "u"}:${dir}`,
+      cx - CELL / 2,
+      cy - CELL / 2,
+      CELL,
+      CELL,
+      (sc) => paintTurtle(sc, CELL / 2, CELL / 2, warn, dir),
+    );
   }
 }
 
@@ -486,6 +487,21 @@ function timeColor(ratio: number): string {
 }
 
 function drawHud(c: CanvasRenderingContext2D, s: GameState) {
+  // Parte estática (texto, vidas) cacheada: solo cambia con puntos/nivel/vidas.
+  hudLayer.draw(c, `${skin.label}:${s.score}:${s.level}:${s.lives}`, (lc) =>
+    paintHudStatic(lc, s),
+  );
+  // Barra de tiempo (cambia cada frame)
+  const ratio = Math.max(0, Math.min(1, s.timeLeft / TIME_LIMIT));
+  const barX = 420;
+  const barW = 170;
+  c.fillStyle = "rgba(255, 255, 255, 0.12)";
+  c.fillRect(barX, HUD_H / 2 - 6, barW, 12);
+  c.fillStyle = timeColor(ratio);
+  c.fillRect(barX, HUD_H / 2 - 6, barW * ratio, 12);
+}
+
+function paintHudStatic(c: CanvasRenderingContext2D, s: GameState) {
   c.fillStyle = COLORS.hud;
   c.fillRect(0, 0, W, HUD_H);
   c.strokeStyle = COLORS.hudLine;
@@ -508,17 +524,9 @@ function drawHud(c: CanvasRenderingContext2D, s: GameState) {
     drawFrogSprite(c, 195 + i * 11, HUD_H / 2, "up", 0.38, COLORS.frog, false);
   }
 
-  // Barra de tiempo
-  const ratio = Math.max(0, Math.min(1, s.timeLeft / TIME_LIMIT));
-  const barX = 420;
-  const barW = 170;
   c.fillStyle = COLORS.text;
   c.textAlign = "right";
-  c.fillText("TIEMPO", barX - 8, HUD_H / 2);
-  c.fillStyle = "rgba(255, 255, 255, 0.12)";
-  c.fillRect(barX, HUD_H / 2 - 6, barW, 12);
-  c.fillStyle = timeColor(ratio);
-  c.fillRect(barX, HUD_H / 2 - 6, barW * ratio, 12);
+  c.fillText("TIEMPO", 420 - 8, HUD_H / 2);
 }
 
 // Sin overlays de pausa ni game over: los dibuja el contenedor (React).

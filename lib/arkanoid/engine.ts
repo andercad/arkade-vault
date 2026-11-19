@@ -26,7 +26,7 @@ import {
   type Explosion,
   type Particle,
 } from "./entities";
-import { createSpriteCache } from "@/lib/canvas-cache";
+import { createLayerCache, createSpriteCache } from "@/lib/canvas-cache";
 import { loadSpritesheet } from "./sprites";
 import { DEFAULT_SKIN, SKINS, type Skin } from "./skins";
 import type {
@@ -81,9 +81,15 @@ export function createArkanoidGame(
   }
 
   // Audios base (se clonan al reproducir para poder solaparse).
+  // Pool de elementos reutilizados (round-robin): cloneNode por sonido era caro.
+  const POOL = 6;
+  function makePool(src: string) {
+    const items = Array.from({ length: POOL }, () => new Audio(src));
+    return { items, next: 0 };
+  }
   const sounds = {
-    bounce: new Audio(SOUND_BOUNCE_SRC),
-    brk: new Audio(SOUND_BREAK_SRC),
+    bounce: makePool(SOUND_BOUNCE_SRC),
+    brk: makePool(SOUND_BREAK_SRC),
   };
 
   let phase: Phase = "playing";
@@ -101,6 +107,9 @@ export function createArkanoidGame(
   let skin: Skin = SKINS[DEFAULT_SKIN];
   // Caché (SPEC 14): ladrillos, pala y bola con glow (neon) como sprites.
   const sprites = createSpriteCache();
+  // Capa estática de ladrillos: se repinta solo al romper uno / cambiar nivel o skin.
+  const brickLayer = createLayerCache();
+  let bricksVersion = 0;
   let sheet: CanvasImageSource | null = null;
   let cancelLoad: (() => void) | null = null;
   let started = false;
@@ -135,10 +144,13 @@ export function createArkanoidGame(
   }
 
   // ── Sonido ────────────────────────────────────────────────────────────────
-  function playSound(audio: HTMLAudioElement) {
+  function playSound(pool: { items: HTMLAudioElement[]; next: number }) {
     if (destroyed || phase === "paused") return;
+    const audio = pool.items[pool.next];
+    pool.next = (pool.next + 1) % pool.items.length;
+    audio.currentTime = 0;
     // catch: el navegador puede bloquear la reproducción (autoplay)
-    (audio.cloneNode() as HTMLAudioElement).play().catch(() => {});
+    audio.play().catch(() => {});
   }
 
   // ── Lógica ────────────────────────────────────────────────────────────────
@@ -160,6 +172,7 @@ export function createArkanoidGame(
   function startLevel(n: number) {
     level = n;
     bricks = createBricks(n);
+    bricksVersion++;
     explosions = [];
     particles = [];
     paddle.x = (CANVAS_W - PADDLE_W) / 2;
@@ -296,6 +309,7 @@ export function createArkanoidGame(
         ball.y += fromTop ? -overlapY : overlapY;
       }
       b.alive = false;
+      bricksVersion++;
       explosions.push({
         x: b.x,
         y: b.y,
@@ -356,10 +370,11 @@ export function createArkanoidGame(
       x: number,
       y: number,
     ) => void,
+    target: CanvasRenderingContext2D = ctx!,
   ) {
     const sh = sheet!;
     if (!skin.glow) {
-      paint(ctx!, sh, x, y);
+      paint(target, sh, x, y);
       return;
     }
     const sp = sprites.get(
@@ -369,7 +384,7 @@ export function createArkanoidGame(
       skin.glow * 2,
       (sc) => paint(sc, sh, 0, 0),
     );
-    ctx!.drawImage(sp.canvas, x - sp.pad, y - sp.pad);
+    target.drawImage(sp.canvas, x - sp.pad, y - sp.pad);
   }
 
   function drawBall(x: number, y: number, size: number) {
@@ -383,12 +398,20 @@ export function createArkanoidGame(
     ctx.fillStyle = skin.bg ?? CLASSIC_BG;
     ctx.fillRect(0, 0, CANVAS_W, CANVAS_H);
 
-    for (const b of bricks) {
-      if (b.alive)
-        drawObject(`brick:${b.color}`, b.x, b.y, b.w, b.h, (c, sh, px, py) =>
-          skin.drawBrick(c, sh, b.color, px, py, b.w, b.h),
-        );
-    }
+    brickLayer.draw(ctx, `${skin.label}:${level}:${bricksVersion}`, (lc) => {
+      for (const b of bricks) {
+        if (b.alive)
+          drawObject(
+            `brick:${b.color}`,
+            b.x,
+            b.y,
+            b.w,
+            b.h,
+            (c, sh, px, py) => skin.drawBrick(c, sh, b.color, px, py, b.w, b.h),
+            lc,
+          );
+      }
+    });
     for (const ex of explosions) {
       const t = ex.age / EXPLOSION_DURATION;
       if (t < 0 || t >= 1) continue;
@@ -588,12 +611,14 @@ export function createArkanoidGame(
   function setSkin(name: SkinName) {
     skin = SKINS[name] ?? SKINS[DEFAULT_SKIN];
     sprites.clear();
+    brickLayer.clear();
     if (started && !destroyed) draw();
   }
 
   function destroy() {
     destroyed = true;
     sprites.clear();
+    brickLayer.clear();
     cancelLoad?.();
     cancelAnimationFrame(rafId);
     window.removeEventListener("keydown", onKeyDown);

@@ -1,12 +1,12 @@
 ---
 name: spec-impl-game
-description: Implementa una spec aprobada de un juego igual que /spec-impl y, al terminar, lanza en secuencia (nunca en paralelo) los subagentes skin-designer y después mobile-porter sobre ese juego.
+description: Implementa una spec aprobada de un juego igual que /spec-impl y, al terminar, lanza en secuencia (nunca en paralelo) los subagentes skin-designer, después mobile-porter y por último game-performance-booster sobre ese juego.
 disable-model-invocation: true
 argument-hint: <NN-spec-name>
 allowed-tools: Read, Glob, Grep, Edit, Write, Agent, AskUserQuestion, Bash(git status:*), Bash(git branch:*), Bash(git checkout:*), Bash(git log:*), Bash(git diff:*), Bash(git stash:*), Bash(cat:*), Bash(ls:*), Bash(curl:*)
 ---
 
-# /spec-impl-game — /spec-impl + skin-designer + mobile-porter
+# /spec-impl-game — /spec-impl + skin-designer + mobile-porter + game-performance-booster
 
 ## Session context
 
@@ -49,7 +49,7 @@ Cuando todos los pasos del plan estén implementados (mensaje final de `/spec-im
 
 ### Fase 6 — Pre-agentes
 
-Los agentes verifican con Playwright y **no arrancan** el dev server. Comprueba que responde (`curl -s -o /dev/null -w "%{http_code}" http://localhost:3000`). Si no, pide al usuario `! npm run dev` y espera.
+Los agentes verifican con Playwright (y `game-performance-booster` mide con `npm run perf`) y **no arrancan** el dev server. Comprueba que responde (`curl -s -o /dev/null -w "%{http_code}" http://localhost:3000`). Si no, pide al usuario `! npm run dev` y espera.
 
 ### Fase 7 — skin-designer
 
@@ -59,6 +59,10 @@ Lanza `Agent` con `subagent_type: "skin-designer"`. Prompt: juego `<game-id>`, s
 
 **Solo cuando la Fase 7 haya terminado** (llamada en un mensaje aparte; nunca en paralelo). Lanza `Agent` con `subagent_type: "mobile-porter"`, mismo patrón de prompt. Si `skin-designer` falló o reportó bloqueo, para y pregunta al usuario antes de seguir.
 
+### Fase 9 — game-performance-booster
+
+**Solo cuando la Fase 8 haya terminado** (llamada en un mensaje aparte; nunca en paralelo). Lanza `Agent` con `subagent_type: "game-performance-booster"`, mismo patrón de prompt (juego `<game-id>`, no commitear, no tocar otros juegos). Si `mobile-porter` falló o reportó bloqueo, para y pregunta al usuario antes de seguir.
+
 ### Cierre
 
-Resumen conciso: spec, rama, archivos tocados por cada agente, filas actualizadas en `references/games-with-themes.md` y `references/games-mobile-status.md`. Recuerda al usuario: verificar criterios de aceptación, pasar Estado → Implementado y hacer los commits él mismo (no commitear sin petición explícita).
+Resumen conciso: spec, rama, archivos tocados por cada agente, filas actualizadas en `references/games-with-themes.md`, `references/games-mobile-status.md` y `references/game-performance.md`. Recuerda al usuario: verificar criterios de aceptación, pasar Estado → Implementado y hacer los commits él mismo (no commitear sin petición explícita).
