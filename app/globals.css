@@ -12,6 +12,12 @@
   --magenta: #ff006e;
   --yellow: #f5ff00;
   --green: #00ff88;
+  --orange: #ff8a00;
+  --violet: #a855ff;
+  --red: #ff2d3d;
+  --blue: #2f7bff;
+  --lime: #b6ff00;
+  --pink: #ff7ad9;
   --gold: #ffcf3a;
   --silver: #c7d0e0;
   --bronze: #d97a3a;
@@ -170,6 +176,48 @@ a {
   text-shadow:
     0 0 6px rgba(0, 255, 136, 0.6),
     0 0 16px rgba(0, 255, 136, 0.35);
+}
+.neon-orange {
+  color: var(--orange);
+  text-shadow:
+    0 0 6px rgba(255, 138, 0, 0.65),
+    0 0 16px rgba(255, 138, 0, 0.4);
+}
+.neon-violet {
+  color: var(--violet);
+  text-shadow:
+    0 0 6px rgba(168, 85, 255, 0.65),
+    0 0 16px rgba(168, 85, 255, 0.4);
+}
+.neon-red {
+  color: var(--red);
+  text-shadow:
+    0 0 6px rgba(255, 45, 61, 0.65),
+    0 0 16px rgba(255, 45, 61, 0.4);
+}
+.neon-blue {
+  color: var(--blue);
+  text-shadow:
+    0 0 6px rgba(47, 123, 255, 0.65),
+    0 0 16px rgba(47, 123, 255, 0.4);
+}
+.neon-lime {
+  color: var(--lime);
+  text-shadow:
+    0 0 6px rgba(182, 255, 0, 0.65),
+    0 0 16px rgba(182, 255, 0, 0.4);
+}
+.neon-pink {
+  color: var(--pink);
+  text-shadow:
+    0 0 6px rgba(255, 122, 217, 0.65),
+    0 0 16px rgba(255, 122, 217, 0.4);
+}
+.neon-silver {
+  color: var(--silver);
+  text-shadow:
+    0 0 6px rgba(199, 208, 224, 0.65),
+    0 0 16px rgba(199, 208, 224, 0.4);
 }
 
 .flicker {
@@ -412,23 +460,86 @@ a {
   transform: translateY(1px) scale(0.98);
 }
 
-.btn.magenta {
-  border-color: var(--magenta);
+.btn.orange {
+  border-color: var(--orange);
 }
-.btn.magenta:hover {
-  color: var(--magenta);
+.btn.orange:hover {
+  color: var(--orange);
   box-shadow:
-    0 0 14px rgba(255, 0, 110, 0.55),
-    inset 0 0 8px rgba(255, 0, 110, 0.35);
+    0 0 14px rgba(255, 138, 0, 0.55),
+    inset 0 0 8px rgba(255, 138, 0, 0.35);
 }
-.btn.yellow {
-  border-color: var(--yellow);
+.btn.violet {
+  border-color: var(--violet);
 }
-.btn.yellow:hover {
-  color: var(--yellow);
+.btn.violet:hover {
+  color: var(--violet);
   box-shadow:
-    0 0 14px rgba(245, 255, 0, 0.6),
-    inset 0 0 8px rgba(245, 255, 0, 0.35);
+    0 0 14px rgba(168, 85, 255, 0.55),
+    inset 0 0 8px rgba(168, 85, 255, 0.35);
+}
+.btn.red {
+  border-color: var(--red);
+}
+.btn.red:hover {
+  color: var(--red);
+  box-shadow:
+    0 0 14px rgba(255, 45, 61, 0.55),
+    inset 0 0 8px rgba(255, 45, 61, 0.35);
+}
+.btn.blue {
+  border-color: var(--blue);
+}
+.btn.blue:hover {
+  color: var(--blue);
+  box-shadow:
+    0 0 14px rgba(47, 123, 255, 0.55),
+    inset 0 0 8px rgba(47, 123, 255, 0.35);
+}
+.btn.lime {
+  border-color: var(--lime);
+}
+.btn.lime:hover {
+  color: var(--lime);
+  box-shadow:
+    0 0 14px rgba(182, 255, 0, 0.55),
+    inset 0 0 8px rgba(182, 255, 0, 0.35);
+}
+.btn.pink {
+  border-color: var(--pink);
+}
+.btn.pink:hover {
+  color: var(--pink);
+  box-shadow:
+    0 0 14px rgba(255, 122, 217, 0.55),
+    inset 0 0 8px rgba(255, 122, 217, 0.35);
+}
+.btn.silver {
+  border-color: var(--silver);
+}
+.btn.silver:hover {
+  color: var(--silver);
+  box-shadow:
+    0 0 14px rgba(199, 208, 224, 0.55),
+    inset 0 0 8px rgba(199, 208, 224, 0.35);
+}
+.btn.green {
+  border-color: var(--green);
+}
+.btn.green:hover {
+  color: var(--green);
+  box-shadow:
+    0 0 14px rgba(0, 255, 136, 0.55),
+    inset 0 0 8px rgba(0, 255, 136, 0.35);
+}
+.btn.cyan {
+  border-color: var(--cyan);
+}
+.btn.cyan:hover {
+  color: var(--cyan);
+  box-shadow:
+    0 0 14px rgba(0, 245, 255, 0.55),
+    inset 0 0 8px rgba(0, 245, 255, 0.35);
 }
 .btn.ghost {
   border-color: var(--ink-faint);
