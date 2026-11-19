@@ -1,6 +1,6 @@
 # SPEC 16 — Registro, login y autenticación con Supabase Auth
 
-> **Estado:** Aprobado
+> **Estado:** Implementado
 > **Depende de:** SPEC 04 (Supabase cimientos), SPEC 06 (leaderboard y juegos)
 > **Fecha:** 2026-11-19
 > **Objetivo:** Sustituir la sesión simulada en `localStorage` por Supabase Auth real (email/usuario + contraseña, Google, GitHub, recuperación de contraseña) con perfil de jugador (avatar y username editable) y puntuaciones vinculadas al usuario.
@@ -163,24 +163,24 @@ Un commit por paso (`16-autenticacion: Paso N`).
 
 ## Criterios de aceptación
 
-- [ ] Registro con email + usuario + contraseña crea `auth.users` + `profiles`, envía email de confirmación y NO inicia sesión.
-- [ ] El enlace del email confirma la cuenta (`email_confirmed_at` no nulo), inicia sesión y lleva a `/`.
-- [ ] Login con cuenta sin confirmar muestra "Confirma tu email antes de entrar".
-- [ ] Login funciona con email y con usuario (case-insensitive) tras confirmar; errores visibles en español.
-- [ ] Login con Google y GitHub crea perfil con username saneado `^[A-Z0-9_]{3,10}$`, único (sufijo numérico si choca).
-- [ ] Recuperar contraseña: email → `/auth/reset-password` → nueva contraseña operativa; sin código válido muestra error.
-- [ ] La sesión sobrevive a recarga y se refresca vía `proxy.ts`; cerrar sesión la elimina.
-- [ ] `email_for_username` no es ejecutable por `anon`/`authenticated`; `SUPABASE_SECRET_KEY` no aparece en el bundle cliente.
-- [ ] Puntuación de usuario logueado guarda `player_name` tecleado (prerrellenado con username) y `user_id`; invitado guarda `user_id` null.
-- [ ] `av_user` ya no se usa; `tsc`, `lint`, `build` limpios; `get_advisors` sin avisos nuevos.
-- [ ] CLAUDE.md y README.md actualizados (incluye `/perfil`, avatar y borrado).
-- [ ] Con sesión, el nav muestra un avatar circular: la foto de la red social si existe; si no (o si no carga), las iniciales sobre un fondo que combina con el navbar.
-- [ ] Con sesión, avatar y nombre forman un único bloque; al pulsarlo se abre un menú con "Perfil" y "Cerrar sesión" (no se ven siempre) y se cierra con clic fuera o `Esc`. En móvil (390×844) la barra muestra solo el avatar y no desborda.
-- [ ] `/perfil` ofrece "Guardar usuario", "Salir" (sin guardar) y "Cerrar sesión".
-- [ ] `/perfil` permite cambiar el username (3-10 caracteres, `A-Z0-9_`, único, se guarda en mayúsculas); nav, reproductor y Salón lo reflejan sin recargar y persiste tras recargar.
-- [ ] Username repetido o inválido → error en español; el login por usuario usa el nombre nuevo y el viejo deja de valer.
-- [ ] Las puntuaciones antiguas de un usuario que cambia de nombre conservan `player_name` y `user_id`.
-- [ ] Al borrar un usuario, sus puntuaciones se conservan con `user_id` null y su `profiles` se elimina.
+- [x] Registro con email + usuario + contraseña crea `auth.users` + `profiles`, envía email de confirmación y NO inicia sesión.
+- [x] El enlace del email confirma la cuenta (`email_confirmed_at` no nulo), inicia sesión y lleva a `/`.
+- [x] Login con cuenta sin confirmar muestra "Confirma tu email antes de entrar".
+- [x] Login funciona con email y con usuario (case-insensitive) tras confirmar; errores visibles en español.
+- [x] Login con Google y GitHub crea perfil con username saneado `^[A-Z0-9_]{3,10}$`, único (sufijo numérico si choca).
+- [x] Recuperar contraseña: email → `/auth/reset-password` → nueva contraseña operativa; sin código válido muestra error.
+- [x] La sesión sobrevive a recarga y se refresca vía `proxy.ts`; cerrar sesión la elimina.
+- [x] `email_for_username` no es ejecutable por `anon`/`authenticated`; `SUPABASE_SECRET_KEY` no aparece en el bundle cliente.
+- [x] Puntuación de usuario logueado guarda `player_name` tecleado (prerrellenado con username) y `user_id`; invitado guarda `user_id` null.
+- [x] `av_user` ya no se usa; `tsc`, `lint`, `build` limpios; `get_advisors` sin avisos nuevos.
+- [x] CLAUDE.md y README.md actualizados (incluye `/perfil`, avatar y borrado).
+- [x] Con sesión, el nav muestra un avatar circular: la foto de la red social si existe; si no (o si no carga), las iniciales sobre un fondo que combina con el navbar.
+- [x] Con sesión, avatar y nombre forman un único bloque; al pulsarlo se abre un menú con "Perfil" y "Cerrar sesión" (no se ven siempre) y se cierra con clic fuera o `Esc`. En móvil (390×844) la barra muestra solo el avatar y no desborda.
+- [x] `/perfil` ofrece "Guardar usuario", "Salir" (sin guardar) y "Cerrar sesión".
+- [x] `/perfil` permite cambiar el username (3-10 caracteres, `A-Z0-9_`, único, se guarda en mayúsculas); nav, reproductor y Salón lo reflejan sin recargar y persiste tras recargar.
+- [x] Username repetido o inválido → error en español; el login por usuario usa el nombre nuevo y el viejo deja de valer.
+- [x] Las puntuaciones antiguas de un usuario que cambia de nombre conservan `player_name` y `user_id`.
+- [x] Al borrar un usuario, sus puntuaciones se conservan con `user_id` null y su `profiles` se elimina.
 
 ---
 
