@@ -46,6 +46,7 @@ export function create<Juego>Game(canvas: HTMLCanvasElement, callbacks: ...): ..
 ```sql
 -- supabase/migrations/NNNN_seed_<slug>.sql
 insert into public.games (id, title, short, long, cat, cover, color, sort_order)
+-- <color> = CATEGORY_COLOR[<CAT>] (SPEC 15), no se elige
 values ('<slug>', '<TÍTULO>', '<short>', '<long>', '<CAT>', 'cover-<slug>', '<color>', <n>);
 ```
 
@@ -73,18 +74,15 @@ Estructura de archivos nueva y convenciones (teclas, constantes del original con
 6. **Registro del juego.**
    - Registrar el juego en `lib/game-registry.ts`, incluido `touchControls` (solo las direcciones y acciones que usa el juego).
    - Verificación: `/juegos/<slug>/jugar` monta el canvas y, con emulación táctil, aparece el mando.
-7. **Categoría o color nuevo** _(solo si `cat` o `color` no están soportados hoy)_.
-   - Ampliar el CHECK de `games`, `Category`/`AccentColor`/`CATEGORIES` en `lib/games.ts` y el acento CSS (ver "Categoría o color nuevo" en `checklist.md`).
-   - Verificación: `npx tsc --noEmit` y `list_migrations`.
-8. **Migración seed.**
-   - Crear `supabase/migrations/NNNN_seed_<slug>.sql`, aplicarla con `apply_migration` y regenerar `database.types.ts` si hace falta.
-   - Verificación: `list_migrations`, `select id from games` y `get_advisors`.
-9. **Portada y CSS.**
+7. **Migración seed.**
+   - Crear `supabase/migrations/NNNN_seed_<slug>.sql` con el `color` de `CATEGORY_COLOR[<CAT>]` (mapa de `checklist.md`), aplicarla con `apply_migration` y regenerar `database.types.ts` si hace falta.
+   - Verificación: `list_migrations`, `select id, cat, color from games` (color = el del mapa) y `get_advisors`.
+8. **Portada y CSS.**
    - Añadir `.cover-<slug>` y el CSS del canvas/escalado en `app/globals.css` (`/frontend-design`).
    - Verificación: tarjeta visible en `/juegos` y sin desbordar a 375 px.
-10. **Verificación en navegador y documentación.**
-    - Probar con Playwright (guardar score "TEST", ver leaderboard), borrar las filas de prueba de `scores` y actualizar `CLAUDE.md` y `README.md`.
-    - Verificación: ambos mencionan la spec; `npm run lint` y `npm run build` pasan.
+9. **Verificación en navegador y documentación.**
+   - Probar con Playwright (guardar score "TEST", ver leaderboard), borrar las filas de prueba de `scores` y actualizar `CLAUDE.md` y `README.md`.
+   - Verificación: ambos mencionan la spec; `npm run lint` y `npm run build` pasan.
 
 Cada paso = un commit `NN-<slug>: Paso N`.
 

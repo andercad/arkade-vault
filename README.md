@@ -15,7 +15,7 @@ https://github.com/Klerith/fernando-skills
 npx skills@latest add Klerith/fernando-skills
 ```
 
-Skill propia del proyecto: `/add-game` (`.claude/skills/add-game/`). Genera la spec para añadir un juego real con leaderboard (desde `references/started-games/` o nuevo), siguiendo SPEC 05 y 06; se implementa con `/spec-impl`. Admite `cat` ARCADE/PUZZLE/SHOOTER/VERSUS/RACING/FIGHTING/PLATFORMER/MAZE/RHYTHM/SPORTS/STRATEGY y `color` cyan/magenta/yellow/green/orange/violet/red; los no soportados aún por BD/código (solo los 4+4 originales) añaden a la spec un paso de ampliación de CHECK, `lib/games.ts` y CSS. Con `disable-model-invocation` (no se invoca ni se precarga; `game-jam` lee sus archivos con Read); su "Modo game-jam" (no interactivo) lo aplica `game-jam` o se activa con `args` que empiezan por `game-jam:`.
+Skill propia del proyecto: `/add-game` (`.claude/skills/add-game/`). Genera la spec para añadir un juego real con leaderboard (desde `references/started-games/` o nuevo), siguiendo SPEC 05 y 06; se implementa con `/spec-impl`. Admite `cat` ARCADE/PUZZLE/SHOOTER/VERSUS/RACING/FIGHTING/PLATFORMER/MAZE/RHYTHM/SPORTS/STRATEGY; el `color` no se elige: se deriva de la categoría con `CATEGORY_COLOR` (SPEC 15: ARCADE green, PUZZLE cyan, SHOOTER magenta, VERSUS yellow, RACING orange, PLATFORMER violet, FIGHTING red, MAZE blue, SPORTS lime, RHYTHM pink, STRATEGY silver), sin paso de ampliación de CHECK/`lib/games.ts`/CSS (BD, tipos y CSS ya admiten las 11). Con `disable-model-invocation` (no se invoca ni se precarga; `game-jam` lee sus archivos con Read); su "Modo game-jam" (no interactivo) lo aplica `game-jam` o se activa con `args` que empiezan por `game-jam:`.
 
 Skill propia `/spec-impl-game` (`.claude/skills/spec-impl-game/`): implementa la spec de un juego siguiendo `/spec-impl` y después lanza, uno tras otro, los subagentes `skin-designer`, `mobile-porter` y `game-performance-booster`.
 
@@ -80,6 +80,7 @@ Luego abre `http://192.168.1.50:3000` en el móvil (la IP sale de `ipconfig`). R
 | `12-controles-tactiles.md`                     | Mando táctil bajo el canvas (`touchControls` por juego en el registro) y HUD compacto en móvil                  |
 | `13-gamepad-mk2.md`                            | Aspecto Gamepad MK-II del mando táctil (carcasa neón, cruz con hub, botones A/B), fijo abajo en móvil           |
 | `14-revision-performance.md`                   | Revisión de performance: ≥58 FPS con CPU ×6 en los 5 juegos (cachés de capa y sprites con glow), `npm run perf` |
+| `15-colores-por-categoria.md`                  | Un color fijo por categoría (11↔11): migración `0009`, `CATEGORY_COLOR`, acentos CSS y agentes/skills alineados |
 | `game-jam/frogger/01-frogger-core.md`          | Frogger: motor TS en `lib/frogger/` (carretera, río, casas, vidas, tiempo)                                      |
 | `game-jam/frogger/02-frogger-platform.md`      | Frogger en la plataforma: registro, migración `0008`, portada, pausa (botón + `P`/`Esc`) y guardado             |
 | `game-jam/frogger/03-frogger-hazards-audio.md` | Frogger: peligros extra y audio (pendiente de implementar)                                                      |

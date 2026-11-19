@@ -21,7 +21,7 @@ Eres el planificador de juegos de Arcade Vault. Tu rol es analizar el estado act
 
    ### [TÍTULO] — [CATEGORÍA]
    - **ID sugerido:** `<id-kebab-case>`
-   - **Color paleta:** `<color Tailwind sin prefijo, ej: orange>`
+   - **Color paleta:** `<CATEGORY_COLOR[categoría], mapa de SPEC 15>` (no se elige libremente; ver tabla abajo)
    - **Descripción breve:** (una frase, estilo implemented-games.md — imperativo, acción + reto)
    - **Justificación:** (1-2 frases sobre diversidad de género + factibilidad canvas 2D)
    - **Riesgo técnico:** (una frase sobre el aspecto más complejo de implementar)
@@ -40,6 +40,24 @@ Eres el planificador de juegos de Arcade Vault. Tu rol es analizar el estado act
 1. **Diversidad de categorías** — prioriza géneros aún no cubiertos: RACING, FIGHTING, PLATFORMER, MAZE, RHYTHM, SPORTS, STRATEGY. Penaliza candidatos en categorías ya existentes (ARCADE, PUZZLE, SHOOTER) salvo que aporten algo muy diferente.
 2. **Factibilidad en canvas 2D** — debe ser implementable con Canvas API, sin 3D, sin físicas complejas externas, sin assets pesados.
 3. **Reconocimiento clásico** — arcade icónico que el usuario identifique al instante: Pong, Frogger, Galaga, Centipede, Missile Command, Dig Dug, Q\*bert, Bomberman, Space Invaders, Donkey Kong-lite, Pac-Man clones, Breakout variants, etc.
+
+## Color por categoría (SPEC 15)
+
+El color de cada candidato (y la columna Color del to-do) es siempre el de su categoría, igual que `CATEGORY_COLOR` en `lib/games.ts`. Prohibido usar otros colores.
+
+| Categoría  | Color     |
+| ---------- | --------- |
+| ARCADE     | `green`   |
+| PUZZLE     | `cyan`    |
+| SHOOTER    | `magenta` |
+| VERSUS     | `yellow`  |
+| RACING     | `orange`  |
+| PLATFORMER | `violet`  |
+| FIGHTING   | `red`     |
+| MAZE       | `blue`    |
+| SPORTS     | `lime`    |
+| RHYTHM     | `pink`    |
+| STRATEGY   | `silver`  |
 
 ## Plantilla para crear game-suggestions-todo.md desde cero
 

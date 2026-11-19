@@ -23,13 +23,6 @@ export function GameCard({ game }: { game: Game }) {
     if (el) el.style.transform = "";
   };
 
-  const btnColor =
-    game.color === "magenta"
-      ? "magenta"
-      : game.color === "yellow"
-        ? "yellow"
-        : "";
-
   return (
     <div
       ref={tiltRef}
@@ -51,7 +44,7 @@ export function GameCard({ game }: { game: Game }) {
             <b>{game.best.toLocaleString("es-ES")}</b>
           </div>
           <button
-            className={"btn " + btnColor}
+            className={"btn " + game.color}
             onClick={(e) => {
               e.stopPropagation();
               router.push(href);

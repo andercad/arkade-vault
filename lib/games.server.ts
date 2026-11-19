@@ -1,5 +1,5 @@
 // Lecturas de catálogo desde Supabase (solo servidor: usa cookies()).
-// Los tipos, CATS y formatPlays viven en lib/games.ts para poder usarse en el cliente.
+// Los tipos, CATEGORIES y formatPlays viven en lib/games.ts para poder usarse en el cliente.
 import { createClient } from "@/lib/supabase/server";
 import type { Database } from "@/lib/supabase/database.types";
 import type { AccentColor, Category, Game } from "@/lib/games";

@@ -67,8 +67,8 @@ Nunca modifiques `references/`.
 
 Con `AskUserQuestion`, solo lo que no puedas deducir (máx. 4 por tanda; recomienda una opción por defecto):
 
-- `id` (slug de URL), título, `cat` (`ARCADE|PUZZLE|SHOOTER|VERSUS|RACING|FIGHTING|PLATFORMER|MAZE|RHYTHM|SPORTS|STRATEGY`), `color` (`cyan|magenta|yellow|green|orange|violet|red`), textos `short` y `long`.
-  - Soportados hoy por BD y código: `ARCADE|PUZZLE|SHOOTER|VERSUS` y `cyan|magenta|yellow|green` (`Category`/`AccentColor` en `lib/games.ts`, CHECK de `0003_games_scores.sql`). Si eliges otro valor, la spec incluye el paso "Categoría o color nuevo" de `checklist.md`.
+- `id` (slug de URL), título, `cat` (`ARCADE|PUZZLE|SHOOTER|VERSUS|RACING|FIGHTING|PLATFORMER|MAZE|RHYTHM|SPORTS|STRATEGY`), textos `short` y `long`.
+  - El `color` **no se pregunta ni se elige**: es `CATEGORY_COLOR[cat]` (`lib/games.ts`, SPEC 15), ver tabla "Color por categoría" de `checklist.md`. BD (`games_cat_color_check`), `Category`/`AccentColor` y el CSS ya admiten las 11 categorías y 11 colores.
 - Campos del HUD de plataforma: `score` siempre; el resto según el juego (vidas, nivel, líneas…).
 - Extras del original: ¿se portan o quedan fuera? (menús, skins, sonido, selector de nivel, récords en `localStorage`).
 - Teclas de pausa (por defecto `Esc` y `P`) y si hay controles táctiles (por defecto fuera, con aviso "REQUIERE TECLADO").
@@ -88,7 +88,7 @@ No preguntes lo que ya dicta `checklist.md`.
 
 ## Modo game-jam
 
-Aplica cuando lo sigue el subagente `game-jam` (`.claude/agents/game-jam.md`), que lo lee con Read (no puede invocarlo ni precargarlo: `disable-model-invocation`), o cuando `$ARGUMENTS` empieza por `game-jam:`. Un subagente no puede usar `AskUserQuestion`, y leído con Read no recibe `$ARGUMENTS` ni expande los comandos `!`. El subagente decide antes `id`, título, `cat`, `color`, `sort_order`, mecánica, controles y canvas; si llegan por `$ARGUMENTS`, úsalos. No los preguntes. Aplica estas diferencias:
+Aplica cuando lo sigue el subagente `game-jam` (`.claude/agents/game-jam.md`), que lo lee con Read (no puede invocarlo ni precargarlo: `disable-model-invocation`), o cuando `$ARGUMENTS` empieza por `game-jam:`. Un subagente no puede usar `AskUserQuestion`, y leído con Read no recibe `$ARGUMENTS` ni expande los comandos `!`. El subagente decide antes `id`, título, `cat` (el `color` se deriva de `cat` con el mapa), `sort_order`, mecánica, controles y canvas; si llegan por `$ARGUMENTS`, úsalos. No los preguntes. Aplica estas diferencias:
 
 - Sin preguntas: usa lo recibido en `$ARGUMENTS`; lo que falte, decídelo tú y regístralo en Decisiones.
 - Juego siempre nuevo y original (Fase 2, rama "descripción"); no se lee `references/started-games/`.
