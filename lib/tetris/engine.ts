@@ -104,6 +104,7 @@ export function createTetrisGame(
     gridLayer.clear();
     sprites.clear();
   }
+  let boardVersion = 0; // invalida la capa de tablero al cambiar `board`
   let lastTime: number | null = null;
   let rafId = 0;
   let lastSnap: TetrisSnapshot | null = null;
@@ -133,6 +134,7 @@ export function createTetrisGame(
   // ── Lógica ────────────────────────────────────────────────────────────────
   function initGame() {
     board = createBoard();
+    boardVersion++;
     score = 0;
     lines = 0;
     level = startLevel;
@@ -165,6 +167,7 @@ export function createTetrisGame(
 
   function merge() {
     if (!current) return;
+    boardVersion++;
     for (let r = 0; r < current.shape.length; r++)
       for (let col = 0; col < current.shape[r].length; col++)
         if (current.shape[r][col])
@@ -182,6 +185,7 @@ export function createTetrisGame(
       }
     }
     if (cleared) {
+      boardVersion++;
       lines += cleared;
       score += (LINE_SCORES[cleared] || 0) * level; // nivel previo al recálculo
       level = startLevel + Math.floor(lines / 10);
@@ -254,18 +258,26 @@ export function createTetrisGame(
     const color = skin.colors[colorIndex];
     if (!color) return;
     c.globalAlpha = alpha;
-    if (skin.glow > 0) {
-      // Sprite por color; el fantasma lo vuelca con globalAlpha.
-      const sp = sprites.get(
-        `${skin.label}:block:${color}`,
-        BLOCK,
-        BLOCK,
-        skin.glow * 2,
-        (sc) => skin.draw(sc, 0, 0, BLOCK, color),
-      );
-      c.drawImage(sp.canvas, px - sp.pad, py - sp.pad);
-    } else skin.draw(c, px, py, BLOCK, color);
+    paintBlock(c, px, py, color);
     c.globalAlpha = 1;
+  }
+
+  // Sprite por skin+color en todos los skins (pad 0 sin glow); el fantasma lo
+  // vuelca con globalAlpha. Evita decenas de fillRect por bloque cada frame.
+  function paintBlock(
+    t: CanvasRenderingContext2D,
+    px: number,
+    py: number,
+    color: string,
+  ) {
+    const sp = sprites.get(
+      `${skin.label}:block:${color}`,
+      BLOCK,
+      BLOCK,
+      skin.glow * 2,
+      (sc) => skin.draw(sc, 0, 0, BLOCK, color),
+    );
+    t.drawImage(sp.canvas, px - sp.pad, py - sp.pad);
   }
 
   function drawGrid(c: CanvasRenderingContext2D, gridColor: string) {
@@ -334,12 +346,17 @@ export function createTetrisGame(
       c.fillRect(0, 0, W, H);
     }
     const gridColor = skin.grid ?? GRID_COLOR;
-    // Rejilla cacheada: solo se repinta al cambiar de skin.
-    gridLayer.draw(c, skin.label, (lc) => drawGrid(lc, gridColor));
-
-    for (let r = 0; r < ROWS; r++)
-      for (let col = 0; col < COLS; col++)
-        drawBlock(col * BLOCK, r * BLOCK, board[r][col]);
+    // Rejilla + bloques fijados cacheados: solo se repintan al cambiar de skin
+    // o de tablero (boardVersion).
+    gridLayer.draw(c, `${skin.label}:${boardVersion}`, (lc) => {
+      drawGrid(lc, gridColor);
+      for (let r = 0; r < ROWS; r++)
+        for (let col = 0; col < COLS; col++) {
+          const color = skin.colors[board[r][col]];
+          if (board[r][col] && color)
+            paintBlock(lc, col * BLOCK, r * BLOCK, color);
+        }
+    });
 
     drawPanel(gridColor);
 

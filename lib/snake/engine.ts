@@ -215,10 +215,6 @@ export function createSnakeGame(
   // ── Draw ──────────────────────────────────────────────────────────────────
   // Segmento: con glow (neon) sale de un sprite por color; sin glow, directo.
   function drawSegment(cell: Cell, color: string, isHead: boolean) {
-    if (!skin.glowSegment) {
-      skin.drawSegment(c, cell, color, isHead);
-      return;
-    }
     const sp = sprites.get(
       `${skin.label}:seg:${color}:${isHead ? "h" : "b"}`,
       CELL,
@@ -305,28 +301,27 @@ export function createSnakeGame(
     c.save();
     c.translate(0, HUD_H);
     if (fruit) {
-      if (skin.glowFruit) {
-        const glowColor = skin.glowFruit;
-        const { key, cell } = fruit;
-        const sp = sprites.get(
-          `${skin.label}:fruit:${key}`,
-          CELL,
-          CELL,
-          FRUIT_GLOW * 2,
-          (sc) => {
+      // Siempre desde sprite: evita reescalar el spritesheet grande por frame.
+      const glowColor = skin.glowFruit;
+      const { key, cell } = fruit;
+      const sp = sprites.get(
+        `${skin.label}:fruit:${key}`,
+        CELL,
+        CELL,
+        glowColor ? FRUIT_GLOW * 2 : 2,
+        (sc) => {
+          if (glowColor) {
             sc.shadowColor = glowColor;
             sc.shadowBlur = FRUIT_GLOW;
-            drawFruit(sc, sheet, key, { col: 0, row: 0 });
-          },
-        );
-        c.drawImage(
-          sp.canvas,
-          cell.col * CELL - sp.pad,
-          cell.row * CELL - sp.pad,
-        );
-      } else {
-        drawFruit(c, sheet, fruit.key, fruit.cell);
-      }
+          }
+          drawFruit(sc, sheet, key, { col: 0, row: 0 });
+        },
+      );
+      c.drawImage(
+        sp.canvas,
+        cell.col * CELL - sp.pad,
+        cell.row * CELL - sp.pad,
+      );
     }
     for (let i = body.length - 1; i >= 1; i--)
       drawSegment(body[i], skin.colors.body, false);

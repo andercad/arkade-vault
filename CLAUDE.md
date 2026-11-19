@@ -12,7 +12,7 @@ Workflow is Spec Driven Design using `/spec` and `/spec-impl` skills, installed 
 
 ## Specs
 
-Specs en `specs/` (01 MVP pantallas, 02 homepage, 03 about/contacto, 04 Supabase cimientos, 05 Asteroids, 06 leaderboard y juegos: `06-leaderboard-y-juegos.md`, 07 Tetris + registro genérico de juegos: `07-tetris.md`, 08 Arkanoid con sonido y 5 niveles: `08-arkanoid.md`, 09 Snake con sprites de frutas: `09-snake.md`, 10 selector de skin integrado en el HUD: `10-hud-skins-integrados.md`, 11 botón de fin al Salón de la fama y reset del reproductor: `11-fin-leaderboard-y-reset.md`, 12 mando táctil para jugar en móvil: `12-controles-tactiles.md`, 13 aspecto Gamepad MK-II del mando (carcasa neón, cruz con hub, botones A/B): `13-gamepad-mk2.md`). Game-jam Frogger en `specs/game-jam/frogger/` (01 motor TS en `lib/frogger/`: `01-frogger-core.md`; 02 plataforma, migración `0008`, portada, pausa botón + `P`/`Esc` y guardado: `02-frogger-platform.md`; 03 peligros y audio: `03-frogger-hazards-audio.md`). Leer la spec relevante y sus dependencias antes de implementar.
+Specs en `specs/` (01 MVP pantallas, 02 homepage, 03 about/contacto, 04 Supabase cimientos, 05 Asteroids, 06 leaderboard y juegos: `06-leaderboard-y-juegos.md`, 07 Tetris + registro genérico de juegos: `07-tetris.md`, 08 Arkanoid con sonido y 5 niveles: `08-arkanoid.md`, 09 Snake con sprites de frutas: `09-snake.md`, 10 selector de skin integrado en el HUD: `10-hud-skins-integrados.md`, 11 botón de fin al Salón de la fama y reset del reproductor: `11-fin-leaderboard-y-reset.md`, 12 mando táctil para jugar en móvil: `12-controles-tactiles.md`, 13 aspecto Gamepad MK-II del mando (carcasa neón, cruz con hub, botones A/B): `13-gamepad-mk2.md`, 14 revisión de performance (≥58 FPS con CPU ×6, cachés de capa y sprites con glow): `14-revision-performance.md`). Game-jam Frogger en `specs/game-jam/frogger/` (01 motor TS en `lib/frogger/`: `01-frogger-core.md`; 02 plataforma, migración `0008`, portada, pausa botón + `P`/`Esc` y guardado: `02-frogger-platform.md`; 03 peligros y audio: `03-frogger-hazards-audio.md`). Leer la spec relevante y sus dependencias antes de implementar.
 
 Buenas prácticas:
 
@@ -31,6 +31,7 @@ Next.js 16.4.6 (App Router, `app/` at repo root, no `src/`), React 19.3, Tailwin
 - `npm run build` / `npm start` — build / serve
 - `ALLOWED_DEV_ORIGINS=<ip> npm run dev` — permite abrir el dev server desde el móvil en la LAN (`next.config.ts`; lista separada por comas, vacío por defecto).
 - `npm run lint` — ESLint (flat config)
+- `npm run perf` — mide FPS y JS/frame de los 5 juegos × skins con CPU ×1/×6 (Playwright, Chromium con ventana; requiere `npm run dev` activo; `PERF_URL`, `PERF_GAMES=a,b`, `PERF_HEADLESS=1`); sale con código 1 si algún caso con ×6 queda <58 FPS (SPEC 14).
 - Sin test runner. Prettier + `prettier-plugin-tailwindcss` (`.prettierrc.json`).
 
 ## Rutas (`app/`)
@@ -55,6 +56,7 @@ Next.js 16.4.6 (App Router, `app/` at repo root, no `src/`), React 19.3, Tailwin
 
 Reutilizar antes de crear código nuevo:
 
+- `lib/canvas-cache.ts`: `createLayerCache()` (capa estática offscreen, se repinta solo si cambia la clave) y `createSpriteCache()` (sprites con glow pre-renderizados). Usar en vez de `shadowBlur` por objeto cada frame; limpiar en `setSkin`/`destroy` (SPEC 14).
 - `lib/game-engine.ts`: contrato común (`GameStatus`, `HudItem`, `GameSnapshot`, `GameCallbacks`, `GameEngine`, `GameOption`, `TouchControls`).
 - `components/touch-controls.tsx`: mando táctil genérico, configurado por `touchControls` en el registro. Todo motor nuevo lo cumple vía adaptador.
 - `lib/game-registry.ts`: único punto de alta de juegos (`GAME_REGISTRY`, `getGameDefinition`); UI genérica, sin ramas por juego.
@@ -69,7 +71,7 @@ Reutilizar antes de crear código nuevo:
 ## Skills
 
 - `/spec` y `/spec-impl`: flujo Spec Driven (config en `specs/.spec-config.yml`, `AutoCreateBranch: true` crea rama `spec-NN-slug`).
-- `/spec-impl-game` (propia, `.claude/skills/spec-impl-game/SKILL.md`, `disable-model-invocation`): implementa la spec de un juego leyendo y siguiendo `/spec-impl` (fuente única; busca también en `specs/game-jam/*/`) y, al terminar, lanza en secuencia `skin-designer` y luego `mobile-porter` sobre ese juego (nunca en paralelo; exige dev server activo).
+- `/spec-impl-game` (propia, `.claude/skills/spec-impl-game/SKILL.md`, `disable-model-invocation`): implementa la spec de un juego leyendo y siguiendo `/spec-impl` (fuente única; busca también en `specs/game-jam/*/`) y, al terminar, lanza en secuencia `skin-designer`, luego `mobile-porter` y por último `game-performance-booster` sobre ese juego (nunca en paralelo; exige dev server activo).
 - `/frontend-design`: usar siempre para diseñar interfaces de usuario.
 - `/add-game` (propia, `.claude/skills/add-game/`: `SKILL.md`, `template.md`, `checklist.md`): genera la spec para añadir un juego real (motor TS, fila en `games`, leaderboard en `scores`) desde `references/started-games/` o nuevo, siguiendo SPEC 05 y 06; luego se implementa con `/spec-impl`. Admite `cat` ARCADE/PUZZLE/SHOOTER/VERSUS/RACING/FIGHTING/PLATFORMER/MAZE/RHYTHM/SPORTS/STRATEGY y `color` cyan/magenta/yellow/green/orange/violet/red; los no soportados aún por BD/código (solo los 4+4 originales) añaden a la spec un paso de ampliación de CHECK, `lib/games.ts` y CSS. Con `disable-model-invocation` (no se invoca ni se precarga; `game-jam` lee sus archivos con Read); su "Modo game-jam" (no interactivo) lo aplica `game-jam` o se activa con `args` que empiezan por `game-jam:`.
 
@@ -81,4 +83,5 @@ Reutilizar antes de crear código nuevo:
 - Subagente `game-jam` (`.claude/agents/game-jam.md`): dado un tema, diseña un juego original y escribe ≥2 specs (motor, plataforma, extra opcional) en `specs/game-jam/<game-id>/`, formato SPEC 07-09. Lee con Read `.claude/skills/add-game/` (`disable-model-invocation`, sin `skills:`) y genera con él el spec core en modo game-jam. Solo escribe specs; se implementan después con `/spec-impl`.
 - Subagente `skin-designer` (`.claude/agents/skin-designer.md`): aplica ≥3 skins (`classic` default, `retro`, `neon`, legibles en modo oscuro) solo al juego que se le indique, siguiendo el patrón de Tetris (`lib/<juego>/skins.ts`, opción `skin` `live` en el registro, `setSkin` en el motor). Un juego por invocación; verifica con Playwright. Estado por juego en `references/games-with-themes.md` (excepción: única escritura del agente en `references/`).
 - Subagente `mobile-porter` (`.claude/agents/mobile-porter.md`): porta/revisa un solo juego para móvil siguiendo SPEC 12 (`touchControls` del registro, CSS móvil acotado a `pointer: coarse`/≤520px, sin tocar `touch-controls.tsx`/`game-player.tsx`); verifica con Playwright táctil 390×844 + escritorio. Estado por juego en `references/games-mobile-status.md` (excepción: única escritura del agente en `references/`).
+- Subagente `game-performance-booster` (`.claude/agents/game-performance-booster.md`): revisa/corrige el performance de un solo juego (id por parámetro) siguiendo la SPEC 14: `shadowBlur` por objeto y fondos estáticos redibujados → capa estática y sprites con glow cacheados (`lib/canvas-cache.ts`), invalidados en `setSkin`/`destroy`; objetivo ≥58 FPS con CPU ×6 medido con `npm run perf`; visual idéntico. Un juego por invocación; verifica con Playwright. Estado por juego en `references/game-performance.md` (excepción: única escritura del agente en `references/`).
 - Mantener README.md sincronizado cuando cambie este archivo.
