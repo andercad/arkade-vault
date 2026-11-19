@@ -2,11 +2,9 @@
 
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/lib/auth";
 
 export function AuthForm() {
   const router = useRouter();
-  const { login } = useAuth();
   const [tab, setTab] = useState<"in" | "up">("in");
   const [user, setUser] = useState("");
   const [pass, setPass] = useState("");
@@ -14,12 +12,10 @@ export function AuthForm() {
 
   const submit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    login({ name: (user || "PLAYER1").toUpperCase().slice(0, 10) });
-    router.push("/");
+    // Provisional (SPEC 16, paso 4): el login real llega en el paso 5.
   };
 
   const guest = () => {
-    login(null);
     router.push("/");
   };
 
