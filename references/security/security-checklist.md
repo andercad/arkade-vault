@@ -1,10 +1,10 @@
 ## Checklist de seguridad básico
 
-  - [ ] RLS: Row Level Security habilitado en todas las tablas: `game_stats`, `games`, `profiles` y `scores`
-  - [ ] Minimum password length — mínimo 8 caracteres
-  - [ ] Leaked password protection — (el warning 4)
-  - [ ] Max signup rate — limitar signups por IP (anti-bot)
-  - [ ] Headers de seguridad en Next.js
+  - [x] RLS: Row Level Security habilitado en todas las tablas: `game_stats`, `games`, `profiles` y `scores` (SPEC 17: `game_stats` es vista con `security_invoker`, aplica el RLS de `games`/`scores`; migración `0012`)
+  - [x] Minimum password length — mínimo 8 caracteres (SPEC 17: + minúscula, mayúscula, dígito y símbolo)
+  - [ ] Leaked password protection — (el warning 4) — **no disponible en plan Free** (requiere Pro); aviso aceptado
+  - [x] Max signup rate — limitar signups por IP (anti-bot) (SPEC 17: 10 por 5 min por IP + `sb-forwarded-for`)
+  - [x] Headers de seguridad en Next.js (SPEC 17: `next.config.ts`)
 
   Ej:
 

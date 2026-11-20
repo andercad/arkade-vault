@@ -25,7 +25,7 @@ Juegos jugables: Asteroids, Tetris, Arkanoid, Snake y Frogger, cada uno con moto
 
 Rutas: `/` home · `/juegos` biblioteca · `/juegos/[id]` detalle · `/juegos/[id]/jugar` (el menú de fin enlaza a `/salon-de-la-fama?juego=<id>`; el estado del reproductor se reinicia al salir) · `/salon-de-la-fama` (`?juego=<id>` elige la pestaña inicial) · `/login` (SPEC 16: email o usuario + contraseña, Google/GitHub, recuperar contraseña, invitado) · `/perfil` (avatar y cambio de username; el avatar del nav abre el menú Perfil / Cerrar sesión) · `/auth/callback` · `/auth/reset-password` · `/about` (contacto con Resend).
 
-Autenticación (SPEC 16): Supabase Auth con confirmación de email, perfil `profiles` (username único, editable en `/perfil`; avatar con la foto de la red social o iniciales) y `scores.user_id` (si se borra el usuario, sus puntuaciones se conservan con `user_id` null). `proxy.ts` refresca la sesión. Env nueva: `SUPABASE_SECRET_KEY` (solo servidor; en `.env.local`, nunca `NEXT_PUBLIC_`). En el panel de Supabase: "Confirm email" activado, proveedores Google/GitHub y Redirect URLs `http://localhost:3000/auth/callback` y `/auth/reset-password`.
+Autenticación (SPEC 16): Supabase Auth con confirmación de email, perfil `profiles` (username único, editable en `/perfil`; avatar con la foto de la red social o iniciales) y `scores.user_id` (si se borra el usuario, sus puntuaciones se conservan con `user_id` null). `proxy.ts` refresca la sesión y (SPEC 17) redirige `/perfil` a `/login` sin sesión (`PROTECTED_ROUTES`). Env nueva: `SUPABASE_SECRET_KEY` (solo servidor; en `.env.local`, nunca `NEXT_PUBLIC_`). En el panel de Supabase: "Confirm email" activado, proveedores Google/GitHub y Redirect URLs `http://localhost:3000/auth/callback` y `/auth/reset-password`.
 
 Lista detallada de juegos (desde la BD): `references/implemented-games.md`.
 
@@ -66,27 +66,28 @@ Luego abre `http://192.168.1.50:3000` en el móvil (la IP sale de `ipconfig`). R
 
 ## Specs (`specs/`)
 
-| Spec                                           | Contenido                                                                                                          |
-| ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
-| `01-mvp-pantallas.md`                          | MVP visual: 5 pantallas con datos mock                                                                             |
-| `02-homepage.md`                               | Home en `/`, Biblioteca movida a `/juegos`, nav completa                                                           |
-| `03-about-contacto.md`                         | `/about` + formulario de contacto (Resend, Server Action)                                                          |
-| `04-supabase-cimientos.md`                     | Supabase: clientes, migraciones, tipos generados                                                                   |
-| `05-asteroids.md`                              | Asteroids: primer juego real jugable (motor TS en `lib/asteroids/`)                                                |
-| `06-leaderboard-y-juegos.md`                   | Tablas `games` y `scores` en Supabase; leaderboard real (solo Asteroids)                                           |
-| `07-tetris.md`                                 | Tetris (motor TS en `lib/tetris/`) y registro genérico de juegos                                                   |
-| `08-arkanoid.md`                               | Arkanoid (motor TS en `lib/arkanoid/`) con sonido y 5 niveles                                                      |
-| `09-snake.md`                                  | Snake (motor TS en `lib/snake/`) con sprites de frutas y niveles                                                   |
-| `10-hud-skins-integrados.md`                   | Selector de skin (opciones `live`) integrado en el HUD del reproductor                                             |
-| `11-fin-leaderboard-y-reset.md`                | Botón del menú de fin al Salón de la fama (`?juego=<id>`) y reset del reproductor al salir                         |
-| `12-controles-tactiles.md`                     | Mando táctil bajo el canvas (`touchControls` por juego en el registro) y HUD compacto en móvil                     |
-| `13-gamepad-mk2.md`                            | Aspecto Gamepad MK-II del mando táctil (carcasa neón, cruz con hub, botones A/B), fijo abajo en móvil              |
-| `14-revision-performance.md`                   | Revisión de performance: ≥58 FPS con CPU ×6 en los 5 juegos (cachés de capa y sprites con glow), `npm run perf`    |
-| `15-colores-por-categoria.md`                  | Un color fijo por categoría (11↔11): migración `0009`, `CATEGORY_COLOR`, acentos CSS y agentes/skills alineados    |
-| `16-autenticacion.md`                          | Supabase Auth: registro con confirmación, login email/usuario, Google/GitHub, reset, `profiles` y `scores.user_id` |
-| `game-jam/frogger/01-frogger-core.md`          | Frogger: motor TS en `lib/frogger/` (carretera, río, casas, vidas, tiempo)                                         |
-| `game-jam/frogger/02-frogger-platform.md`      | Frogger en la plataforma: registro, migración `0008`, portada, pausa (botón + `P`/`Esc`) y guardado                |
-| `game-jam/frogger/03-frogger-hazards-audio.md` | Frogger: peligros extra y audio (pendiente de implementar)                                                         |
+| Spec                                           | Contenido                                                                                                                 |
+| ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| `01-mvp-pantallas.md`                          | MVP visual: 5 pantallas con datos mock                                                                                    |
+| `02-homepage.md`                               | Home en `/`, Biblioteca movida a `/juegos`, nav completa                                                                  |
+| `03-about-contacto.md`                         | `/about` + formulario de contacto (Resend, Server Action)                                                                 |
+| `04-supabase-cimientos.md`                     | Supabase: clientes, migraciones, tipos generados                                                                          |
+| `05-asteroids.md`                              | Asteroids: primer juego real jugable (motor TS en `lib/asteroids/`)                                                       |
+| `06-leaderboard-y-juegos.md`                   | Tablas `games` y `scores` en Supabase; leaderboard real (solo Asteroids)                                                  |
+| `07-tetris.md`                                 | Tetris (motor TS en `lib/tetris/`) y registro genérico de juegos                                                          |
+| `08-arkanoid.md`                               | Arkanoid (motor TS en `lib/arkanoid/`) con sonido y 5 niveles                                                             |
+| `09-snake.md`                                  | Snake (motor TS en `lib/snake/`) con sprites de frutas y niveles                                                          |
+| `10-hud-skins-integrados.md`                   | Selector de skin (opciones `live`) integrado en el HUD del reproductor                                                    |
+| `11-fin-leaderboard-y-reset.md`                | Botón del menú de fin al Salón de la fama (`?juego=<id>`) y reset del reproductor al salir                                |
+| `12-controles-tactiles.md`                     | Mando táctil bajo el canvas (`touchControls` por juego en el registro) y HUD compacto en móvil                            |
+| `13-gamepad-mk2.md`                            | Aspecto Gamepad MK-II del mando táctil (carcasa neón, cruz con hub, botones A/B), fijo abajo en móvil                     |
+| `14-revision-performance.md`                   | Revisión de performance: ≥58 FPS con CPU ×6 en los 5 juegos (cachés de capa y sprites con glow), `npm run perf`           |
+| `15-colores-por-categoria.md`                  | Un color fijo por categoría (11↔11): migración `0009`, `CATEGORY_COLOR`, acentos CSS y agentes/skills alineados           |
+| `16-autenticacion.md`                          | Supabase Auth: registro con confirmación, login email/usuario, Google/GitHub, reset, `profiles` y `scores.user_id`        |
+| `17-medidas-seguridad.md`                      | Seguridad básica: migración `0012`, contraseña fuerte, reenvío de IP en Auth, headers y `/perfil` protegido en `proxy.ts` |
+| `game-jam/frogger/01-frogger-core.md`          | Frogger: motor TS en `lib/frogger/` (carretera, río, casas, vidas, tiempo)                                                |
+| `game-jam/frogger/02-frogger-platform.md`      | Frogger en la plataforma: registro, migración `0008`, portada, pausa (botón + `P`/`Esc`) y guardado                       |
+| `game-jam/frogger/03-frogger-hazards-audio.md` | Frogger: peligros extra y audio (pendiente de implementar)                                                                |
 
 ### Buenas prácticas
 
