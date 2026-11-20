@@ -8,7 +8,7 @@ if (!token || !chatId) {
     !token && "TELEGRAM_BOT_TOKEN",
     !chatId && "TELEGRAM_CHAT_ID",
   ].filter(Boolean);
-  console.error(`Falta ${missing.join(" y ")} (definir en .claude/settings.local.json → env)`);
+  console.error(`Falta ${missing.join(" y ")} (definir en .claude/settings.local.json → env, o en las variables del entorno cloud)`);
   process.exit(1);
 }
 

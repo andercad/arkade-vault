@@ -18,7 +18,7 @@ node "$CLAUDE_PROJECT_DIR/.claude/skills/telegram-send/send.mjs" <<'EOF'
 EOF
 ```
 
-3. Reporta solo el resultado (`message_id`) o el error. Si falta variable de entorno, indica definir `TELEGRAM_BOT_TOKEN` y `TELEGRAM_CHAT_ID` en `.claude/settings.local.json` → `env` y reiniciar Claude Code. Nunca muestres el token.
+3. Reporta solo el resultado (`message_id`) o el error. Si falta variable de entorno, indica definir `TELEGRAM_BOT_TOKEN` y `TELEGRAM_CHAT_ID` en `.claude/settings.local.json` → `env` (local; reiniciar Claude Code) o, en rutinas cloud (`/schedule`), en las variables del entorno cloud (claude.ai/code → Environments) con red permitida a `api.telegram.org`. Nunca muestres el token.
 
 ## Uso desde agentes (aviso de fin)
 
