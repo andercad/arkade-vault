@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
-import { MIN_PASSWORD, PASSWORD_ERROR } from "@/lib/auth-validation";
+import { PASSWORD_ERROR, validatePassword } from "@/lib/auth-validation";
 import { createClient } from "@/lib/supabase/client";
 
 type Status = "checking" | "ready" | "invalid";
@@ -30,7 +30,8 @@ export function ResetPasswordForm({ code }: { code: string | null }) {
     e.preventDefault();
     if (pending) return;
     setError(null);
-    if (pass.length < MIN_PASSWORD) return setError(PASSWORD_ERROR);
+    const weak = validatePassword(pass);
+    if (weak) return setError(weak);
     if (pass !== repeat) return setError("Las contraseñas no coinciden.");
 
     setPending(true);
@@ -41,7 +42,7 @@ export function ResetPasswordForm({ code }: { code: string | null }) {
         error.code === "same_password"
           ? "La nueva contraseña debe ser distinta de la anterior."
           : error.code === "weak_password"
-            ? "La contraseña es demasiado débil."
+            ? PASSWORD_ERROR
             : "No se pudo cambiar la contraseña. Inténtalo de nuevo.",
       );
       return;

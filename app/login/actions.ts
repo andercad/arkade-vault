@@ -1,9 +1,10 @@
 "use server";
 
 import { headers } from "next/headers";
-import { createClient } from "@/lib/supabase/server";
+import { createAuthActionClient, createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import {
+  PASSWORD_ERROR,
   validateSignIn,
   validateSignUp,
   type AuthResult,
@@ -11,6 +12,8 @@ import {
 
 const GENERIC_ERROR = "No se pudo completar la operación. Inténtalo de nuevo.";
 const INVALID_CREDENTIALS = "Usuario o contraseña incorrectos.";
+const RATE_LIMIT_ERROR =
+  "Demasiados intentos. Espera unos minutos y vuelve a probar.";
 
 function field(formData: FormData, name: string): string {
   const v = formData.get(name);
@@ -48,7 +51,9 @@ export async function signUp(formData: FormData): Promise<AuthResult> {
   }
   if (taken) return { ok: false, error: "Ese usuario ya existe." };
 
-  const { data, error } = await supabase.auth.signUp({
+  // Solo para auth.*: la clave secreta salta RLS (SPEC 17).
+  const authClient = await createAuthActionClient();
+  const { data, error } = await authClient.auth.signUp({
     email,
     password,
     options: {
@@ -61,7 +66,10 @@ export async function signUp(formData: FormData): Promise<AuthResult> {
       return { ok: false, error: "Ese correo ya está registrado." };
     }
     if (error.code === "weak_password") {
-      return { ok: false, error: "La contraseña es demasiado débil." };
+      return { ok: false, error: PASSWORD_ERROR };
+    }
+    if (error.code === "over_request_rate_limit") {
+      return { ok: false, error: RATE_LIMIT_ERROR };
     }
     if (error.code === "over_email_send_rate_limit") {
       return {
@@ -106,9 +114,16 @@ export async function signIn(formData: FormData): Promise<AuthResult> {
     }
   }
 
-  const supabase = await createClient();
-  const { error } = await supabase.auth.signInWithPassword({ email, password });
+  // Solo para auth.*: la clave secreta salta RLS (SPEC 17).
+  const authClient = await createAuthActionClient();
+  const { error } = await authClient.auth.signInWithPassword({
+    email,
+    password,
+  });
   if (error) {
+    if (error.code === "over_request_rate_limit") {
+      return { ok: false, error: RATE_LIMIT_ERROR };
+    }
     if (error.code === "email_not_confirmed") {
       return { ok: false, error: "Confirma tu email antes de entrar." };
     }
