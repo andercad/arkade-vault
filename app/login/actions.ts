@@ -4,6 +4,7 @@ import { headers } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import {
+  PASSWORD_ERROR,
   validateSignIn,
   validateSignUp,
   type AuthResult,
@@ -61,7 +62,7 @@ export async function signUp(formData: FormData): Promise<AuthResult> {
       return { ok: false, error: "Ese correo ya está registrado." };
     }
     if (error.code === "weak_password") {
-      return { ok: false, error: "La contraseña es demasiado débil." };
+      return { ok: false, error: PASSWORD_ERROR };
     }
     if (error.code === "over_email_send_rate_limit") {
       return {
