@@ -1,6 +1,7 @@
 # SPEC 17 — Medidas de seguridad básicas (BD, Auth y headers)
 
-> **Estado:** Aprobado
+> **Estado:** Implementado
+>
 > **Depende de:** SPEC 06 (leaderboard y juegos), SPEC 16 (autenticación)
 > **Fecha:** 2026-11-20
 > **Objetivo:** Aplicar el checklist de `references/security/security-checklist.md`: cerrar los avisos de seguridad de Supabase, endurecer contraseñas y rate limit de Auth, y enviar headers de seguridad desde Next.js.
@@ -127,19 +128,19 @@ Un commit por paso (`17-medidas-seguridad: Paso N`).
 
 ## Criterios de aceptación
 
-- [ ] `games`, `profiles`, `scores` con RLS activo y `game_stats` con `security_invoker = true`.
-- [ ] `get_advisors` security no muestra avisos de `rls_auto_enable`; solo queda `auth_leaked_password_protection` (aceptado por plan Free).
-- [ ] Insertar en `scores` con un `user_id` distinto de `auth.uid()` falla; con `null` (invitado) o el propio funciona.
-- [ ] El event trigger `ensure_rls` sigue activando RLS en tablas nuevas.
-- [ ] Registro y reset rechazan contraseñas < 8 o sin minúscula, mayúscula, número y símbolo, con mensaje en español, tanto en la app como en Supabase.
-- [ ] Cuentas existentes con contraseña antigua siguen pudiendo entrar.
-- [ ] Rate limit "sign-ups and sign-ins" = 10 / 5 min por IP; superarlo muestra "Demasiados intentos…".
-- [ ] El rate limit cuenta la IP del jugador (`sb-forwarded-for`), no la del servidor.
-- [ ] `SUPABASE_SECRET_KEY` no aparece en el bundle cliente.
-- [ ] Todas las rutas responden con `X-Content-Type-Options`, `X-Frame-Options` y `Referrer-Policy`.
-- [ ] Sin sesión, `/perfil` responde con redirección a `/login` desde el proxy; con sesión carga normal.
-- [ ] Las demás rutas (`/`, `/juegos/**`, `/salon-de-la-fama`, `/about`, `/login`) siguen públicas y el invitado puede jugar y guardar.
-- [ ] `tsc`, `lint` y `build` limpios; checklist, `CLAUDE.md` y `README.md` actualizados.
+- [x] `games`, `profiles`, `scores` con RLS activo y `game_stats` con `security_invoker = true`.
+- [x] `get_advisors` security no muestra avisos de `rls_auto_enable`; solo queda `auth_leaked_password_protection` (aceptado por plan Free).
+- [x] Insertar en `scores` con un `user_id` distinto de `auth.uid()` falla; con `null` (invitado) o el propio funciona.
+- [x] El event trigger `ensure_rls` sigue activando RLS en tablas nuevas.
+- [x] Registro y reset rechazan contraseñas < 8 o sin minúscula, mayúscula, número y símbolo, con mensaje en español, tanto en la app como en Supabase.
+- [x] Cuentas existentes con contraseña antigua siguen pudiendo entrar.
+- [x] Rate limit "sign-ups and sign-ins" = 10 / 5 min por IP; superarlo muestra "Demasiados intentos…".
+- [x] El rate limit cuenta la IP del jugador (`sb-forwarded-for`), no la del servidor.
+- [x] `SUPABASE_SECRET_KEY` no aparece en el bundle cliente.
+- [x] Todas las rutas responden con `X-Content-Type-Options`, `X-Frame-Options` y `Referrer-Policy`.
+- [x] Sin sesión, `/perfil` responde con redirección a `/login` desde el proxy; con sesión carga normal.
+- [x] Las demás rutas (`/`, `/juegos/**`, `/salon-de-la-fama`, `/about`, `/login`) siguen públicas y el invitado puede jugar y guardar.
+- [x] `tsc`, `lint` y `build` limpios; checklist, `CLAUDE.md` y `README.md` actualizados.
 
 ---
 
