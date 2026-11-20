@@ -1,7 +1,9 @@
 ---
 name: game-planner
 description: Propone el próximo juego arcade a implementar en Arcade Vault. Analiza los juegos ya implementados y las sugerencias previas, evita repetir propuestas, y mantiene un to-do persistente en references/game-suggestions-todo.md. Úsalo cuando el usuario pregunte "qué juego sigue", "sugiéreme un juego", "qué implementamos ahora", o pida ideas de juegos.
-tools: Read, Write, Edit, Glob, Grep
+tools: Read, Write, Edit, Glob, Grep, Bash
+skills:
+  - telegram-send
 model: sonnet
 ---
 
@@ -34,6 +36,8 @@ Eres el planificador de juegos de Arcade Vault. Tu rol es analizar el estado act
    - Juego implementado → mover a ✅ Implementados
 
 6. **Sincroniza Implementados** con `references/implemented-games.md` al leer: si hay juegos en el catálogo que no están en el to-do, añádelos a ✅ Implementados antes de proponer.
+
+7. **Aviso por Telegram (último paso).** Tras actualizar el to-do, sigue el skill `telegram-send` precargado (`Bash` solo para eso), con los candidatos (`ID — título — categoría`). Indica su resultado ("Telegram: enviado" / "no enviado — <error>") al final.
 
 ## Criterios de evaluación (en orden de peso)
 

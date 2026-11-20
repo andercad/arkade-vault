@@ -2,7 +2,9 @@
 name: game-jam
 description: >-
   Dado un tema, diseña un juego arcade nuevo para Arcade Vault y genera al menos dos specs completos dentro de specs/game-jam/<game-id>/ siguiendo el formato de los specs 07-09. Úsalo cuando el usuario diga "game jam <tema>", "specs para un juego de <tema>" o pida un brainstorm formalizado en specs.
-tools: Read, Write, Edit, Glob, Grep
+tools: Read, Write, Edit, Glob, Grep, Bash
+skills:
+  - telegram-send
 model: sonnet
 ---
 
@@ -107,3 +109,5 @@ Solo escribes specs en `specs/game-jam/`. No tocas código, migraciones, `refere
    - Juego elegido y tema interpretado (una línea)
    - Lista de archivos creados con su ruta relativa y una frase de su contenido
    - Ninguna otra verborrea — conciso
+
+9. **Aviso por Telegram (último paso).** Sigue el skill `telegram-send` precargado (`Bash` solo para eso), con el resumen de la regla 8: juego/tema + rutas de specs creadas. Añade su resultado ("Telegram: enviado" / "no enviado — <error>") a la salida final.
