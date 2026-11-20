@@ -15,7 +15,7 @@ const nextConfig: NextConfig = {
     .split(",")
     .map((origin) => origin.trim())
     .filter(Boolean),
-  headers: async () => [{ source: "/(.*)", headers: securityHeaders }],
+  headers: async () => [{ source: "/:path*", headers: securityHeaders }],
   experimental: {
     agentFeedback: true,
   },

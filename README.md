@@ -42,6 +42,7 @@ Cachés de canvas `lib/canvas-cache.ts` (capa estática y sprites con glow, SPEC
 - Subagente `skin-designer` (`.claude/agents/skin-designer.md`): aplica ≥3 skins (`classic` default, `retro`, `neon`, legibles en modo oscuro) solo al juego que se le indique, siguiendo el patrón de Tetris (SPEC 07). Estado por juego en `references/games-with-themes.md`.
 - Subagente `mobile-porter` (`.claude/agents/mobile-porter.md`): porta/revisa un juego para móvil siguiendo la SPEC 12 (`touchControls` en el registro, CSS móvil acotado, verificación táctil 390×844 con Playwright). Estado por juego en `references/games-mobile-status.md`.
 - Subagente `game-performance-booster` (`.claude/agents/game-performance-booster.md`): revisa/corrige el performance de un juego (id por parámetro) con el patrón de la SPEC 14 (capa estática y sprites con glow cacheados, ≥58 FPS con CPU ×6 medido con `npm run perf`). Estado por juego en `references/game-performance.md`.
+- Subagente `security-auditor` (`.claude/agents/security-auditor.md`): audita la seguridad de la BD Supabase (RLS, policies, funciones `SECURITY DEFINER`, advisors, logs de Auth) y de la app (secretos, headers, `proxy.ts`, validación de contraseña) según SPEC 16/17. Solo lectura: propone correcciones sin aplicarlas. Estado en `references/security/security-audit.md`.
 
 ## Commands
 
