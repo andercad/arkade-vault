@@ -2268,6 +2268,7 @@ a {
   gap: 8px;
   margin: 22px 0 12px;
   flex-wrap: wrap;
+  justify-content: center;
 }
 .modal .input-row input {
   flex: 1 1 140px;

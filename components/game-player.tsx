@@ -8,37 +8,7 @@ import { getGameDefinition } from "@/lib/game-registry";
 import type { Game } from "@/lib/games";
 import { submitScore } from "@/lib/scores";
 import Link from "next/link";
-import { useEffect, useRef, useState, useSyncExternalStore } from "react";
-
-// Último nombre guardado por el jugador (invitado), para pre-rellenar el modal.
-const NAME_KEY = "av_player_name";
-const nameListeners = new Set<() => void>();
-
-function subscribeName(cb: () => void) {
-  nameListeners.add(cb);
-  window.addEventListener("storage", cb);
-  return () => {
-    nameListeners.delete(cb);
-    window.removeEventListener("storage", cb);
-  };
-}
-
-function readStoredName(): string | null {
-  try {
-    return localStorage.getItem(NAME_KEY);
-  } catch {
-    return null;
-  }
-}
-
-function writeStoredName(name: string) {
-  try {
-    localStorage.setItem(NAME_KEY, name);
-  } catch {
-    return;
-  }
-  nameListeners.forEach((cb) => cb());
-}
+import { useEffect, useRef, useState } from "react";
 
 const INITIAL_SNAPSHOT: GameSnapshot = {
   score: 0,
@@ -47,7 +17,7 @@ const INITIAL_SNAPSHOT: GameSnapshot = {
 };
 
 export function GamePlayer({ game }: { game: Game }) {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
   const control = useRef<GameControl>(null);
   // La página ya devuelve 404 si el id no está en el registro.
   const definition = getGameDefinition(game.id)!;
@@ -57,8 +27,6 @@ export function GamePlayer({ game }: { game: Game }) {
   const [saved, setSaved] = useState(false);
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState(false);
-  // Override manual del nombre; si es null se usa el de la sesión o "INVITADO".
-  const [typedName, setTypedName] = useState<string | null>(null);
 
   // Valores de las opciones del juego (skin, nivel inicial…), declaradas en el registro.
   const [optionValues, setOptionValues] = useState<Record<string, string>>(() =>
@@ -77,16 +45,11 @@ export function GamePlayer({ game }: { game: Game }) {
       setSaved(false);
       setSaving(false);
       setSaveError(false);
-      setTypedName(null);
     };
   }, []);
 
-  const storedName = useSyncExternalStore(
-    subscribeName,
-    readStoredName,
-    () => null,
-  );
-  const name = typedName ?? user?.name ?? storedName ?? "INVITADO";
+  // Sin sesión se muestra INVITADO; mientras carga la sesión, un guion (sin parpadeo).
+  const name = user?.name ?? (loading ? "—" : "INVITADO");
   const { score } = snap;
   // "live" se ven siempre en la barra; "restart" solo en el overlay de pausa.
   const liveOptions = (definition.options ?? []).filter(
@@ -139,23 +102,18 @@ export function GamePlayer({ game }: { game: Game }) {
   );
 
   const save = async () => {
-    if (saving) return;
+    if (saving || !user) return;
     setSaving(true);
     setSaveError(false);
-    // Nombre vacío → "INVITADO" (el CHECK de BD exige 1 a 10 caracteres).
-    const finalName = name.trim().toUpperCase().slice(0, 10) || "INVITADO";
-    // La BD admite 0 a 1.000.000 (CHECK).
+    // La BD admite 0 a 1.000.000 (CHECK); el nombre es el username (3-10).
     const ok = await submitScore({
       gameId: game.id,
-      name: finalName,
+      name: user.name,
       score: Math.min(score, 1_000_000),
     });
     setSaving(false);
-    if (ok) {
-      // Solo invitados: el nombre de un usuario con sesión es su username.
-      if (!user) writeStoredName(finalName);
-      setSaved(true);
-    } else setSaveError(true);
+    if (ok) setSaved(true);
+    else setSaveError(true);
   };
 
   return (
@@ -262,15 +220,22 @@ export function GamePlayer({ game }: { game: Game }) {
             <h2>FIN DEL JUEGO</h2>
             <div className="final-label">PUNTUACIÓN FINAL</div>
             <div className="final">{fmt(score)}</div>
-            {!saved ? (
+            {loading ? null : !user ? (
+              <div>
+                <div
+                  className="pixel"
+                  style={{ fontSize: 10, color: "var(--yellow)" }}
+                >
+                  INICIA SESIÓN PARA GUARDAR TU PUNTUACIÓN
+                </div>
+                <div className="input-row">
+                  <Link href="/login" className="btn yellow">
+                    INICIAR SESIÓN
+                  </Link>
+                </div>
+              </div>
+            ) : !saved ? (
               <div className="input-row">
-                <input
-                  value={name}
-                  onChange={(e) =>
-                    setTypedName(e.target.value.toUpperCase().slice(0, 10))
-                  }
-                  placeholder="TUS INICIALES"
-                />
                 <button className="btn yellow" onClick={save} disabled={saving}>
                   GUARDAR PUNTUACIÓN
                 </button>

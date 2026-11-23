@@ -5,6 +5,7 @@
   - [ ] Leaked password protection — (el warning 4) — **no disponible en plan Free** (requiere Pro); aviso aceptado
   - [x] Max signup rate — limitar signups por IP (anti-bot) (SPEC 17: 10 por 5 min por IP + `sb-forwarded-for`)
   - [x] Headers de seguridad en Next.js (SPEC 17: `next.config.ts`)
+  - [x] Insert en `scores` solo con sesión (SPEC 18, migración `0013`): policy `scores insert usuario` (`to authenticated`, `user_id = (select auth.uid())`), `user_id not null`, FK `on delete cascade`; `anon` no puede insertar
 
   Ej:
 
