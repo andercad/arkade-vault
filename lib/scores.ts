@@ -17,7 +17,8 @@ export interface RecentScore {
   createdAt: string;
 }
 
-// Inserta una puntuación (RLS + CHECKs en BD). Devuelve false si falla.
+// Inserta una puntuación (RLS + CHECKs en BD). Solo con sesión: `user_id` lo pone
+// la BD (`default auth.uid()`) y la policy rechaza a anon (SPEC 18). false si falla.
 export async function submitScore(e: {
   gameId: string;
   name: string;
