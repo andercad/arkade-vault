@@ -1,6 +1,6 @@
 # SPEC 18 — Solo los jugadores con sesión guardan puntuación
 
-> **Estado:** Aprobado
+> **Estado:** Implementado
 >
 > **Depende de:** SPEC 06 (leaderboard y juegos), SPEC 16 (autenticación), SPEC 17 (medidas de seguridad)
 > **Fecha:** 2026-11-23
@@ -87,16 +87,16 @@ Un commit por paso (`18-solo-logueados-puntuan: Paso N`). Al final, proponer `se
 
 ## Criterios de aceptación
 
-- [ ] `scores` no contiene filas con `user_id` null y la columna es `not null`.
-- [ ] Insertar en `scores` como `anon` falla; como `authenticated` solo funciona con su propio `user_id`.
-- [ ] Borrar un usuario de `auth.users` borra sus puntuaciones (cascade).
-- [ ] El invitado puede jugar; al terminar ve "INICIA SESIÓN PARA GUARDAR TU PUNTUACIÓN" y un botón a `/login`, sin input ni botón de guardar.
-- [ ] Con sesión, el modal no tiene input de nombre; la puntuación se guarda con `player_name` = username.
-- [ ] La puntuación guardada aparece en el leaderboard del detalle, en el salón de la fama y en la actividad de la home.
-- [ ] Sin parpadeo invitado→usuario en el modal mientras carga la sesión.
-- [ ] `av_player_name` ya no se usa en el código.
-- [ ] `get_advisors` security sin avisos nuevos.
-- [ ] `tsc`, `lint` y `build` limpios; `CLAUDE.md`, `README.md`, checklist, `security-auditor.md` y runbook actualizados.
+- [x] `scores` no contiene filas con `user_id` null y la columna es `not null`.
+- [x] Insertar en `scores` como `anon` falla; como `authenticated` solo funciona con su propio `user_id`.
+- [x] Borrar un usuario de `auth.users` borra sus puntuaciones (cascade).
+- [x] El invitado puede jugar; al terminar ve "INICIA SESIÓN PARA GUARDAR TU PUNTUACIÓN" y un botón a `/login`, sin input ni botón de guardar.
+- [x] Con sesión, el modal no tiene input de nombre; la puntuación se guarda con `player_name` = username.
+- [x] La puntuación guardada aparece en el leaderboard del detalle, en el salón de la fama y en la actividad de la home.
+- [x] Sin parpadeo invitado→usuario en el modal mientras carga la sesión.
+- [x] `av_player_name` ya no se usa en el código.
+- [x] `get_advisors` security sin avisos nuevos.
+- [x] `tsc`, `lint` y `build` limpios; `CLAUDE.md`, `README.md`, checklist, `security-auditor.md` y runbook actualizados.
 
 ---
 
