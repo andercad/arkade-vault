@@ -36,6 +36,7 @@ Cachés de canvas `lib/canvas-cache.ts` (capa estática y sprites con glow, SPEC
 ## Tooling de Claude
 
 - Hook `PostToolUse` (`.claude/hooks/format-lint.mjs`): Prettier + ESLint `--fix` tras cada Write/Edit.
+- Producción: Claude solo accede a dev por MCP; prod (Supabase + Netlify) se migra a mano con `references/deploy/prod-runbook.md` (script único `prod-setup.sql` en el SQL Editor de prod) y se verifica con `references/deploy/verify-prod.sql`.
 - MCP (`.mcp.json`): Supabase. Playwright MCP para validar UI (screenshots en `.playwright-screenshots/`).
 - `/telegram-send <mensaje>` (`.claude/skills/telegram-send/`): envía texto a Telegram (Bot API `sendMessage`). Requiere `TELEGRAM_BOT_TOKEN` y `TELEGRAM_CHAT_ID` en el bloque `env` de `.claude/settings.local.json` (ignorado por git); reiniciar Claude Code tras definirlas. En rutinas cloud (`/schedule`) ese archivo no existe: definirlas como variables del entorno cloud (claude.ai/code → Environments) y permitir red a `api.telegram.org`. Los subagentes `security-auditor`, `game-jam` y `game-planner` avisan por Telegram al terminar con el skill precargado (`skills: [telegram-send]`); si falla, lo indican sin reintentar.
 - Subagente `game-planner` (`.claude/agents/game-planner.md`): planifica qué juego encaja, con memoria persistente en `.claude/agent-memory/game-planner/` y To-Do en `references/game-suggestions-todo.md`. Usar antes de `/add-game`.
