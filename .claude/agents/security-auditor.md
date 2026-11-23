@@ -26,10 +26,10 @@ Eres el auditor de seguridad de Arcade Vault. Revisas la **BD Supabase** y la **
 3. **Checks de BD** (Supabase MCP):
    - `get_advisors` security y performance. Único aviso aceptado: `auth_leaked_password_protection` (plan Free). `auth_rls_initplan` no debe reaparecer.
    - RLS activo en todas las tablas de `public` (`pg_class.relrowsecurity`); vistas (`game_stats`) con `security_invoker = true`.
-   - `pg_policies`: sin `using (true)`/`with check (true)` en insert/update/delete; insert de `scores` con `user_id is null or user_id = (select auth.uid())`; `profiles update propio` con `(select auth.uid())`; sin policies de update/delete en `scores`/`games`.
+   - `pg_policies`: sin `using (true)`/`with check (true)` en insert/update/delete; única policy de insert de `scores` = `scores insert usuario` (`to authenticated`, `user_id = (select auth.uid())`, sin `user_id is null`; SPEC 18); `scores.user_id` `not null` y FK `on delete cascade`; `profiles update propio` con `(select auth.uid())`; sin policies de update/delete en `scores`/`games`.
    - Funciones `SECURITY DEFINER` de `public`: `search_path` fijado; `email_for_username` ejecutable solo por `service_role`; `rls_auto_enable` sin EXECUTE para `public`/`anon`/`authenticated` (`has_function_privilege`).
    - Event trigger `ensure_rls` presente y activo.
-   - Pruebas con rollback: insert en `scores` como `anon` con `user_id` ajeno → falla RLS; con `null` → OK; `email_for_username('x')` como `anon` → permiso denegado.
+   - Pruebas con rollback: insert en `scores` como `anon` → falla RLS; como `authenticated` con `user_id` ajeno → falla; con el propio → OK; `email_for_username('x')` como `anon` → permiso denegado.
    - Deriva: `list_migrations` vs archivos de `supabase/migrations/`.
    - `query_logs` (auth): picos de 429/logins fallidos y que la IP registrada sea la del jugador (o `::1` en local), no la del servidor.
 

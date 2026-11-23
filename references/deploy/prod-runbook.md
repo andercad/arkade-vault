@@ -12,6 +12,10 @@ Placeholders: `<PROD_REF>` (Project Settings → General → Reference ID), `<PR
 
 El script equivale a las migraciones 0001-0012 consolidadas. No deja historial de migraciones en prod: los cambios futuros se aplican pegando el SQL nuevo en el SQL Editor.
 
+### Migración 0013 (SPEC 18): solo con sesión se guarda puntuación
+
+`prod-setup.sql` (0001-0012) **no** la incluye. Pegar a mano `supabase/migrations/0013_scores_solo_usuarios.sql` en el SQL Editor de prod **antes o junto al despliegue** de la UI de SPEC 18. **Borra de forma irreversible** las puntuaciones con `user_id is null`: si se quieren conservar, exportarlas antes (`select * from public.scores where user_id is null;`). Después, `verify-prod.sql` debe mostrar la policy `scores insert usuario` (y no `scores insert anónimo`).
+
 ## 2. Auth (panel prod → Authentication)
 
 - **Providers → Email**: "Confirm email" ON; longitud mínima 8 y requisitos minúscula + mayúscula + dígito + símbolo.
@@ -39,7 +43,7 @@ Después, **redeploy** (las `NEXT_PUBLIC_*` se fijan en el build). Si el escáne
 ## 4. Comprobar la app
 
 - `/` y `/juegos` listan 5 juegos.
-- Jugar como invitado y comprobar que se guarda la puntuación.
+- Jugar como invitado: al terminar solo sale "INICIA SESIÓN PARA GUARDAR TU PUNTUACIÓN"; con sesión, guardar y ver la puntuación en el ranking.
 - Crear cuenta → llega el email de confirmación → login.
 - Panel prod → Advisors: solo debe quedar "Leaked password protection" (requiere Pro).
 
@@ -124,7 +128,7 @@ game     arkanoid ARCADE green | asteroids SHOOTER magenta | frogger ARCADE gree
 policy   games    | games lectura pública    | SELECT
          profiles | profiles lectura pública | SELECT
          profiles | profiles update propio   | UPDATE
-         scores   | scores insert anónimo    | INSERT
+         scores   | scores insert usuario    | INSERT   (tras 0013, SPEC 18)
          scores   | scores lectura pública   | SELECT
 table    game_stats rls=false kind=v   (vista security_invoker)
          games rls=true kind=r | profiles rls=true kind=r | scores rls=true kind=r
