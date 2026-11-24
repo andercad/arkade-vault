@@ -1,6 +1,5 @@
 "use server";
 
-import { headers } from "next/headers";
 import { createAuthActionClient, createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import {
@@ -20,13 +19,12 @@ function field(formData: FormData, name: string): string {
   return typeof v === "string" ? v.trim() : "";
 }
 
-async function siteOrigin(): Promise<string> {
-  const h = await headers();
-  const origin = h.get("origin");
-  if (origin) return origin;
-  const host = h.get("x-forwarded-host") ?? h.get("host");
-  const proto = h.get("x-forwarded-proto") ?? "http";
-  return `${proto}://${host}`;
+// SPEC 20: origen fijo por entorno; nunca de Origin/Host (manipulables).
+function siteOrigin(): string {
+  const url = process.env.NEXT_PUBLIC_SITE_URL?.trim().replace(/\/+$/, "");
+  if (url) return url;
+  if (process.env.NODE_ENV !== "production") return "http://localhost:3000";
+  throw new Error("Falta NEXT_PUBLIC_SITE_URL en el entorno del servidor.");
 }
 
 export async function signUp(formData: FormData): Promise<AuthResult> {
@@ -58,7 +56,7 @@ export async function signUp(formData: FormData): Promise<AuthResult> {
     password,
     options: {
       data: { username },
-      emailRedirectTo: `${await siteOrigin()}/auth/callback`,
+      emailRedirectTo: `${siteOrigin()}/auth/callback`,
     },
   });
   if (error) {
