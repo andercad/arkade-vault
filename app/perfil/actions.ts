@@ -1,6 +1,7 @@
 "use server";
 
 import { createAuthActionClient, createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import {
   PASSWORD_ERROR,
   validatePassword,
@@ -11,6 +12,50 @@ const GENERIC_ERROR = "No se pudo completar la operación. Inténtalo de nuevo."
 const NO_SESSION = "Inicia sesión para continuar.";
 const RATE_LIMIT_ERROR =
   "Demasiados intentos. Espera unos minutos y vuelve a probar.";
+
+// SPEC 19: borra la cuenta del usuario de la sesión. El cascade (0010, 0013)
+// elimina su profiles y sus scores.
+export async function deleteAccount(formData: FormData): Promise<AuthResult> {
+  const confirm = String(formData.get("confirm") ?? "")
+    .trim()
+    .toUpperCase();
+
+  const supabase = await createClient();
+  const { data: userData } = await supabase.auth.getUser();
+  const user = userData.user;
+  if (!user) return { ok: false, error: NO_SESSION };
+
+  const { data: profile, error: profileError } = await supabase
+    .from("profiles")
+    .select("username")
+    .eq("id", user.id)
+    .maybeSingle();
+  if (profileError || !profile) {
+    if (profileError)
+      console.error("[perfil] Error al leer perfil:", profileError);
+    return { ok: false, error: GENERIC_ERROR };
+  }
+  if (!confirm || confirm !== profile.username) {
+    return { ok: false, error: "El usuario no coincide." };
+  }
+
+  try {
+    const { error } = await createAdminClient().auth.admin.deleteUser(user.id);
+    if (error) throw error;
+  } catch (err) {
+    console.error("[perfil] Error al eliminar la cuenta:", err);
+    return { ok: false, error: GENERIC_ERROR };
+  }
+
+  // El usuario ya no existe: solo limpia las cookies de esta sesión.
+  const { error: signOutError } = await supabase.auth.signOut({
+    scope: "local",
+  });
+  if (signOutError) {
+    console.error("[perfil] Error al limpiar la sesión:", signOutError);
+  }
+  return { ok: true };
+}
 
 // SPEC 19: el usuario sale siempre de la sesión (cookies), nunca del cliente.
 export async function changePassword(formData: FormData): Promise<AuthResult> {

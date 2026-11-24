@@ -4,7 +4,7 @@ import { useEffect, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { Avatar } from "@/components/avatar";
 import { useAuth } from "@/lib/auth";
-import { changePassword } from "@/app/perfil/actions";
+import { changePassword, deleteAccount } from "@/app/perfil/actions";
 
 // SPEC 19: cambio de contraseña desplegable (actual + nueva + repetir).
 function PasswordSection({ disabled }: { disabled: boolean }) {
@@ -252,7 +252,159 @@ export function ProfileForm() {
         >
           CERRAR SESIÓN
         </button>
+
+        <DangerZone
+          username={user.name}
+          disabled={pending}
+          onDeleted={async () => {
+            await signOut();
+            router.push("/?cuenta=eliminada");
+          }}
+        />
       </div>
+    </div>
+  );
+}
+
+// SPEC 19: eliminar cuenta, confirmando con el username en un modal.
+function DangerZone({
+  username,
+  disabled,
+  onDeleted,
+}: {
+  username: string;
+  disabled: boolean;
+  onDeleted: () => Promise<void>;
+}) {
+  const [open, setOpen] = useState(false);
+  const [confirm, setConfirm] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [pending, setPending] = useState(false);
+
+  const close = () => {
+    if (pending) return;
+    setOpen(false);
+    setConfirm("");
+    setError(null);
+  };
+
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && !pending) {
+        setOpen(false);
+        setConfirm("");
+        setError(null);
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open, pending]);
+
+  const matches = confirm.trim().toUpperCase() === username;
+
+  const submit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (pending) return;
+    if (!matches) return setError("El usuario no coincide.");
+    setError(null);
+    setPending(true);
+    let res;
+    try {
+      res = await deleteAccount(new FormData(e.currentTarget));
+    } catch {
+      res = {
+        ok: false as const,
+        error: "No se pudo completar la operación. Inténtalo de nuevo.",
+      };
+    }
+    if (!res.ok) {
+      setPending(false);
+      return setError(res.error);
+    }
+    await onDeleted();
+  };
+
+  return (
+    <div
+      style={{
+        marginTop: 28,
+        paddingTop: 18,
+        borderTop: "1px dashed var(--red)",
+      }}
+    >
+      <div
+        className="mono"
+        style={{
+          fontSize: 11,
+          color: "var(--red)",
+          letterSpacing: "0.16em",
+          marginBottom: 10,
+        }}
+      >
+        ZONA PELIGROSA
+      </div>
+      <button
+        type="button"
+        className="btn red"
+        style={{ width: "100%" }}
+        disabled={disabled}
+        onClick={() => setOpen(true)}
+      >
+        ELIMINAR CUENTA
+      </button>
+
+      {open && (
+        <div className="modal-bd" onClick={close}>
+          <form
+            className="modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="delete-title"
+            onClick={(e) => e.stopPropagation()}
+            onSubmit={submit}
+            noValidate
+          >
+            <h2 id="delete-title">ELIMINAR CUENTA</h2>
+            <p className="mono" style={{ fontSize: 13, lineHeight: 1.6 }}>
+              Esta acción es irreversible: se borran tu perfil y todas tus
+              puntuaciones.
+            </p>
+            {error && (
+              <div className="terminal-error" role="alert">
+                {error}
+              </div>
+            )}
+            <div className="field" style={{ textAlign: "left" }}>
+              <label htmlFor="delete-confirm">
+                Escribe tu usuario para confirmar
+              </label>
+              <input
+                id="delete-confirm"
+                name="confirm"
+                value={confirm}
+                onChange={(e) => setConfirm(e.target.value)}
+                autoComplete="off"
+                autoFocus
+                disabled={pending}
+              />
+            </div>
+            <div className="actions">
+              <button
+                type="button"
+                className="btn ghost"
+                disabled={pending}
+                onClick={close}
+              >
+                CANCELAR
+              </button>
+              <button type="submit" className="btn red" disabled={pending}>
+                {pending ? "ELIMINANDO…" : "ELIMINAR"}
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
     </div>
   );
 }
