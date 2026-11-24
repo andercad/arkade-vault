@@ -6,6 +6,8 @@
   - [x] Max signup rate — limitar signups por IP (anti-bot) (SPEC 17: 10 por 5 min por IP + `sb-forwarded-for`)
   - [x] Headers de seguridad en Next.js (SPEC 17: `next.config.ts`)
   - [x] Insert en `scores` solo con sesión (SPEC 18, migración `0013`): policy `scores insert usuario` (`to authenticated`, `user_id = (select auth.uid())`), `user_id not null`, FK `on delete cascade`; `anon` no puede insertar
+  - [x] Cambio de contraseña con re-autenticación (SPEC 19): `changePassword` exige la contraseña actual (verificada en servidor con `signInWithPassword`, cuenta en el rate limit por IP), usuario de la sesión, `signOut({ scope: "others" })` tras el cambio
+  - [x] Borrado de cuenta (SPEC 19): `auth.admin.deleteUser` solo en Server Action (`app/perfil/actions.ts`), id de `getUser()` (nunca del cliente), confirmación por username; el cascade limpia `profiles` y `scores`
 
   Ej:
 

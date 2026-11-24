@@ -26,7 +26,7 @@
 - `components/profile-form.tsx`:
   - Botón "CAMBIAR CONTRASEÑA" (solo si `hasPassword`) que despliega formulario: contraseña actual, nueva, repetir; `.terminal-error` / `.terminal-notice` "Contraseña actualizada."; al éxito se vacía y se pliega.
   - Orden: usuario → cambiar contraseña → SALIR / CERRAR SESIÓN → "Zona peligrosa" con botón ELIMINAR CUENTA (rojo).
-  - Modal de eliminar: aviso (irreversible, borra perfil y puntuaciones), input "Escribe tu usuario para confirmar", botón ELIMINAR habilitado solo si coincide con `user.name`; CANCELAR y `Esc` cierran. Éxito → `signOut()` de `useAuth` + `router.push("/?cuenta=eliminada")`.
+  - Modal de eliminar: aviso (irreversible, borra perfil y puntuaciones), input "Escribe tu usuario para confirmar", al pulsar ELIMINAR, si no coincide con `user.name` (sin distinguir mayúsculas) muestra "El usuario no coincide." y no llama al servidor; CANCELAR y `Esc` cierran. Éxito → `signOut()` de `useAuth` + `router.push("/?cuenta=eliminada")`.
 - Home: aviso "Cuenta eliminada" con `?cuenta=eliminada` (componente cliente con `useSearchParams` dentro de `Suspense`, compatible con `cacheComponents`).
 - `lib/supabase/admin.ts`: comentario (usos: `email_for_username` y `deleteUser`).
 - Docs: `CLAUDE.md` + `README.md` (SPEC 19, `/perfil`, admin), `references/security/security-checklist.md` (re-auth en cambio de contraseña, `deleteUser` solo servidor con usuario de la sesión), `.claude/agents/security-auditor.md` (checks equivalentes).
@@ -81,7 +81,7 @@ Mensajes:
    - Verificación: `tsc`/`lint` limpios; Playwright en `/perfil` con cuenta email: actual mala → "La contraseña actual no es correcta."; débil → `PASSWORD_ERROR`; repetir distinta → "no coinciden"; igual a la actual → mensaje; correcta → "Contraseña actualizada.", sigue con sesión; cerrar sesión y entrar con la nueva → OK, con la antigua → falla; con cuenta solo OAuth (o simulando `providers` sin `email`) el botón no aparece; llamar a la acción sin sesión → "Inicia sesión para continuar.".
 2. **Eliminar cuenta.**
    - `deleteAccount` en `app/perfil/actions.ts`; zona peligrosa + modal en `components/profile-form.tsx`; aviso en la home con `?cuenta=eliminada`; comentario de `lib/supabase/admin.ts`.
-   - Verificación: crear usuario de prueba en dev con alguna puntuación; Playwright: modal con ELIMINAR deshabilitado hasta escribir el username exacto (minúsculas también valen); CANCELAR/`Esc` cierran sin borrar; confirmar → home con "Cuenta eliminada", nav sin sesión; `execute_sql` (`SELECT`): 0 filas en `auth.users`, `profiles` y `scores` para ese id; volver a `/perfil` → `/login`; entrar con sus credenciales → falla; `confirm` manipulado en la acción → "El usuario no coincide." y nada borrado.
+   - Verificación: crear usuario de prueba en dev con alguna puntuación; Playwright: modal: username erróneo → "El usuario no coincide." al pulsar ELIMINAR (minúsculas también valen); CANCELAR/`Esc` cierran sin borrar; confirmar → home con "Cuenta eliminada", nav sin sesión; `execute_sql` (`SELECT`): 0 filas en `auth.users`, `profiles` y `scores` para ese id; volver a `/perfil` → `/login`; entrar con sus credenciales → falla; `confirm` manipulado en la acción → "El usuario no coincide." y nada borrado.
 3. **Docs y cierre.**
    - `CLAUDE.md`, `README.md`, `security-checklist.md`, `security-auditor.md` según Alcance; Estado → Implementado.
    - Verificación: `npm run build` OK; grep de `SUPABASE_SECRET_KEY`/`createAdminClient` solo en archivos `server-only`/Server Actions; todos los criterios marcados.
@@ -96,7 +96,7 @@ Un commit por paso (`19-perfil-contrasena-y-borrar-cuenta: Paso N`). Al final, p
 - [ ] El cambio exige la contraseña actual correcta, nueva con la regla de SPEC 17 y repetir igual; cada fallo muestra su mensaje.
 - [ ] Tras cambiarla, la nueva sirve para entrar y la antigua no; la sesión actual sigue abierta y las de otros dispositivos se cierran.
 - [ ] Intentos con contraseña actual errónea cuentan en el rate limit de Auth (mensaje "Demasiados intentos…").
-- [ ] ELIMINAR CUENTA abre un modal; el botón de confirmar solo se habilita al escribir el username; CANCELAR/`Esc` no borra nada.
+- [ ] ELIMINAR CUENTA abre un modal; confirmar con un username distinto muestra "El usuario no coincide." y no borra; CANCELAR/`Esc` no borra nada.
 - [ ] Al confirmar, desaparecen el usuario de `auth.users`, su fila de `profiles` y todas sus `scores`; queda sin sesión en la home con aviso "Cuenta eliminada".
 - [ ] Las Server Actions toman el usuario de la sesión, no del cliente; sin sesión devuelven error.
 - [ ] `SUPABASE_SECRET_KEY` no aparece en el bundle cliente.
