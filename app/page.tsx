@@ -1,4 +1,6 @@
+import { Suspense } from "react";
 import Link from "next/link";
+import { AccountDeletedNotice } from "@/components/home/account-deleted-notice";
 import { ActivitySection } from "@/components/home/activity-section";
 import { FeaturesSection } from "@/components/home/features-section";
 import { FinalCtaSection } from "@/components/home/final-cta-section";
@@ -10,6 +12,9 @@ import { StatsSection } from "@/components/home/stats-section";
 export default function Home() {
   return (
     <div className="home fade-in">
+      <Suspense fallback={null}>
+        <AccountDeletedNotice />
+      </Suspense>
       {/* HERO */}
       <section className="home-hero">
         <FloatingSilhouettes />

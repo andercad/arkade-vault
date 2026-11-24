@@ -21,6 +21,7 @@ export interface User {
   id: string;
   name: string; // profiles.username
   avatarUrl: string | null; // foto de la red social; null → iniciales
+  hasPassword: boolean; // app_metadata.providers incluye "email" (SPEC 19)
 }
 
 interface AuthContextValue {
@@ -48,6 +49,9 @@ async function toUser(authUser: SupabaseUser): Promise<User> {
     name: data?.username ?? "PLAYER",
     avatarUrl:
       typeof photo === "string" && /^https:\/\//.test(photo) ? photo : null,
+    hasPassword:
+      Array.isArray(authUser.app_metadata?.providers) &&
+      authUser.app_metadata.providers.includes("email"),
   };
 }
 

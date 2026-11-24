@@ -3,6 +3,8 @@ import { createClient } from "@supabase/supabase-js";
 import type { Database } from "./database.types";
 
 // Cliente con service_role: solo servidor. Nunca importar desde componentes cliente.
+// Usos: `email_for_username` (login por usuario, SPEC 16) y `auth.admin.deleteUser`
+// (eliminar cuenta, SPEC 19; el id sale siempre de la sesión, nunca del cliente).
 export function createAdminClient() {
   const secretKey = process.env.SUPABASE_SECRET_KEY;
   if (!secretKey) {

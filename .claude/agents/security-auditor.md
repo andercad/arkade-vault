@@ -36,9 +36,10 @@ Eres el auditor de seguridad de Arcade Vault. Revisas la **BD Supabase** y la **
 4. **Checks de app** (Grep/Read/Bash):
    - `.env*` fuera de git (`git ls-files`); ningún secreto con prefijo `NEXT_PUBLIC_`.
    - `SUPABASE_SECRET_KEY`/`sb_secret` ausentes de archivos `"use client"` y de `.next/static` (si existe build).
-   - `import "server-only"` en `lib/supabase/admin.ts` y en `lib/supabase/server.ts`; `createAuthActionClient`/admin usados solo en `app/login/actions.ts` para `auth.*` y `email_for_username`, nunca para consultas de datos.
+   - `import "server-only"` en `lib/supabase/admin.ts` y en `lib/supabase/server.ts`; `createAuthActionClient`/admin usados solo en `app/login/actions.ts` y `app/perfil/actions.ts` para `auth.*`, `email_for_username` y `deleteUser`, nunca para consultas de datos.
    - `next.config.ts`: `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy: strict-origin-when-cross-origin` en `/(.*)`. Con dev server activo: `curl -I` de `/` y `/juegos/asteroids/jugar`.
    - `proxy.ts`: `PROTECTED_ROUTES` incluye `/perfil`, refresca sesión y copia cookies a la redirección; con dev server: `curl -I /perfil` sin cookie → 307 a `/login`.
+   - SPEC 19 (`app/perfil/actions.ts`): `changePassword` exige la actual y la verifica con `signInWithPassword` antes de `updateUser`, y llama a `signOut({ scope: "others" })`; `deleteAccount` toma el id de `getUser()` (nunca de `FormData`), compara el username con `profiles` y es el único uso de `auth.admin.deleteUser`; sin sesión ambas devuelven error.
    - `lib/auth-validation.ts`: contraseña ≥8 con minúscula, mayúscula, dígito y símbolo (misma regla que Supabase); usada en registro y `/auth/reset-password`.
    - Server Actions validan entrada; `app/auth/callback/route.ts` sin open redirect (solo rutas internas); sin `dangerouslySetInnerHTML` con datos de usuario; sin `console.log` de tokens/emails.
    - `npm audit --omit=dev`: reporta high/critical.
