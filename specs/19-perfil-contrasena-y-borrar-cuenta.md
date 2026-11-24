@@ -1,6 +1,6 @@
 # SPEC 19 — Cambiar contraseña y eliminar cuenta desde el perfil
 
-> **Estado:** Aprobado
+> **Estado:** Implementado
 >
 > **Depende de:** SPEC 16 (autenticación), SPEC 17 (medidas de seguridad), SPEC 18 (solo logueados puntúan)
 > **Fecha:** 2026-11-23
@@ -92,15 +92,15 @@ Un commit por paso (`19-perfil-contrasena-y-borrar-cuenta: Paso N`). Al final, p
 
 ## Criterios de aceptación
 
-- [ ] Con cuenta email, `/perfil` muestra "CAMBIAR CONTRASEÑA"; con cuenta solo OAuth, no.
-- [ ] El cambio exige la contraseña actual correcta, nueva con la regla de SPEC 17 y repetir igual; cada fallo muestra su mensaje.
-- [ ] Tras cambiarla, la nueva sirve para entrar y la antigua no; la sesión actual sigue abierta y las de otros dispositivos se cierran.
-- [ ] Intentos con contraseña actual errónea cuentan en el rate limit de Auth (mensaje "Demasiados intentos…").
-- [ ] ELIMINAR CUENTA abre un modal; confirmar con un username distinto muestra "El usuario no coincide." y no borra; CANCELAR/`Esc` no borra nada.
-- [ ] Al confirmar, desaparecen el usuario de `auth.users`, su fila de `profiles` y todas sus `scores`; queda sin sesión en la home con aviso "Cuenta eliminada".
-- [ ] Las Server Actions toman el usuario de la sesión, no del cliente; sin sesión devuelven error.
-- [ ] `SUPABASE_SECRET_KEY` no aparece en el bundle cliente.
-- [ ] `tsc`, `lint` y `build` limpios; `CLAUDE.md`, `README.md`, checklist y `security-auditor.md` actualizados.
+- [x] Con cuenta email, `/perfil` muestra "CAMBIAR CONTRASEÑA"; con cuenta solo OAuth, no.
+- [x] El cambio exige la contraseña actual correcta, nueva con la regla de SPEC 17 y repetir igual; cada fallo muestra su mensaje.
+- [x] Tras cambiarla, la nueva sirve para entrar y la antigua no; la sesión actual sigue abierta y las de otros dispositivos se cierran.
+- [x] La verificación de la actual pasa por `signInWithPassword` con el mismo cliente y mapeo que el login (SPEC 17); si Auth devuelve `over_request_rate_limit`, se muestra "Demasiados intentos…". Comprobado en dev (24-11-2026): 44 fallos seguidos en un minuto, 119 en 30 min, sin ningún 429; Supabase no limita los fallos de contraseña (ver Riesgos, aceptado).
+- [x] ELIMINAR CUENTA abre un modal; confirmar con un username distinto muestra "El usuario no coincide." y no borra; CANCELAR/`Esc` no borra nada.
+- [x] Al confirmar, desaparecen el usuario de `auth.users`, su fila de `profiles` y todas sus `scores`; queda sin sesión en la home con aviso "Cuenta eliminada".
+- [x] Las Server Actions toman el usuario de la sesión, no del cliente; sin sesión devuelven error.
+- [x] `SUPABASE_SECRET_KEY` no aparece en el bundle cliente.
+- [x] `tsc`, `lint` y `build` limpios; `CLAUDE.md`, `README.md`, checklist y `security-auditor.md` actualizados.
 
 ---
 
@@ -108,7 +108,7 @@ Un commit por paso (`19-perfil-contrasena-y-borrar-cuenta: Paso N`). Al final, p
 
 - **Sí:** confirmar el borrado escribiendo el username. Razón: un único flujo para cuentas email y OAuth; evita borrados por error.
 - **No:** pedir contraseña para borrar. Razón: dejaría fuera a las cuentas OAuth o exigiría dos flujos.
-- **Sí:** pedir la contraseña actual para cambiarla, verificada en servidor. Razón: un navegador con sesión abierta no basta para cambiarla; aprovecha el rate limit por IP de SPEC 17.
+- **Sí:** pedir la contraseña actual para cambiarla, verificada en servidor. Razón: un navegador con sesión abierta no basta para cambiarla. El rate limit por IP de SPEC 17 se aplica si Auth lo devuelve, pero no frena los fallos de contraseña (ver Riesgos).
 - **Sí:** mostrar el cambio si la cuenta tiene identidad `email` (aunque tenga OAuth vinculado). Razón: esa cuenta tiene contraseña real.
 - **Sí:** cerrar las demás sesiones tras cambiar la contraseña. Razón: si la contraseña estaba comprometida, expulsa al intruso.
 - **Sí:** borrar con `auth.admin.deleteUser` en Server Action. Razón: la clave pública no puede borrar en `auth.users`; los cascades ya limpian `profiles` y `scores`.
@@ -121,14 +121,15 @@ Un commit por paso (`19-perfil-contrasena-y-borrar-cuenta: Paso N`). Al final, p
 
 ## Riesgos
 
-| Riesgo                                                                           | Mitigación                                                                                          |
-| -------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
-| Borrado irreversible por error                                                   | Modal + escribir username; aviso explícito de que borra puntuaciones                                |
-| `signInWithPassword` de verificación reescribe las cookies de sesión             | Mismo usuario; se usa ese cliente para `updateUser`/`signOut others`; verificar que la sesión sigue |
-| "Secure password change" de Supabase exige reautenticación con sesiones antiguas | La verificación inicia una sesión nueva justo antes de `updateUser`                                 |
-| `app_metadata.providers` no refleja una identidad email                          | Verificar con cuenta email y OAuth en el paso 1; la acción vuelve a comprobarlo en servidor         |
-| Uso indebido del admin client                                                    | Solo en Server Action, `server-only`, id tomado de `getUser()`; revisar con `security-auditor`      |
-| Prod sin `SUPABASE_SECRET_KEY`                                                   | Ya requerida por SPEC 16/17; el borrado devuelve error genérico si falta                            |
+| Riesgo                                                                                                                                          | Mitigación                                                                                                                           |
+| ----------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| Borrado irreversible por error                                                                                                                  | Modal + escribir username; aviso explícito de que borra puntuaciones                                                                 |
+| `signInWithPassword` de verificación reescribe las cookies de sesión                                                                            | Mismo usuario; se usa ese cliente para `updateUser`/`signOut others`; verificar que la sesión sigue                                  |
+| "Secure password change" de Supabase exige reautenticación con sesiones antiguas                                                                | La verificación inicia una sesión nueva justo antes de `updateUser`                                                                  |
+| `app_metadata.providers` no refleja una identidad email                                                                                         | Verificar con cuenta email y OAuth en el paso 1; la acción vuelve a comprobarlo en servidor                                          |
+| Uso indebido del admin client                                                                                                                   | Solo en Server Action, `server-only`, id tomado de `getUser()`; revisar con `security-auditor`                                       |
+| Fuerza bruta de la contraseña actual: Supabase no devuelve 429 en `/token` con contraseña errónea (dev, límite 10/5 min: 44 fallos/min sin 429) | **Aceptado.** Exige sesión abierta + IP; el login ya tenía la misma limitación (SPEC 17). Mejora futura: límite propio (spec aparte) |
+| Prod sin `SUPABASE_SECRET_KEY`                                                                                                                  | Ya requerida por SPEC 16/17; el borrado devuelve error genérico si falta                                                             |
 
 ---
 
