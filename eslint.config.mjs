@@ -14,6 +14,8 @@ const eslintConfig = defineConfig([
     "next-env.d.ts",
     // Prototipo HTML/JSX de referencia, no es código de la app.
     "references/**",
+    // App Angular (SPEC 24): tiene su propio ESLint.
+    "angular/**",
   ]),
 ]);
 

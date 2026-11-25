@@ -46,3 +46,8 @@ supabase/.temp/
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# angular (SPEC 24)
+/angular/.angular/
+/angular/dist/
+/angular/node_modules/
