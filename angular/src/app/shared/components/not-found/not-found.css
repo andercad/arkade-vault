@@ -1,0 +1,15 @@
+.nf {
+  text-align: center;
+  padding: 80px 24px;
+}
+
+.nf-title {
+  color: var(--ink-faint);
+  font-size: 14px;
+  margin: 0 0 16px;
+}
+
+.nf-hint {
+  color: var(--ink-dim);
+  margin: 0 0 24px;
+}

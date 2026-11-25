@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 import type { TouchControls, TouchDirection } from '@/lib/game-engine';
-import { PadButtonComponent } from './touch-pad-button';
+import { PadButtonComponent } from '../touch-pad-button/touch-pad-button';
 
 const DIRECTIONS: TouchDirection[] = ['up', 'left', 'right', 'down'];
 

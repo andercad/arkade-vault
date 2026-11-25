@@ -13,7 +13,12 @@
     "importHelpers": true,
     "target": "ES2022",
     "module": "preserve",
-    "paths": { "@/lib/*": ["../lib/*"], "@shared/*": ["./src/app/shared/*"] }
+    "paths": {
+      "@/lib/*": ["../lib/*"],
+      "@shared/*": ["./src/app/shared/*"],
+      "@play/*": ["./src/app/play/*"],
+      "@not-found/*": ["./src/app/not-found/*"]
+    }
   },
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,

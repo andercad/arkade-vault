@@ -3,7 +3,7 @@ import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { Observable, Subject, of, throwError } from 'rxjs';
 import type { Game } from '@/lib/games';
-import { GamesService } from '../games.service';
+import { GamesService } from '@shared/services/games.service';
 import { GamePlayerComponent } from '@shared/components/game-player/game-player';
 import { PlayPageComponent } from './play-page';
 
