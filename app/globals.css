@@ -744,9 +744,10 @@ a {
   letter-spacing: 0.2em;
 }
 .btn.pulse {
-  animation: pulse 1.6s ease-in-out infinite;
+  animation: btn-pulse 1.6s ease-in-out infinite;
 }
-@keyframes pulse {
+/* "btn-pulse": Tailwind 4 define su propio @keyframes pulse y pisaba este */
+@keyframes btn-pulse {
   0%,
   100% {
     box-shadow:

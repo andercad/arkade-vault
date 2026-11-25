@@ -99,7 +99,10 @@ async function GameDetail({
             </div>
           </div>
           <div className="detail-actions">
-            <Link href={`/juegos/${game.id}/jugar`} className="btn xl pulse">
+            <Link
+              href={`/juegos/${game.id}/jugar`}
+              className={"btn xl pulse " + game.color}
+            >
               ▶ JUGAR AHORA
             </Link>
             <Link href="/juegos" className="btn ghost lg">
