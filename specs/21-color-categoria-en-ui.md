@@ -1,6 +1,6 @@
 # SPEC 21 — Color de categoría en la UI
 
-> **Estado:** Aprobado
+> **Estado:** Implementado
 > **Depende de:** SPEC 02 (homepage), SPEC 06 (leaderboard y juegos), SPEC 15 (colores por categoría)
 > **Fecha:** 2026-11-24
 > **Objetivo:** Que la etiqueta de categoría, el título del juego en la actividad, los chips de filtro y el botón JUGAR de la ficha usen el color de la categoría del juego, y que el nombre de usuario en la actividad tenga un color único.
@@ -117,14 +117,14 @@ Nota (descubierta en el Paso 3): Tailwind 4 define su propio `@keyframes pulse {
 
 ## Criterios de aceptación
 
-- [ ] Etiqueta de categoría en tarjeta de biblioteca, mini-card de home y ficha usa el color de su categoría.
-- [ ] En "Últimas puntuaciones" todos los nombres de usuario tienen el mismo color (`--ink`) y el título del juego usa el color de su categoría.
-- [ ] "▶ JUGAR AHORA" de la ficha tiene borde, hover y pulse en el color del juego.
-- [ ] Chips de categoría del filtro en su color; activo con borde y glow de su color; TODOS activo en blanco (no comparte color con ninguna categoría).
-- [ ] Botones `.btn.pulse` sin clase de color siguen pulsando en cian.
-- [ ] Hover de la tarjeta de biblioteca (borde, sombra y degradado de esquina) en el color de su categoría.
-- [ ] Ningún color hardcodeado por juego: todo sale de `game.color` / `CATEGORY_COLOR`.
-- [ ] `tsc`, `lint`, `build` limpios; CLAUDE.md y README.md mencionan SPEC 21.
+- [x] Etiqueta de categoría en tarjeta de biblioteca, mini-card de home y ficha usa el color de su categoría.
+- [x] En "Últimas puntuaciones" todos los nombres de usuario tienen el mismo color (`--ink`) y el título del juego usa el color de su categoría.
+- [x] "▶ JUGAR AHORA" de la ficha tiene borde, hover y pulse en el color del juego.
+- [x] Chips de categoría del filtro en su color; activo con borde y glow de su color; TODOS activo en blanco (no comparte color con ninguna categoría).
+- [x] Botones `.btn.pulse` sin clase de color siguen pulsando en cian.
+- [x] Hover de la tarjeta de biblioteca (borde, sombra y degradado de esquina) en el color de su categoría.
+- [x] Ningún color hardcodeado por juego: todo sale de `game.color` / `CATEGORY_COLOR`.
+- [x] `tsc`, `lint`, `build` limpios; CLAUDE.md y README.md mencionan SPEC 21.
 
 ---
 
