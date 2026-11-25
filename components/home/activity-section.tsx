@@ -33,8 +33,8 @@ async function RecentCard() {
               className="tick-row"
               style={{ animationDelay: i * 60 + "ms" }}
             >
-              <span className={"tk-p neon-" + r.color}>{r.player}</span>
-              <span className="tk-mid">▸ {r.gameTitle}</span>
+              <span className="tk-p">{r.player}</span>
+              <span className={"tk-mid neon-" + r.color}>▸ {r.gameTitle}</span>
               <span className="tk-s">+{r.score.toLocaleString("es-ES")}</span>
               <span className="tk-t">{timeAgo(r.createdAt)}</span>
             </div>
