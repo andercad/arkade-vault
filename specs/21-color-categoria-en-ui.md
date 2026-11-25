@@ -26,7 +26,7 @@
 - `components/home/mini-card.tsx`: `.mini-cat` en el color del juego.
 - `app/juegos/[id]/page.tsx`: tag de categoría (primer `span` de `.detail-tags`) en color/borde del juego; botón "▶ JUGAR AHORA" → `btn xl pulse <color>` con pulse en el color del juego.
 - `components/home/activity-section.tsx`: `tk-p` sin `neon-<color>`, color `--ink` fijo; `tk-mid` ("▸ TÍTULO") en `neon-<color>`.
-- `components/library.tsx`: cada chip de categoría con `accent-<CATEGORY_COLOR[c]>` → texto en su color; activo con borde y glow de su color; `TODOS` sigue magenta.
+- `components/library.tsx`: cada chip de categoría con `accent-<CATEGORY_COLOR[c]>` → texto en su color; activo con borde y glow de su color; `TODOS` activo en blanco (`--ink`, clase `chip-all`), no en magenta (evita confundirlo con SHOOTER).
 - `CLAUDE.md` (SPEC 21 en la lista) + `README.md` sincronizado.
 
 **Fuera:**
@@ -85,7 +85,7 @@ CSS nuevo (patrón):
    - Verificación: Playwright en `/`: todos los `.tk-p` mismo color computado; cada `.tk-mid` en el color de su juego; captura `spec21-actividad.png` (escritorio y 390×844).
 5. **Chips del filtro.**
    - `library.tsx`: clase `accent-<CATEGORY_COLOR[c]>` en chips ≠ TODOS.
-   - Verificación: `/juegos` chip ARCADE verde, PUZZLE cian, SHOOTER magenta; al activarlo, borde y glow de su color; TODOS activo magenta; filtrado sin cambios.
+   - Verificación: `/juegos` chip ARCADE verde, PUZZLE cian, SHOOTER magenta; al activarlo, borde y glow de su color; TODOS activo blanco (`--ink`); pestañas del Salón de la fama siguen magenta; filtrado sin cambios.
 6. **Docs y cierre.**
    - `CLAUDE.md` lista de specs + `README.md`; Estado → Implementado.
    - Verificación: `npx tsc --noEmit`, `npm run lint`, `npm run build` OK.
@@ -97,7 +97,7 @@ CSS nuevo (patrón):
 - [ ] Etiqueta de categoría en tarjeta de biblioteca, mini-card de home y ficha usa el color de su categoría.
 - [ ] En "Últimas puntuaciones" todos los nombres de usuario tienen el mismo color (`--ink`) y el título del juego usa el color de su categoría.
 - [ ] "▶ JUGAR AHORA" de la ficha tiene borde, hover y pulse en el color del juego.
-- [ ] Chips de categoría del filtro en su color; activo con borde y glow de su color; TODOS sin cambios.
+- [ ] Chips de categoría del filtro en su color; activo con borde y glow de su color; TODOS activo en blanco (no comparte color con ninguna categoría).
 - [ ] Botones `.btn.pulse` sin clase de color siguen pulsando en cian.
 - [ ] Ningún color hardcodeado por juego: todo sale de `game.color` / `CATEGORY_COLOR`.
 - [ ] `tsc`, `lint`, `build` limpios; CLAUDE.md y README.md mencionan SPEC 21.
@@ -111,7 +111,7 @@ CSS nuevo (patrón):
 - **Sí:** usuario en `--ink` (blanco). Razón: neutro, coherente con TOP JUGADORES; el color queda para el juego.
 - **Sí:** pulse del color del juego vía `--accent`. Razón: evitar borde de un color con brillo cian.
 - **Sí:** variable CSS `--accent` + `.accent-<color>`. Razón: una regla por componente en vez de 11 variantes por selector; reutilizable.
-- **Sí:** chips del filtro con color de categoría; TODOS magenta. Razón: refuerza la asociación categoría ↔ color.
+- **Sí:** chips del filtro con color de categoría; TODOS activo en blanco (`--ink`) en vez de magenta. Razón: refuerza la asociación categoría ↔ color y evita dos magentas (SHOOTER y TODOS). Blanco y no `--gold`/`--bronze`, que se parecen a yellow/orange. Clase propia `chip-all` para no tocar `.chip.active` del Salón de la fama.
 - **No:** h2 de la ficha, salón de la fama, HUD. Razón: fuera de lo pedido; spec futura si se quiere.
 
 ---

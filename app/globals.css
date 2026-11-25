@@ -918,6 +918,20 @@ a {
 .chip:hover:not(.active) {
   color: var(--ink);
 }
+/* SPEC 21: chips de categoría en el color de su categoría (TODOS sin accent-) */
+.chip[class*="accent-"] {
+  color: var(--accent);
+}
+/* TODOS: blanco, distinto de cualquier categoría */
+.chip-all.active {
+  color: var(--ink);
+  border-color: var(--ink);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--ink) 35%, transparent);
+}
+.chip.active[class*="accent-"] {
+  border-color: var(--accent);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--accent) 35%, transparent);
+}
 
 /* ===== grid + cards ===== */
 .av-grid {
