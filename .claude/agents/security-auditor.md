@@ -37,6 +37,8 @@ Eres el auditor de seguridad de Arcade Vault. Revisas la **BD Supabase** y la **
    - `.env*` fuera de git (`git ls-files`); ningún secreto con prefijo `NEXT_PUBLIC_`.
    - `SUPABASE_SECRET_KEY`/`sb_secret` ausentes de archivos `"use client"` y de `.next/static` (si existe build).
    - `import "server-only"` en `lib/supabase/admin.ts` y en `lib/supabase/server.ts`; `createAuthActionClient`/admin usados solo en `app/login/actions.ts` y `app/perfil/actions.ts` para `auth.*`, `email_for_username` y `deleteUser`, nunca para consultas de datos.
+   - SPEC 20: `clientIp()` (`lib/supabase/server.ts`) no usa la primera entrada de `x-forwarded-for`; `siteOrigin()` (`app/login/actions.ts`) usa `NEXT_PUBLIC_SITE_URL` y no `Origin`/`Host`; el callback detecta PKCE por `error.code`/`error.name`; `npm run check:secret-client` pasa.
+   - **Riesgo aceptado (SPEC 20), no reportar como hallazgo nuevo:** `signUp` revela si un usuario o correo ya existe (decisión de UX; `signIn` no enumera).
    - `next.config.ts`: `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy: strict-origin-when-cross-origin` en `/(.*)`. Con dev server activo: `curl -I` de `/` y `/juegos/asteroids/jugar`.
    - `proxy.ts`: `PROTECTED_ROUTES` incluye `/perfil`, refresca sesión y copia cookies a la redirección; con dev server: `curl -I /perfil` sin cookie → 307 a `/login`.
    - SPEC 19 (`app/perfil/actions.ts`): `changePassword` exige la actual y la verifica con `signInWithPassword` antes de `updateUser`, y llama a `signOut({ scope: "others" })`; `deleteAccount` toma el id de `getUser()` (nunca de `FormData`), compara el username con `profiles` y es el único uso de `auth.admin.deleteUser`; sin sesión ambas devuelven error.

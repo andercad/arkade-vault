@@ -18,7 +18,12 @@ export async function GET(request: NextRequest) {
     // Sin verificador PKCE = el enlace se abrió en otro navegador/dispositivo
     // que el del registro. Supabase ya confirmó el email antes de redirigir
     // aquí, así que la cuenta está lista: solo falta iniciar sesión.
-    if (/code verifier/i.test(error.message)) {
+    // SPEC 20: por código/nombre de error del SDK (AuthPKCECodeVerifierMissingError,
+    // auth-js 2.119), no por el texto del mensaje.
+    if (
+      error.code === "pkce_code_verifier_not_found" ||
+      error.name === "AuthPKCECodeVerifierMissingError"
+    ) {
       return NextResponse.redirect(`${origin}/login?confirmed=1`);
     }
     return failure;

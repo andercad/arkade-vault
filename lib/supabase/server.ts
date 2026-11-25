@@ -39,20 +39,26 @@ export async function createClient() {
   );
 }
 
-// IP del jugador: primera entrada de x-forwarded-for, o x-real-ip.
+// SPEC 20: IP del jugador solo de cabeceras que fija el proxy de confianza (Vercel).
+// Orden: x-vercel-forwarded-for, x-real-ip, ÚLTIMA entrada de x-forwarded-for.
+// La primera entrada de x-forwarded-for la controla el cliente (falsificable).
+// Sin ninguna → null (no se envía `sb-forwarded-for`).
 async function clientIp(): Promise<string | null> {
   const h = await headers();
+  const forwarded = h.get("x-forwarded-for")?.split(",");
   return (
-    h.get("x-forwarded-for")?.split(",")[0]?.trim() ||
-    h.get("x-real-ip") ||
+    h.get("x-vercel-forwarded-for")?.trim() ||
+    h.get("x-real-ip")?.trim() ||
+    forwarded?.[forwarded.length - 1]?.trim() ||
     null
   );
 }
 
 // SPEC 17: cliente SOLO para llamadas `auth.*` de Server Actions (signUp/signIn).
-// Usa la clave secreta + `sb-forwarded-for` para que el rate limit de Auth cuente
-// la IP del jugador y no la del servidor. La clave secreta SALTA RLS: nunca usar
-// este cliente para consultas de datos (`.from()`/`.rpc()`); para eso, `createClient`.
+// Usa la clave secreta + `sb-forwarded-for` (IP de `clientIp()`, SPEC 20) para que
+// el rate limit de Auth cuente la IP del jugador y no la del servidor. La clave
+// secreta SALTA RLS: nunca usar este cliente para consultas de datos
+// (`.from()`/`.rpc()`); para eso, `createClient`.
 export async function createAuthActionClient() {
   const secretKey = process.env.SUPABASE_SECRET_KEY;
   if (!secretKey) {

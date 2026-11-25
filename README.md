@@ -25,7 +25,7 @@ Juegos jugables: Asteroids, Tetris, Arkanoid, Snake y Frogger, cada uno con moto
 
 Rutas: `/` home · `/juegos` biblioteca · `/juegos/[id]` detalle · `/juegos/[id]/jugar` (el menú de fin enlaza a `/salon-de-la-fama?juego=<id>`; el estado del reproductor se reinicia al salir) · `/salon-de-la-fama` (`?juego=<id>` elige la pestaña inicial) · `/login` (SPEC 16: email o usuario + contraseña, Google/GitHub, recuperar contraseña, invitado) · `/perfil` (avatar, cambio de username, cambio de contraseña y eliminar cuenta (SPEC 19); el avatar del nav abre el menú Perfil / Cerrar sesión) · `/auth/callback` · `/auth/reset-password` · `/about` (contacto con Resend).
 
-Autenticación (SPEC 16): Supabase Auth con confirmación de email, perfil `profiles` (username único, editable en `/perfil`; avatar con la foto de la red social o iniciales) y `scores.user_id` (SPEC 18: `not null`; solo los jugadores con sesión guardan puntuación, el invitado juega pero no guarda; si se borra el usuario, sus puntuaciones se borran en cascada, migración `0013`). `proxy.ts` refresca la sesión y (SPEC 17) redirige `/perfil` a `/login` sin sesión (`PROTECTED_ROUTES`). Env nueva: `SUPABASE_SECRET_KEY` (solo servidor; en `.env.local`, nunca `NEXT_PUBLIC_`). En el panel de Supabase: "Confirm email" activado, proveedores Google/GitHub y Redirect URLs `http://localhost:3000/auth/callback` y `/auth/reset-password`.
+Autenticación (SPEC 16): Supabase Auth con confirmación de email, perfil `profiles` (username único, editable en `/perfil`; avatar con la foto de la red social o iniciales) y `scores.user_id` (SPEC 18: `not null`; solo los jugadores con sesión guardan puntuación, el invitado juega pero no guarda; si se borra el usuario, sus puntuaciones se borran en cascada, migración `0013`). `proxy.ts` refresca la sesión y (SPEC 17) redirige `/perfil` a `/login` sin sesión (`PROTECTED_ROUTES`). Env nueva: `SUPABASE_SECRET_KEY` (solo servidor; en `.env.local`, nunca `NEXT_PUBLIC_`) y, desde SPEC 20, `NEXT_PUBLIC_SITE_URL` (origen público sin `/` final; fija el enlace del email de confirmación; obligatoria en producción, en dev `http://localhost:3000`). La IP del jugador para el rate limit se toma de `x-vercel-forwarded-for`/`x-real-ip`/última entrada de `x-forwarded-for`. En el panel de Supabase: "Confirm email" activado, proveedores Google/GitHub y Redirect URLs `http://localhost:3000/auth/callback` y `/auth/reset-password`.
 
 Lista detallada de juegos (desde la BD): `references/implemented-games.md`.
 
@@ -54,6 +54,7 @@ Cachés de canvas `lib/canvas-cache.ts` (capa estática y sprites con glow, SPEC
 - `npm run dev` — dev server (Turbopack)
 - `npm run build` / `npm start` — production build / serve
 - `npm run lint` — ESLint (flat config, `eslint.config.mjs`)
+- `npm run check:secret-client` — falla si `createAuthActionClient` (clave secreta) se usa con `.from(`/`.rpc(` en `app/` o `lib/` (SPEC 20)
 - `npm run perf` — mide FPS y JS/frame de los 5 juegos × skins con CPU ×1/×6 (Playwright, Chromium con ventana; requiere `npm run dev` activo; `PERF_URL`, `PERF_GAMES=a,b`, `PERF_HEADLESS=1`); sale con código 1 si algún caso con ×6 queda <58 FPS (SPEC 14)
 - No test runner configured.
 
@@ -93,6 +94,7 @@ Luego abre `http://192.168.1.50:3000` en el móvil (la IP sale de `ipconfig`). R
 | `17-medidas-seguridad.md`                      | Seguridad básica: migración `0012`, contraseña fuerte, reenvío de IP en Auth, headers y `/perfil` protegido en `proxy.ts` |
 | `18-solo-logueados-puntuan.md`                 | Solo con sesión se guarda puntuación: migración `0013`, `user_id not null`, cascade, el invitado juega sin guardar        |
 | `19-perfil-contrasena-y-borrar-cuenta.md`      | Cambiar contraseña (con la actual) y eliminar cuenta desde `/perfil`, sin migración                                       |
+| `20-endurecer-auth-ip-origen-pkce.md`          | Endurece auth: IP de cabecera fiable, origen fijo con `NEXT_PUBLIC_SITE_URL`, PKCE por código, control de clave secreta  |
 | `game-jam/frogger/01-frogger-core.md`          | Frogger: motor TS en `lib/frogger/` (carretera, río, casas, vidas, tiempo)                                                |
 | `game-jam/frogger/02-frogger-platform.md`      | Frogger en la plataforma: registro, migración `0008`, portada, pausa (botón + `P`/`Esc`) y guardado                       |
 | `game-jam/frogger/03-frogger-hazards-audio.md` | Frogger: peligros extra y audio (pendiente de implementar)                                                                |

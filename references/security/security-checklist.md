@@ -10,6 +10,12 @@
   - [ ] Límite de intentos con contraseña errónea — **aceptado (SPEC 19)**: Supabase Auth no devuelve 429 en `/token` (password) aunque el panel tenga 10/5 min (dev: 44 fallos en 1 min, 0 × 429). Afecta a login y cambio de contraseña; mejora futura: límite propio
   - [x] Borrado de cuenta (SPEC 19): `auth.admin.deleteUser` solo en Server Action (`app/perfil/actions.ts`), id de `getUser()` (nunca del cliente), confirmación por username; el cascade limpia `profiles` y `scores`
 
+  - [x] IP del jugador de cabecera fiable (SPEC 20): `clientIp()` usa `x-vercel-forwarded-for`, `x-real-ip` o la **última** entrada de `x-forwarded-for` (la primera es falsificable); sin ninguna no se envía `sb-forwarded-for`
+  - [x] Origen fijo del enlace de confirmación (SPEC 20): `siteOrigin()` usa `NEXT_PUBLIC_SITE_URL` (obligatoria en prod, fallback `http://localhost:3000` solo en dev), nunca `Origin`/`Host`
+  - [x] PKCE por código de error (SPEC 20): el callback detecta `pkce_code_verifier_not_found` / `AuthPKCECodeVerifierMissingError`, no el texto del mensaje
+  - [x] Clave secreta solo para `auth.*` (SPEC 20): `npm run check:secret-client` falla si el cliente de `createAuthActionClient` usa `.from(`/`.rpc(` en `app/` o `lib/`
+  - [ ] Enumeración de cuentas en `signUp` ("Ese usuario ya existe", "Ese correo ya está registrado") — **riesgo aceptado (SPEC 20)**: UX clara, sin datos sensibles; `signIn` no enumera. Mejora futura: mensajes genéricos
+
   Ej:
 
 ```ts

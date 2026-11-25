@@ -34,9 +34,12 @@ Solo contexto **Production**; en Deploy Previews usar las claves de dev.
 | `NEXT_PUBLIC_SUPABASE_URL`             | `https://<PROD_REF>.supabase.co`                       |
 | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | publishable key de prod (Settings → API Keys)          |
 | `SUPABASE_SECRET_KEY`                  | secret key de prod; marcar como secret                 |
+| `NEXT_PUBLIC_SITE_URL`                 | origen público de prod, sin `/` final (SPEC 20), igual que las Redirect URLs de Supabase; obligatoria: sin ella el registro falla |
 | `RESEND_API_KEY`                       | clave de Resend                                        |
 | `CONTACT_TO_EMAIL`                     | como dev                                               |
 | `CONTACT_FROM_EMAIL`                   | como dev (dominio verificado en Resend)                |
+
+> SPEC 20: `NEXT_PUBLIC_SITE_URL` también debe definirse en **Vercel** (Settings → Environment Variables; despliegue actual, `vercel.json`) y en Preview si se prueba el registro ahí. La IP del jugador se lee de `x-vercel-forwarded-for`/`x-real-ip`/última entrada de `x-forwarded-for`; en otros hostings habría que revisar `clientIp()`.
 
 Después, **redeploy** (las `NEXT_PUBLIC_*` se fijan en el build). Si el escáner de secretos de Netlify rompe el build por las `NEXT_PUBLIC_*`, añadir `SECRETS_SCAN_OMIT_KEYS=NEXT_PUBLIC_SUPABASE_URL,NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`.
 
