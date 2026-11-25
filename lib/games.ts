@@ -1,5 +1,7 @@
 // Tipos y utilidades de catálogo seguras para el cliente.
 // Las lecturas de Supabase (getGames, getGame) viven en lib/games.server.ts.
+import type { Database } from "@/lib/supabase/database.types";
+
 export const CATEGORIES = [
   "ARCADE",
   "PUZZLE",
@@ -58,4 +60,22 @@ export function formatPlays(n: number): string {
   if (n < 1000) return String(n);
   const k = (Math.round(n / 100) / 10).toFixed(1).replace(".", ",");
   return `${k.replace(/,0$/, "")}K`;
+}
+
+type GameRow = Database["public"]["Tables"]["games"]["Row"];
+type StatsRow = Database["public"]["Views"]["game_stats"]["Row"];
+
+// Fila de BD (+ estadísticas) → Game. Pura: la usan games.server.ts (Next) y el BFF de Angular.
+export function toGame(row: GameRow, stats?: StatsRow): Game {
+  return {
+    id: row.id,
+    title: row.title,
+    short: row.short,
+    long: row.long,
+    cat: row.cat as Category,
+    cover: row.cover,
+    color: row.color as AccentColor,
+    best: stats?.best ?? 0,
+    plays: stats?.plays ?? 0,
+  };
 }

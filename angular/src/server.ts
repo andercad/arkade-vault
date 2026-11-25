@@ -4,25 +4,80 @@ import {
   isMainModule,
   writeResponseToNodeResponse,
 } from '@angular/ssr/node';
+import { createClient } from '@supabase/supabase-js';
 import express from 'express';
 import { join } from 'node:path';
+import { toGame } from '@/lib/games';
+import type { Database } from '@/lib/supabase/database.types';
+
+// Variables de angular/.env (SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY). Opcional: en
+// producción llegan del entorno del proceso.
+try {
+  process.loadEnvFile();
+} catch {
+  // Sin .env: se usan las variables del entorno.
+}
 
 const browserDistFolder = join(import.meta.dirname, '../browser');
 
 const app = express();
 const angularApp = new AngularNodeAppEngine();
 
+app.disable('x-powered-by');
+
+// Mismas cabeceras de seguridad que next.config.ts (SPEC 17).
+app.use((_req, res, next) => {
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'DENY');
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  next();
+});
+
+const GAME_ID = /^[a-z0-9-]{1,40}$/;
+
 /**
- * Example Express Rest API endpoints can be defined here.
- * Uncomment and define endpoints as necessary.
- *
- * Example:
- * ```ts
- * app.get('/api/{*splat}', (req, res) => {
- *   // Handle API request
- * });
- * ```
+ * GET /api/games/:id → `Game` (con `best`/`plays` de `game_stats`).
+ * 404 si el id no es válido o no existe; 500 si falla la lectura. Solo lectura, clave
+ * publicable y sin sesión (las policies RLS siguen protegiendo los datos).
  */
+app.get('/api/games/:id', async (req, res) => {
+  const id = req.params['id'];
+  if (!GAME_ID.test(id)) {
+    res.status(404).json({ error: 'not_found' });
+    return;
+  }
+  const url = process.env['SUPABASE_URL'];
+  const key = process.env['SUPABASE_PUBLISHABLE_KEY'];
+  if (!url || !key) {
+    res.status(500).json({ error: 'read_failed' });
+    return;
+  }
+  try {
+    const supabase = createClient<Database>(url, key, {
+      auth: { persistSession: false, autoRefreshToken: false },
+    });
+    const [game, stats] = await Promise.all([
+      supabase.from('games').select('*').eq('id', id).maybeSingle(),
+      supabase.from('game_stats').select('*').eq('game_id', id).maybeSingle(),
+    ]);
+    if (game.error || stats.error) {
+      res.status(500).json({ error: 'read_failed' });
+      return;
+    }
+    if (!game.data) {
+      res.status(404).json({ error: 'not_found' });
+      return;
+    }
+    res.json(toGame(game.data, stats.data ?? undefined));
+  } catch {
+    res.status(500).json({ error: 'read_failed' });
+  }
+});
+
+// Cualquier otra ruta /api/* no existe (no debe caer en el handler de Angular).
+app.use('/api', (_req, res) => {
+  res.status(404).json({ error: 'not_found' });
+});
 
 /**
  * Serve static files from /browser

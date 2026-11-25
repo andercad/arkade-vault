@@ -1,25 +1,7 @@
 // Lecturas de catálogo desde Supabase (solo servidor: usa cookies()).
 // Los tipos, CATEGORIES y formatPlays viven en lib/games.ts para poder usarse en el cliente.
 import { createClient } from "@/lib/supabase/server";
-import type { Database } from "@/lib/supabase/database.types";
-import type { AccentColor, Category, Game } from "@/lib/games";
-
-type GameRow = Database["public"]["Tables"]["games"]["Row"];
-type StatsRow = Database["public"]["Views"]["game_stats"]["Row"];
-
-function toGame(row: GameRow, stats?: StatsRow): Game {
-  return {
-    id: row.id,
-    title: row.title,
-    short: row.short,
-    long: row.long,
-    cat: row.cat as Category,
-    cover: row.cover,
-    color: row.color as AccentColor,
-    best: stats?.best ?? 0,
-    plays: stats?.plays ?? 0,
-  };
-}
+import { toGame, type Game } from "@/lib/games";
 
 export async function getGames(): Promise<Game[]> {
   const supabase = await createClient();
