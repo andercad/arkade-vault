@@ -964,16 +964,27 @@ a {
   position: absolute;
   inset: -1px;
   background: linear-gradient(135deg, transparent 60%, rgba(0, 245, 255, 0.4));
+  background: linear-gradient(
+    135deg,
+    transparent 60%,
+    color-mix(in srgb, var(--accent, var(--cyan)) 40%, transparent)
+  );
   opacity: 0;
   transition: opacity 180ms;
   pointer-events: none;
 }
+/* hover: color de la categoría vía --accent (SPEC 21), cian por defecto */
 .card:hover {
   transform: translateY(-6px) rotateX(2deg) rotateY(-2deg);
   border-color: var(--cyan);
+  border-color: var(--accent, var(--cyan));
   box-shadow:
     0 18px 40px -10px rgba(0, 245, 255, 0.4),
     0 0 0 1px rgba(0, 245, 255, 0.3);
+  box-shadow:
+    0 18px 40px -10px
+      color-mix(in srgb, var(--accent, var(--cyan)) 40%, transparent),
+    0 0 0 1px color-mix(in srgb, var(--accent, var(--cyan)) 30%, transparent);
 }
 .card:hover::before {
   opacity: 0.5;

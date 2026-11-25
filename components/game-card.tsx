@@ -26,7 +26,7 @@ export function GameCard({ game }: { game: Game }) {
   return (
     <div
       ref={tiltRef}
-      className="card"
+      className={"card accent-" + game.color}
       onMouseMove={onMove}
       onMouseLeave={onLeave}
       onClick={() => router.push(href)}
