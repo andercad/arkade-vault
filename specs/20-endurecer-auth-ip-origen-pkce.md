@@ -1,6 +1,6 @@
 # SPEC 20 — Endurecer la autenticación: IP real, origen fijo y error PKCE por código
 
-> **Estado:** Aprobado
+> **Estado:** Implementado
 >
 > **Depende de:** SPEC 16 (autenticación), SPEC 17 (medidas de seguridad), SPEC 19 (perfil: contraseña y borrar cuenta)
 > **Fecha:** 2026-11-24
@@ -87,15 +87,15 @@ Un commit por paso (`20-endurecer-auth-ip-origen-pkce: Paso N`). Al final, propo
 
 ## Criterios de aceptación
 
-- [ ] `clientIp()` no usa la primera entrada de `x-forwarded-for`; falsificar esa cabecera no cambia la IP vista en los logs de Auth.
-- [ ] Sin ninguna cabecera de IP, `signUp`/`signIn` siguen funcionando (sin `sb-forwarded-for`).
-- [ ] `emailRedirectTo` es siempre `${NEXT_PUBLIC_SITE_URL}/auth/callback`, con `Origin`/`Host` falsificados.
-- [ ] En producción sin `NEXT_PUBLIC_SITE_URL`, el registro falla con error de servidor (no cae a `Host`); en desarrollo usa `http://localhost:3000`.
-- [ ] El callback detecta la falta de verificador PKCE por código de error y redirige a `/login?confirmed=1`; un código inválido va a `/login?error=oauth`.
-- [ ] El comando de control falla si la clave secreta se usa con `.from(`/`.rpc(` y pasa con el código actual.
-- [ ] `NEXT_PUBLIC_SITE_URL` aparece en `prod-runbook.md`, `README.md` y `CLAUDE.md`, y está definida en Vercel (verificación manual).
-- [ ] La enumeración de cuentas en `signUp` consta como riesgo aceptado en checklist y `security-auditor.md`.
-- [ ] `tsc`, `lint` y `build` limpios; `CLAUDE.md`, `README.md` y checklist actualizados.
+- [x] `clientIp()` no usa la primera entrada de `x-forwarded-for`; falsificar esa cabecera no cambia la IP vista en los logs de Auth.
+- [x] Sin ninguna cabecera de IP, `signUp`/`signIn` siguen funcionando (sin `sb-forwarded-for`).
+- [x] `emailRedirectTo` es siempre `${NEXT_PUBLIC_SITE_URL}/auth/callback`, con `Origin`/`Host` falsificados.
+- [x] En producción sin `NEXT_PUBLIC_SITE_URL`, el registro falla con error de servidor (no cae a `Host`); en desarrollo usa `http://localhost:3000`.
+- [x] El callback detecta la falta de verificador PKCE por código de error y redirige a `/login?confirmed=1`; un código inválido va a `/login?error=oauth`.
+- [x] El comando de control falla si la clave secreta se usa con `.from(`/`.rpc(` y pasa con el código actual.
+- [x] `NEXT_PUBLIC_SITE_URL` aparece en `prod-runbook.md`, `README.md` y `CLAUDE.md`, y está definida en Vercel (verificación manual).
+- [x] La enumeración de cuentas en `signUp` consta como riesgo aceptado en checklist y `security-auditor.md`.
+- [x] `tsc`, `lint` y `build` limpios; `CLAUDE.md`, `README.md` y checklist actualizados.
 
 ---
 
