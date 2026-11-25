@@ -9,7 +9,7 @@ export function MiniCard({ game }: { game: Game }) {
       </div>
       <div className="mini-meta">
         <div className="mini-title">{game.title}</div>
-        <div className="mini-cat">{game.cat}</div>
+        <div className={"mini-cat accent-" + game.color}>{game.cat}</div>
       </div>
     </Link>
   );
