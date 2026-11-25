@@ -744,9 +744,10 @@ a {
   letter-spacing: 0.2em;
 }
 .btn.pulse {
-  animation: pulse 1.6s ease-in-out infinite;
+  animation: btn-pulse 1.6s ease-in-out infinite;
 }
-@keyframes pulse {
+/* "btn-pulse": Tailwind 4 define su propio @keyframes pulse y pisaba este */
+@keyframes btn-pulse {
   0%,
   100% {
     box-shadow:
@@ -757,7 +758,57 @@ a {
     box-shadow:
       0 0 20px var(--cyan),
       inset 0 0 12px rgba(0, 245, 255, 0.45);
+    box-shadow:
+      0 0 20px var(--accent, var(--cyan)),
+      inset 0 0 12px
+        color-mix(in srgb, var(--accent, var(--cyan)) 45%, transparent);
   }
+}
+
+/* SPEC 21: color de acento por categoría (--accent) */
+.accent-green,
+.btn.green {
+  --accent: var(--green);
+}
+.accent-cyan,
+.btn.cyan {
+  --accent: var(--cyan);
+}
+.accent-magenta,
+.btn.magenta {
+  --accent: var(--magenta);
+}
+.accent-yellow,
+.btn.yellow {
+  --accent: var(--yellow);
+}
+.accent-orange,
+.btn.orange {
+  --accent: var(--orange);
+}
+.accent-violet,
+.btn.violet {
+  --accent: var(--violet);
+}
+.accent-red,
+.btn.red {
+  --accent: var(--red);
+}
+.accent-blue,
+.btn.blue {
+  --accent: var(--blue);
+}
+.accent-lime,
+.btn.lime {
+  --accent: var(--lime);
+}
+.accent-pink,
+.btn.pink {
+  --accent: var(--pink);
+}
+.accent-silver,
+.btn.silver {
+  --accent: var(--silver);
 }
 
 /* ===== hero / library ===== */
@@ -867,6 +918,20 @@ a {
 .chip:hover:not(.active) {
   color: var(--ink);
 }
+/* SPEC 21: chips de categoría en el color de su categoría (TODOS sin accent-) */
+.chip[class*="accent-"] {
+  color: var(--accent);
+}
+/* TODOS: blanco, distinto de cualquier categoría */
+.chip-all.active {
+  color: var(--ink);
+  border-color: var(--ink);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--ink) 35%, transparent);
+}
+.chip.active[class*="accent-"] {
+  border-color: var(--accent);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--accent) 35%, transparent);
+}
 
 /* ===== grid + cards ===== */
 .av-grid {
@@ -899,16 +964,27 @@ a {
   position: absolute;
   inset: -1px;
   background: linear-gradient(135deg, transparent 60%, rgba(0, 245, 255, 0.4));
+  background: linear-gradient(
+    135deg,
+    transparent 60%,
+    color-mix(in srgb, var(--accent, var(--cyan)) 40%, transparent)
+  );
   opacity: 0;
   transition: opacity 180ms;
   pointer-events: none;
 }
+/* hover: color de la categoría vía --accent (SPEC 21), cian por defecto */
 .card:hover {
   transform: translateY(-6px) rotateX(2deg) rotateY(-2deg);
   border-color: var(--cyan);
+  border-color: var(--accent, var(--cyan));
   box-shadow:
     0 18px 40px -10px rgba(0, 245, 255, 0.4),
     0 0 0 1px rgba(0, 245, 255, 0.3);
+  box-shadow:
+    0 18px 40px -10px
+      color-mix(in srgb, var(--accent, var(--cyan)) 40%, transparent),
+    0 0 0 1px color-mix(in srgb, var(--accent, var(--cyan)) 30%, transparent);
 }
 .card:hover::before {
   opacity: 0.5;
@@ -928,8 +1004,9 @@ a {
   font-size: 8px;
   padding: 4px 6px;
   background: rgba(0, 0, 0, 0.6);
-  color: var(--cyan);
+  color: var(--accent, var(--cyan));
   border: 1px solid var(--line);
+  border-color: color-mix(in srgb, var(--accent, var(--cyan)) 55%, transparent);
   z-index: 2;
 }
 .card .meta {
@@ -1271,6 +1348,10 @@ a {
   padding: 6px 10px;
   border: 1px solid var(--line);
   color: var(--ink-dim);
+}
+.detail-tags span[class*="accent-"] {
+  color: var(--accent);
+  border-color: color-mix(in srgb, var(--accent) 55%, transparent);
 }
 .detail-info p {
   color: var(--ink-dim);
@@ -2954,7 +3035,7 @@ a {
 .mini-cat {
   font-family: var(--mono);
   font-size: 10px;
-  color: var(--ink-faint);
+  color: var(--accent, var(--ink-faint));
   letter-spacing: 0.14em;
   margin-top: 4px;
 }
@@ -3169,9 +3250,10 @@ a {
   font-family: var(--pixel);
   font-size: 10px;
   letter-spacing: 0.06em;
+  color: var(--ink);
 }
 .tk-mid {
-  color: var(--ink-dim);
+  /* color: lo pone neon-<color> del juego (SPEC 21), no se fija aquí */
   font-size: 12px;
 }
 .tk-s {

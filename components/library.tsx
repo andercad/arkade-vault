@@ -1,7 +1,12 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { CATEGORIES, type Category, type Game } from "@/lib/games";
+import {
+  CATEGORIES,
+  CATEGORY_COLOR,
+  type Category,
+  type Game,
+} from "@/lib/games";
 import { GameCard } from "./game-card";
 
 export function Library({ games }: { games: Game[] }) {
@@ -49,7 +54,11 @@ export function Library({ games }: { games: Game[] }) {
           {chips.map((c) => (
             <button
               key={c}
-              className={"chip" + (cat === c ? " active" : "")}
+              className={
+                "chip" +
+                (c === "TODOS" ? " chip-all" : " accent-" + CATEGORY_COLOR[c]) +
+                (cat === c ? " active" : "")
+              }
               onClick={() => setCat(c)}
             >
               {c}

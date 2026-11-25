@@ -61,7 +61,7 @@ async function GameDetail({
         </div>
         <div style={{ marginTop: 20 }} className="detail-info">
           <div className="detail-tags">
-            <span>{game.cat}</span>
+            <span className={"accent-" + game.color}>{game.cat}</span>
             <span>1 JUGADOR</span>
             <span>TECLADO / TÁCTIL</span>
             <span>RETRO 1985</span>
@@ -99,7 +99,10 @@ async function GameDetail({
             </div>
           </div>
           <div className="detail-actions">
-            <Link href={`/juegos/${game.id}/jugar`} className="btn xl pulse">
+            <Link
+              href={`/juegos/${game.id}/jugar`}
+              className={"btn xl pulse " + game.color}
+            >
               ▶ JUGAR AHORA
             </Link>
             <Link href="/juegos" className="btn ghost lg">
