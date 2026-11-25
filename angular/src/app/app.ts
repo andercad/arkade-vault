@@ -1,16 +1,11 @@
-import { Component, signal } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { Component } from '@angular/core';
+import { RouterLink, RouterOutlet } from '@angular/router';
 
-/**
- *
- */
+/** Shell de la app: fondo, cabecera mínima (logo), contenido de ruta y footer. */
 @Component({
-  imports: [RouterOutlet],
+  imports: [RouterOutlet, RouterLink],
   selector: 'app-root',
-  styleUrl: './app.css',
   templateUrl: './app.html',
+  styleUrl: './app.css',
 })
-/** Componente raíz de la app Angular (shell provisional hasta el paso 2). */
-export class App {
-  protected readonly title = signal('arcade-vault-angular');
-}
+export class App {}

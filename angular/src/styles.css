@@ -1,1 +1,20 @@
-/* You can add global styles to this file, and also import other style files */
+/* Fuentes autoalojadas (@fontsource): sin CDN por RGPD. */
+@import '@fontsource/press-start-2p/400.css';
+@import '@fontsource/jetbrains-mono/400.css';
+@import '@fontsource/jetbrains-mono/500.css';
+@import '@fontsource/jetbrains-mono/700.css';
+@import '@fontsource/courier-prime/400.css';
+@import '@fontsource/courier-prime/700.css';
+
+/* Mismo CSS que la app Next (SPEC 24: se reutiliza sin partirlo). */
+@import '../../app/globals.css';
+
+/* Tailwind debe escanear las plantillas de Angular. */
+@source './';
+
+/* Variables que next/font define en la app Next. */
+:root {
+  --font-press-start: 'Press Start 2P';
+  --font-jetbrains: 'JetBrains Mono';
+  --font-courier-prime: 'Courier Prime';
+}
