@@ -1,0 +1,5 @@
+.play-loading {
+  text-align: center;
+  padding: 80px;
+  color: var(--ink-faint);
+}

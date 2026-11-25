@@ -1,9 +1,17 @@
+import { Component, input } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { Observable, Subject, of, throwError } from 'rxjs';
+import type { GameDefinition } from '@/lib/game-registry';
 import type { Game } from '@/lib/games';
 import { GamesService } from '../games.service';
+import { GameCanvasComponent } from '@shared/components/game-canvas/game-canvas';
 import { PlayPageComponent } from './play-page';
+
+@Component({ selector: 'app-game-canvas', template: '' })
+class GameCanvasStub {
+  readonly definition = input.required<GameDefinition>();
+}
 
 describe('PlayPageComponent', () => {
   let getGame: (id: string) => Observable<Game | null>;
@@ -12,6 +20,11 @@ describe('PlayPageComponent', () => {
   beforeEach(() => {
     calls = [];
     getGame = () => of(null);
+    // jsdom no tiene canvas 2D: se sustituye el canvas real por un stub.
+    TestBed.overrideComponent(PlayPageComponent, {
+      remove: { imports: [GameCanvasComponent] },
+      add: { imports: [GameCanvasStub] },
+    });
     TestBed.configureTestingModule({
       providers: [
         provideRouter([]),
@@ -53,10 +66,17 @@ describe('PlayPageComponent', () => {
     expect((fixture.nativeElement as HTMLElement).textContent).toContain('CARGANDO');
   });
 
-  it('juego cargado → pinta el título', async () => {
-    getGame = () => of({ id: 'snake', title: 'SNAKE' } as Game);
-    const el = await render('snake');
-    expect(el.querySelector('.play-title')?.textContent).toContain('SNAKE');
+  it('juego cargado → marco CRT con el canvas y el mando táctil del registro', async () => {
+    getGame = () => of({ id: 'tetris', title: 'TETRIS' } as Game);
+    const el = await render('tetris');
+    expect(el.querySelector('.crt .crt-screen app-game-canvas')).toBeTruthy();
+    expect(el.querySelector('app-touch-controls .gp')).toBeTruthy();
+  });
+
+  it('juego vertical (alto > ancho) usa crt-portrait', async () => {
+    getGame = () => of({ id: 'tetris', title: 'TETRIS' } as Game);
+    const el = await render('tetris');
+    expect(el.querySelector('.crt')!.classList.contains('crt-portrait')).toBe(true);
   });
 
   it('404 del endpoint (null) → no encontrado', async () => {

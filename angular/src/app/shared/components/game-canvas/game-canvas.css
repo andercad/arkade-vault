@@ -1,0 +1,4 @@
+/* Sin caja propia: el canvas sigue siendo hijo directo de `.crt-screen` (flex). */
+:host {
+  display: contents;
+}

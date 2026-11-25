@@ -1,0 +1,4 @@
+/* Sin caja propia: `.gp` conserva su posición (fija en móvil vertical). */
+:host {
+  display: contents;
+}

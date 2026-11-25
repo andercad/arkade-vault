@@ -4,6 +4,8 @@ import { getGameDefinition } from '@/lib/game-registry';
 import { DataErrorComponent } from '../data-error/data-error';
 import { GamesService } from '../games.service';
 import { NotFoundComponent } from '../not-found/not-found';
+import { GameCanvasComponent } from '@shared/components/game-canvas/game-canvas';
+import { TouchControlsComponent } from '@shared/components/touch-controls/touch-controls';
 
 /**
  * Ruta `/juegos/:id/jugar`. Comprueba el registro de forma síncrona y carga el juego con
@@ -11,32 +13,10 @@ import { NotFoundComponent } from '../not-found/not-found';
  */
 @Component({
   selector: 'app-play-page',
-  imports: [DataErrorComponent, NotFoundComponent],
+  imports: [DataErrorComponent, NotFoundComponent, GameCanvasComponent, TouchControlsComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  template: `
-    @if (!definition()) {
-      <app-not-found />
-    } @else if (game.isLoading()) {
-      <div class="pixel play-loading">CARGANDO…</div>
-    } @else if (game.error()) {
-      <app-data-error />
-    } @else if (game.value(); as g) {
-      <h1 class="pixel play-title">{{ g.title }}</h1>
-    } @else {
-      <app-not-found />
-    }
-  `,
-  styles: `
-    .play-loading {
-      text-align: center;
-      padding: 80px;
-      color: var(--ink-faint);
-    }
-    .play-title {
-      text-align: center;
-      padding: 80px;
-    }
-  `,
+  templateUrl: './play-page.html',
+  styleUrl: './play-page.css',
 })
 export class PlayPageComponent {
   /** Segmento `:id` de la ruta (binding de parámetros). */

@@ -1,0 +1,45 @@
+<div class="gp" role="group" aria-label="Mando táctil">
+  <div class="gp-body">
+    <div class="gp-col gp-col-left">
+      <div class="gp-dpad">
+        @for (dir of directions; track dir) {
+          <button
+            appPadButton
+            [class]="'dp dp-' + dir"
+            [code]="controls().dpad[dir]"
+            [disabled]="disabled() || !controls().dpad[dir]"
+            [label]="directionLabel[dir]"
+          >
+            <svg class="dp-arrow" viewBox="0 0 24 24" aria-hidden="true">
+              <polygon [attr.points]="arrowPoints[dir]" fill="currentColor" />
+            </svg>
+          </button>
+        }
+        <div class="dp-hub" aria-hidden="true">
+          <span class="dp-hub-gem"></span>
+        </div>
+      </div>
+    </div>
+    @if (actions().length > 0) {
+      <div class="gp-col gp-col-right">
+        <div class="gp-actions">
+          @for (a of actions(); track a.action.code + a.action.label) {
+            <div class="ab-wrap">
+              <button
+                appPadButton
+                [class]="'ab ' + (a.letter === 'A' ? 'a' : 'b')"
+                [code]="a.action.code"
+                [disabled]="disabled()"
+                [label]="a.action.label"
+              >
+                <span class="ab-ring" aria-hidden="true"></span>
+                <span class="ab-letter" aria-hidden="true">{{ a.letter }}</span>
+              </button>
+              <span class="ab-label" aria-hidden="true">{{ a.action.label }}</span>
+            </div>
+          }
+        </div>
+      </div>
+    }
+  </div>
+</div>
