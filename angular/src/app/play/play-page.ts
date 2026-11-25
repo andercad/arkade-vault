@@ -4,16 +4,15 @@ import { getGameDefinition } from '@/lib/game-registry';
 import { DataErrorComponent } from '../data-error/data-error';
 import { GamesService } from '../games.service';
 import { NotFoundComponent } from '../not-found/not-found';
-import { GameCanvasComponent } from '@shared/components/game-canvas/game-canvas';
-import { TouchControlsComponent } from '@shared/components/touch-controls/touch-controls';
+import { GamePlayerComponent } from '@shared/components/game-player/game-player';
 
 /**
  * Ruta `/juegos/:id/jugar`. Comprueba el registro de forma síncrona y carga el juego con
- * `rxResource` (sin resolver, para poder pintar «CARGANDO…»). El reproductor llega en el paso 5.
+ * `rxResource` (sin resolver, para poder pintar «CARGANDO…»). Pinta el reproductor con el juego cargado.
  */
 @Component({
   selector: 'app-play-page',
-  imports: [DataErrorComponent, NotFoundComponent, GameCanvasComponent, TouchControlsComponent],
+  imports: [DataErrorComponent, NotFoundComponent, GamePlayerComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './play-page.html',
   styleUrl: './play-page.css',

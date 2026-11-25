@@ -1,0 +1,102 @@
+<ng-template #optionTpl let-opt>
+  <label class="player-option">
+    <span class="l">{{ opt.label }}</span>
+    <select [value]="optionValues()[opt.key]" (change)="changeOption(opt, $event)">
+      @for (ch of opt.choices; track ch.value) {
+        <option [value]="ch.value" [selected]="ch.value === optionValues()[opt.key]">
+          {{ ch.label }}
+        </option>
+      }
+    </select>
+  </label>
+</ng-template>
+
+<div class="av-player fade-in">
+  <div class="player-hud">
+    <div class="hud-stats">
+      <div class="hud-stat">
+        <div class="l">Jugador</div>
+        <div class="v" style="color: var(--ink)">INVITADO</div>
+      </div>
+      <div class="hud-stat">
+        <div class="l">Puntuación</div>
+        <div class="v">{{ formatScore(snap().score) }}</div>
+      </div>
+      @for (item of snap().hud; track item.key) {
+        <div [class]="'hud-stat ' + item.key">
+          <div class="l">{{ item.label }}</div>
+          <div class="v">{{ item.value }}</div>
+        </div>
+      }
+    </div>
+    @for (opt of liveOptions(); track opt.key) {
+      <ng-container *ngTemplateOutlet="optionTpl; context: { $implicit: opt }" />
+    }
+    <div class="hud-actions">
+      <button type="button" class="btn yellow" (click)="togglePause()">
+        {{ paused() ? 'REANUDAR' : 'PAUSA' }}
+      </button>
+      <button type="button" class="btn magenta" (click)="finish()">FIN</button>
+      <a [routerLink]="['/juegos', game().id]" class="btn ghost">SALIR</a>
+    </div>
+  </div>
+
+  <div [class]="portrait() ? 'crt crt-portrait' : 'crt'" [style.--ar]="aspectRatio()">
+    <div class="crt-screen">
+      <app-game-canvas
+        #canvas
+        [definition]="definition()"
+        (stateChange)="snap.set($event)"
+        (gameOver)="over.set(true)"
+      />
+      @if (paused()) {
+        <div class="crt-content pause-overlay">
+          <div>
+            <div class="pixel neon-yellow pause-title">EN PAUSA</div>
+            <div class="mono pause-hint">PULSA REANUDAR, P O ESC PARA CONTINUAR</div>
+            @if (restartOptions().length > 0) {
+              <div class="pause-options">
+                @for (opt of restartOptions(); track opt.key) {
+                  <ng-container *ngTemplateOutlet="optionTpl; context: { $implicit: opt }" />
+                }
+                <button type="button" class="btn" (click)="restart()">REINICIAR</button>
+              </div>
+            }
+          </div>
+        </div>
+      }
+    </div>
+    <div class="crt-bottom">
+      <span class="led">SEÑAL OK</span>
+      <span>{{ game().title }} · CRT-83 · 60 HZ</span>
+      <span>CARGA · 1MB</span>
+    </div>
+  </div>
+
+  @if (definition().touchControls; as tc) {
+    <app-touch-controls [controls]="tc" [disabled]="paused() || over()" />
+  }
+
+  @if (over()) {
+    <div class="modal-bd">
+      <div class="modal" role="dialog" aria-modal="true" aria-labelledby="final-title">
+        <h2 id="final-title">FIN DEL JUEGO</h2>
+        <div class="final-label">PUNTUACIÓN FINAL</div>
+        <div class="final">{{ formatScore(snap().score) }}</div>
+        <div>
+          <div class="pixel final-notice">INICIA SESIÓN PARA GUARDAR TU PUNTUACIÓN</div>
+          <div class="input-row">
+            <a routerLink="/login" class="btn yellow">INICIAR SESIÓN</a>
+          </div>
+        </div>
+        <div class="actions">
+          <button type="button" class="btn" (click)="restart()">JUGAR DE NUEVO</button>
+          <a routerLink="/salon-de-la-fama" [queryParams]="{ juego: game().id }" class="btn yellow">
+            VER SALÓN DE LA FAMA
+          </a>
+          <a routerLink="/juegos" class="btn magenta">VOLVER AL VAULT</a>
+        </div>
+      </div>
+    </div>
+  }
+</div>

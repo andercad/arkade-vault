@@ -1,0 +1,25 @@
+/* Sin caja propia: `.av-player` sigue siendo el bloque de `.av-main`. */
+:host {
+  display: contents;
+}
+
+.pause-overlay {
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 5;
+}
+
+.pause-title {
+  font-size: 22px;
+}
+
+.pause-hint {
+  font-size: 11px;
+  color: var(--ink-dim);
+  margin-top: 10px;
+  letter-spacing: 0.16em;
+}
+
+.final-notice {
+  font-size: 10px;
+  color: var(--yellow);
+}

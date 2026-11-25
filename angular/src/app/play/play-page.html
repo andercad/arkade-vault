@@ -4,21 +4,8 @@
   <div class="pixel play-loading">CARGANDO…</div>
 } @else if (game.error()) {
   <app-data-error />
-} @else if (game.value() && definition(); as def) {
-  <!-- Provisional (paso 4): canvas + mando; el reproductor completo llega en el paso 5. -->
-  <div class="av-player">
-    <div
-      [class]="def.height > def.width ? 'crt crt-portrait' : 'crt'"
-      [style.--ar]="def.width / def.height"
-    >
-      <div class="crt-screen">
-        <app-game-canvas [definition]="def" />
-      </div>
-    </div>
-    @if (def.touchControls; as tc) {
-      <app-touch-controls [controls]="tc" />
-    }
-  </div>
+} @else if (game.value(); as g) {
+  <app-game-player [game]="g" />
 } @else {
   <app-not-found />
 }
