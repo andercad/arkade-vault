@@ -1,6 +1,6 @@
 # SPEC 21 — Color de categoría en la UI
 
-> **Estado:** Borrador
+> **Estado:** Aprobado
 > **Depende de:** SPEC 02 (homepage), SPEC 06 (leaderboard y juegos), SPEC 15 (colores por categoría)
 > **Fecha:** 2026-11-24
 > **Objetivo:** Que la etiqueta de categoría, el título del juego en la actividad, los chips de filtro y el botón JUGAR de la ficha usen el color de la categoría del juego, y que el nombre de usuario en la actividad tenga un color único.

@@ -757,7 +757,57 @@ a {
     box-shadow:
       0 0 20px var(--cyan),
       inset 0 0 12px rgba(0, 245, 255, 0.45);
+    box-shadow:
+      0 0 20px var(--accent, var(--cyan)),
+      inset 0 0 12px
+        color-mix(in srgb, var(--accent, var(--cyan)) 45%, transparent);
   }
+}
+
+/* SPEC 21: color de acento por categoría (--accent) */
+.accent-green,
+.btn.green {
+  --accent: var(--green);
+}
+.accent-cyan,
+.btn.cyan {
+  --accent: var(--cyan);
+}
+.accent-magenta,
+.btn.magenta {
+  --accent: var(--magenta);
+}
+.accent-yellow,
+.btn.yellow {
+  --accent: var(--yellow);
+}
+.accent-orange,
+.btn.orange {
+  --accent: var(--orange);
+}
+.accent-violet,
+.btn.violet {
+  --accent: var(--violet);
+}
+.accent-red,
+.btn.red {
+  --accent: var(--red);
+}
+.accent-blue,
+.btn.blue {
+  --accent: var(--blue);
+}
+.accent-lime,
+.btn.lime {
+  --accent: var(--lime);
+}
+.accent-pink,
+.btn.pink {
+  --accent: var(--pink);
+}
+.accent-silver,
+.btn.silver {
+  --accent: var(--silver);
 }
 
 /* ===== hero / library ===== */
