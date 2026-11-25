@@ -35,7 +35,7 @@ Cachés de canvas `lib/canvas-cache.ts` (capa estática y sprites con glow, SPEC
 
 ## Tooling de Claude
 
-- Hook `PostToolUse` (`.claude/hooks/format-lint.mjs`): Prettier + ESLint `--fix` tras cada Write/Edit.
+- Hook `PostToolUse` (`.claude/hooks/format-lint.mjs`): Prettier + ESLint `--fix` tras cada Write/Edit (los `.ts`/`.html` de `angular/` con el ESLint propio de `angular/`, SPEC 24, solo cuando exista su `eslint.config.*`).
 - Producción: Claude solo accede a dev por MCP; prod (Supabase + Netlify) se migra a mano con `references/deploy/prod-runbook.md` (script único `prod-setup.sql` en el SQL Editor de prod) y se verifica con `references/deploy/verify-prod.sql`.
 - MCP (`.mcp.json`): Supabase. Playwright MCP para validar UI (screenshots en `.playwright-screenshots/`).
 - `/telegram-send <mensaje>` (`.claude/skills/telegram-send/`): envía texto a Telegram (Bot API `sendMessage`). Requiere `TELEGRAM_BOT_TOKEN` y `TELEGRAM_CHAT_ID` en el bloque `env` de `.claude/settings.local.json` (ignorado por git); reiniciar Claude Code tras definirlas. En rutinas cloud (`/schedule`) ese archivo no existe: definirlas como variables del entorno cloud (claude.ai/code → Environments) y permitir red a `api.telegram.org`. Los subagentes `security-auditor`, `game-jam`, `game-planner` y `game-expander` avisan por Telegram al terminar con el skill precargado (`skills: [telegram-send]`); si falla, lo indican sin reintentar.
@@ -48,6 +48,8 @@ Cachés de canvas `lib/canvas-cache.ts` (capa estática y sprites con glow, SPEC
 - Subagente `security-auditor` (`.claude/agents/security-auditor.md`): audita la seguridad de la BD Supabase (RLS, policies, funciones `SECURITY DEFINER`, advisors, logs de Auth) y de la app (secretos, headers, `proxy.ts`, validación de contraseña) según SPEC 16/17. Solo lectura: propone correcciones sin aplicarlas. Estado en `references/security/security-audit.md`. Regla de uso en `.claude/rules/security-auditor.md` (se carga al tocar migraciones, auth, `proxy.ts`, `next.config.ts`…).
 
 - Context7 (`ctx7`): al generar código con librerías/frameworks/SDK externos, consultar antes la doc actual (`npx ctx7@latest library <nombre> "<consulta>"` → `docs <libraryId> "<consulta>"`). Solo cuando haga falta; no para lógica propia.
+
+- Plugin Angular (instalado; solo para código de `angular/`, SPEC 24+): agente `angular:angular-dev` para implementar/depurar/ejecutar specs Angular y `angular:angular-architect` (solo lectura) para decisiones de arquitectura. Skills por tema: `angular-skills:angular-developer` (sintaxis/APIs), `angular:angular-solid` (diseño previo), `angular:angular-quality-a11y` (antes de plantillas), `angular:angular-security`, `angular:angular-rendering-performance`, `angular:angular-reactivity-state`, `angular:angular-backend-integration`, `angular:angular-workspace`, `angular:angular-architecture`, `angular:angular-modernization-governance` (`angular:angular-i18n` solo si se usa Transloco). La política (tests, a11y WCAG-2.2-AA, docs, i18n, verify) está en el bloque "Convenciones Angular" de `CLAUDE.md`, creado con `angular:angular-project-guidelines`.
 
 ## Commands
 

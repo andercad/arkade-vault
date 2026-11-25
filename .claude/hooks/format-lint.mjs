@@ -1,4 +1,4 @@
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { spawnSync } from "node:child_process";
 import path from "node:path";
 
@@ -25,14 +25,36 @@ if (path.isAbsolute(rel) || ignored.some((p) => rel === p || rel.startsWith(p.en
   process.exit(0);
 }
 
-const run = (args) =>
-  spawnSync("npx", args, { cwd: root, encoding: "utf8", shell: true });
+const run = (args, cwd = root) =>
+  spawnSync("npx", args, { cwd, encoding: "utf8", shell: true });
 
-// Prettier: formatea cualquier tipo soportado (ignora desconocidos)
-const prettier = run(["prettier", "--write", "--ignore-unknown", `"${abs}"`]);
-if (prettier.status !== 0) {
-  console.error(prettier.stderr || prettier.stdout);
-  process.exit(2);
+const angularDir = path.join(root, "angular");
+const isAngular = rel.startsWith("angular/");
+
+// Prettier: formatea cualquier tipo soportado (ignora desconocidos).
+// En angular/ ya lo hace el hook del plugin `angular` (evita doble escritura en paralelo).
+if (!isAngular) {
+  const prettier = run(["prettier", "--write", "--ignore-unknown", `"${abs}"`]);
+  if (prettier.status !== 0) {
+    console.error(prettier.stderr || prettier.stdout);
+    process.exit(2);
+  }
+}
+
+// ESLint de angular/ (angular-eslint, plantillas .html incluidas): solo si ya existe
+// su config; el ESLint de la raíz ignora angular/**.
+if (isAngular && /\.(ts|html)$/.test(abs)) {
+  const hasConfig = ["eslint.config.js", "eslint.config.mjs"].some((f) =>
+    existsSync(path.join(angularDir, f)),
+  );
+  if (hasConfig) {
+    const eslint = run(["eslint", "--fix", `"${abs}"`], angularDir);
+    if (eslint.status !== 0) {
+      console.error(eslint.stdout + eslint.stderr);
+      process.exit(2);
+    }
+  }
+  process.exit(0);
 }
 
 // ESLint: solo archivos JS/TS

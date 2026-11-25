@@ -75,6 +75,37 @@ Reutilizar antes de crear código nuevo:
 - Cada `lib/<juego>/utils.ts`/`constants.ts`: helpers y dimensiones propios del juego; no duplicar entre juegos, promover a `lib/` si se repite.
 - Lista de juegos existentes: `references/implemented-games.md` (actualizar al añadir uno).
 
+## Convenciones Angular
+
+Solo para `angular/` (SPEC 24+); la app Next no se rige por este bloque.
+
+- tests: required # specs unitarios (`.spec.ts`) junto a cada componente, servicio, guard, pipe y directiva nuevos o modificados; runner del CLI (`ng test`), configurado en el paso 1 de la SPEC 24
+- a11y: WCAG-2.2-AA
+- docs: jsdoc
+- i18n: none # monolingüe (es); textos en plantillas
+- workspace: app # app única en `angular/` (`package.json` propio)
+- verify: cd angular && ng build && ng test --watch=false && ng lint # (ESLint de `angular/`: SPEC 24, paso 1); en la raíz, `npm run lint && npm run build` deben seguir OK
+
+### Al implementar código Angular
+
+Aplica siempre, también al implementar una spec:
+
+1. Antes de escribir una pieza >30 líneas o que toque varias clases, decide en 5–8 líneas piezas, responsabilidad única, dependencias y extensión (SOLID; skill `angular-solid`). Sin capas ni abstracciones prematuras.
+2. Plantillas accesibles desde el principio al nivel `a11y`: leer la skill `angular-quality-a11y` antes de escribir cualquier plantilla; semántica nativa, nombre accesible, teclado, foco, contraste y tamaño de objetivo.
+3. `docs: jsdoc` → JSDoc conciso en API pública, nada sobre lo evidente.
+4. `tests: required` → crear el `.spec.ts` junto a cada pieza nueva o modificada, en el mismo paso, no en uno posterior.
+5. Sintaxis y APIs de Angular: skill `angular-developer`. Solo APIs estables salvo petición o uso previo. Reutilizar los motores de `lib/` sin duplicarlos.
+6. Antes de dar un paso por terminado, ejecutar `verify` y corregir. Informar qué se verificó y qué no.
+
+### Al redactar specs Angular
+
+Además de la plantilla de `/spec`, cada spec Angular incluye:
+
+- **Diseño de clases**: piezas, responsabilidad de cada una y dependencias (SOLID).
+- **Criterios de aceptación de accesibilidad** al nivel `a11y` (teclado, foco, etiquetas, contraste, tamaño de objetivo) para toda pantalla o componente con UI.
+- **Plan de tests** por pieza (casos y límites), con su `.spec.ts` en el mismo paso del plan que la pieza.
+- **Comando `verify`** como criterio de aceptación final.
+
 ## Skills
 
 - `/spec` y `/spec-impl`: flujo Spec Driven (config en `specs/.spec-config.yml`, `AutoCreateBranch: true` crea rama `spec-NN-slug`).
@@ -86,7 +117,7 @@ Reutilizar antes de crear código nuevo:
 
 - `/telegram-send <mensaje>` (propia, `.claude/skills/telegram-send/`: `SKILL.md`, `send.mjs`; invocable, uso solo explícito o por agentes): envía texto a Telegram (POST `sendMessage` de la Bot API). Lee `TELEGRAM_BOT_TOKEN` y `TELEGRAM_CHAT_ID` del bloque `env` de `.claude/settings.local.json` (ignorado por git; nunca en `settings.json`); requiere reiniciar Claude Code tras cambiarlas. En rutinas cloud (`/schedule`) ese archivo no existe: definirlas como variables del entorno cloud (claude.ai/code → Environments) y permitir red a `api.telegram.org`. Los subagentes `security-auditor`, `game-jam`, `game-planner` y `game-expander` avisan por Telegram al terminar con el skill precargado (`skills: [telegram-send]`, necesitan `Bash`); si falla, lo indican sin reintentar.
 
-- Hook `PostToolUse` (`.claude/settings.json` → `.claude/hooks/format-lint.mjs`): tras Write/Edit/MultiEdit ejecuta Prettier y ESLint `--fix`; ignora `references/`, `.claude/`, `.agents/`, `.next/`, `node_modules/`. Si falla, corregir antes de seguir.
+- Hook `PostToolUse` (`.claude/settings.json` → `.claude/hooks/format-lint.mjs`): tras Write/Edit/MultiEdit ejecuta Prettier y ESLint `--fix` (los `.ts`/`.html` de `angular/` con el ESLint propio de `angular/` —angular-eslint + jsdoc, SPEC 24—, solo cuando exista su `eslint.config.*`); ignora `references/`, `.claude/`, `.agents/`, `.next/`, `node_modules/`. Si falla, corregir antes de seguir.
 - MCP (`.mcp.json`): Supabase (docs, database, migraciones, tipos). Playwright MCP para validar UI; screenshots en `.playwright-screenshots/` (gitignored).
 - Subagente `game-planner` (`.claude/agents/game-planner.md`, `memory: project`): decide qué juego encaja; usar antes de `/add-game`. Memoria en `.claude/agent-memory/game-planner/` (`MEMORY.md`, `suggestions.md`); vuelca sugerencias en `references/game-suggestions-todo.md` (excepción: única escritura del agente en `references/`).
 - Subagente `game-expander` (`.claude/agents/game-expander.md`): propone 2-3 ideas de expansión (modos, niveles, mecánicas, power-ups, progresión, audiovisual) por cada juego **ya implementado** solicitado (ids por parámetro; sin ids, todos); nunca propone juegos nuevos ni ideas para juegos no implementados (válido = `implemented-games.md` ∩ `GAME_REGISTRY` ∩ `lib/<id>/`). Solo lectura salvo `references/game-expansions-todo.md` (to-do persistente, excepción: única escritura del agente en `references/`); sugiere `/spec` para implementar una idea.
@@ -96,4 +127,10 @@ Reutilizar antes de crear código nuevo:
 - Subagente `game-performance-booster` (`.claude/agents/game-performance-booster.md`): revisa/corrige el performance de un solo juego (id por parámetro) siguiendo la SPEC 14: `shadowBlur` por objeto y fondos estáticos redibujados → capa estática y sprites con glow cacheados (`lib/canvas-cache.ts`), invalidados en `setSkin`/`destroy`; objetivo ≥58 FPS con CPU ×6 medido con `npm run perf`; visual idéntico. Un juego por invocación; verifica con Playwright. Estado por juego en `references/game-performance.md` (excepción: única escritura del agente en `references/`).
 - Subagente `security-auditor` (`.claude/agents/security-auditor.md`): audita seguridad de BD (RLS, policies, `SECURITY DEFINER`, `get_advisors`, logs de Auth) y app (secretos fuera del bundle, headers, `proxy.ts`, validación de contraseña) contra SPEC 16/17 y `references/security/security-checklist.md`. **Solo lectura** (sin `apply_migration`; `execute_sql` solo `SELECT` o `begin…rollback`): propone SQL/código sin aplicarlo y sugiere `/spec`. Estado en `references/security/security-audit.md` (excepción: única escritura del agente en `references/`). Úsalo tras cada migración o spec que toque auth/datos. Regla de uso en `.claude/rules/security-auditor.md` (carga por `paths:`; una auditoría al final de la rama solo si tocó esos archivos).
 - Context7 (`ctx7`): al generar código que use una librería/framework/SDK/API externa (Next.js, React, Supabase, Tailwind, Resend, Playwright…), consultar antes la doc actual con `npx ctx7@latest library <nombre> "<consulta>"` y luego `npx ctx7@latest docs <libraryId> "<consulta>"`. Solo cuando haga falta (API dependiente de versión/librería); no para lógica propia ni conceptos generales. Para Next.js, además `node_modules/next/dist/docs/`.
+- Plugin Angular (instalado; solo para código de `angular/`, SPEC 24+; no para la app Next): al crear/modificar/depurar código Angular, usar sus skills y agentes en vez de improvisar.
+  - Implementar: agente `angular:angular-dev` (implementa, refactoriza, depura, ejecuta specs; verifica con build/lint/tests). Con `/spec-impl` de una spec Angular, delegar en él.
+  - Decidir: agente `angular:angular-architect` (solo lectura; estructura, estado, renderizado, backend, upgrades, ADR). Usarlo antes de implementar si hay una decisión de arquitectura abierta.
+  - Skills: `angular-skills:angular-developer` (sintaxis/APIs: signals, resource, forms, routing, SSR, testing, CLI), `angular:angular-solid` (diseño previo antes de escribir componentes/servicios), `angular:angular-quality-a11y` (siempre antes de plantillas/UI), `angular:angular-security` (sesión, tokens, XSS), `angular:angular-i18n` (solo si el proyecto usa Transloco), `angular:angular-workspace` (workspace/librerías), `angular:angular-rendering-performance` (SSR/SSG/bundle, SPEC 24 SSR híbrido), `angular:angular-reactivity-state` (estado), `angular:angular-backend-integration` (HTTP/auth/BFF), `angular:angular-architecture` y `angular:angular-modernization-governance` (estructura y upgrades).
+  - Convenciones Angular (tests, a11y, docs, i18n, verify): bloque `## Convenciones Angular` de este archivo, creado con `angular:angular-project-guidelines`; para cambiar la política, volver a ejecutar esa skill (actualiza el bloque, no lo duplica).
+  - Context7 sigue aplicando para APIs dependientes de versión.
 - Mantener README.md sincronizado cuando cambie este archivo.
