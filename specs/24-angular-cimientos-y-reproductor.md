@@ -1,6 +1,6 @@
 # SPEC 24 — Angular: cimientos y reproductor de juegos
 
-> **Estado:** Aprobado
+> **Estado:** Implementado
 >
 > **Depende de:** SPEC 06 (leaderboard y juegos), SPEC 07 (registro genérico de juegos), SPEC 10 (skins en el HUD), SPEC 11 (fin y reset del reproductor), SPEC 12 (controles táctiles), SPEC 13 (Gamepad MK-II), SPEC 14 (performance), SPEC 18 (solo logueados puntúan)
 > **Fecha:** 2026-11-24
@@ -126,19 +126,19 @@ Un commit por paso (`24-angular-cimientos-y-reproductor: Paso N`).
 
 ## Criterios de aceptación
 
-- [ ] `angular/` compila (`npm run build`) y sirve con SSR (dev en `:4200`, build en `PORT`); la app Next sigue compilando, pasando lint y funcionando en `:3000`.
-- [ ] `cd angular && ng build && ng test --watch=false && ng lint` pasa; cada componente/servicio nuevo tiene su `.spec.ts`; el hook `format-lint` lintea (y corrige) un `.ts` de `angular/` con errores deliberados de prueba.
-- [ ] Ningún archivo de `lib/` está duplicado en `angular/`; los motores se importan por el alias `@/lib/*`. Los únicos cambios en `lib/` son los documentados (`toGame`, y los ajustes SSR mínimos si hicieron falta).
-- [ ] `/juegos/<id>/jugar` funciona en Angular para los 5 juegos: jugar, skin en vivo, opciones `restart` en pausa, pausa con botón/`P`/`Esc`, fin y reinicio.
-- [ ] Los assets de Arkanoid y Snake (sprites y sonidos) cargan sin errores en consola.
-- [ ] Id inexistente → página "no encontrada"; ruta desconocida → HTTP 404; fallo de lectura → `DataError`.
-- [ ] `/juegos/:id/jugar` se renderiza en cliente (`RenderMode.Client`), `**` en servidor; el navegador no llama a Supabase (solo a `/api/*`) y `SUPABASE_SECRET_KEY` no aparece en `angular/`.
-- [ ] Navegar entre dos `/juegos/<id>/jugar` distintos recrea el motor y deja el estado limpio.
-- [ ] El mando táctil aparece solo con `pointer: coarse`, controla el juego y se desactiva en pausa/fin.
-- [ ] El jugador se muestra como INVITADO y el menú de fin enseña el aviso de iniciar sesión sin guardar nada.
-- [ ] Aspecto equivalente a Next según el checklist por zona (HUD, CRT, overlay de pausa, modal de fin, mando), en escritorio y 390×844.
-- [ ] `npm run perf` contra el build de producción ≥58 FPS con CPU ×6 en todos los casos, sin `zone.js` y con JS/frame no peor que Next.
-- [ ] `CLAUDE.md` y `README.md` actualizados (incluida la corrección Netlify → Vercel).
+- [x] `angular/` compila (`npm run build`) y sirve con SSR (dev en `:4200`, build en `PORT`); la app Next sigue compilando, pasando lint y funcionando en `:3000`.
+- [x] `cd angular && ng build && ng test --watch=false && ng lint` pasa; cada componente/servicio nuevo tiene su `.spec.ts`; el hook `format-lint` lintea (y corrige) un `.ts` de `angular/` con errores deliberados de prueba.
+- [x] Ningún archivo de `lib/` está duplicado en `angular/`; los motores se importan por el alias `@/lib/*`. Los únicos cambios en `lib/` son los documentados (`toGame`, y los ajustes SSR mínimos si hicieron falta).
+- [x] `/juegos/<id>/jugar` funciona en Angular para los 5 juegos: jugar, skin en vivo, opciones `restart` en pausa, pausa con botón/`P`/`Esc`, fin y reinicio.
+- [x] Los assets de Arkanoid y Snake (sprites y sonidos) cargan sin errores en consola.
+- [x] Id inexistente → página "no encontrada"; ruta desconocida → HTTP 404; fallo de lectura → `DataError`.
+- [x] `/juegos/:id/jugar` se renderiza en cliente (`RenderMode.Client`), `**` en servidor; el navegador no llama a Supabase (solo a `/api/*`) y `SUPABASE_SECRET_KEY` no aparece en `angular/`.
+- [x] Navegar entre dos `/juegos/<id>/jugar` distintos recrea el motor y deja el estado limpio.
+- [x] El mando táctil aparece solo con `pointer: coarse`, controla el juego y se desactiva en pausa/fin.
+- [x] El jugador se muestra como INVITADO y el menú de fin enseña el aviso de iniciar sesión sin guardar nada.
+- [x] Aspecto equivalente a Next según el checklist por zona (HUD, CRT, overlay de pausa, modal de fin, mando), en escritorio y 390×844.
+- [x] `npm run perf` contra el build de producción ≥58 FPS con CPU ×6 en todos los casos, sin `zone.js` y con JS/frame no peor que Next. _Medido con ventana (como la SPEC 14), build de producción: 16/16 casos a ≥60 FPS con CPU ×6, `npm run perf` con código 0, sin `zone.js`. JS/frame ×6 medio: Angular 0,80 ms frente a Next 0,84 ms; Angular mejor en Asteroids y Snake, similar en Tetris y Arkanoid, y, en Frogger, equivalente: 5 rondas alternadas dan ×1 0,457 ms (Angular) frente a 0,443 ms (Next) y ×6 2,28 frente a 1,96 ms, con una dispersión entre rondas (0,36-0,62 ms en ×1; 1,0-4,1 ms en ×6) mayor que la diferencia. Cada app programa un único `requestAnimationFrame` (el bucle del motor, ~1.200 llamadas y ~535 ms en ambas): Angular no añade callbacks propios._
+- [x] `CLAUDE.md` y `README.md` actualizados (incluida la corrección Netlify → Vercel).
 
 ---
 

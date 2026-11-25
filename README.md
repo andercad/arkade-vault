@@ -29,6 +29,23 @@ Autenticación (SPEC 16): Supabase Auth con confirmación de email, perfil `prof
 
 Lista detallada de juegos (desde la BD): `references/implemented-games.md`.
 
+## App Angular (SPEC 24-29)
+
+Migración de Next.js a Angular en seis specs, con las dos apps conviviendo (Next sigue siendo la app desplegada hasta la SPEC 28): 24 cimientos y reproductor, 25 resto de pantallas, 26 auth/guardado/contacto, 27 staging en Vercel, 28 cambio de producción con rollback, 29 retirada de Next y tooling. Motivo: formativo (Angular moderno sobre un producto real) y alineación con el stack Angular del equipo.
+
+La SPEC 24 crea `angular/` (Angular 22, SSR, standalone, signals, zoneless) y sirve `/juegos/:id/jugar` con el mismo reproductor que Next (canvas, HUD, skins, pausa, fin y mando táctil MK-II) para los 5 juegos. Reutiliza los motores de `lib/` por el alias `@/lib/*` y el CSS de `app/globals.css`. Un BFF en el Express del SSR (`GET /api/games/:id`) lee el catálogo de Supabase: el navegador no habla con la BD. El jugador es siempre invitado hasta la SPEC 26; el resto de rutas devuelven la página 404 de Angular hasta la SPEC 25. Mientras duran las SPEC 24-29, los cambios en reproductor, mando táctil y HUD exigen paridad en las dos apps.
+
+```bash
+cd angular
+npm start                      # dev en http://localhost:4200 (Next puede seguir en :3000)
+npm run build                  # build SSR
+PORT=4300 node dist/arcade-vault-angular/server/server.mjs   # servir el build
+ng test --watch=false          # tests unitarios (Vitest)
+ng lint                        # angular-eslint + jsdoc + accesibilidad de plantillas
+```
+
+Variables en `angular/.env` (ignorado por git): `SUPABASE_URL` y `SUPABASE_PUBLISHABLE_KEY` (los mismos valores que `NEXT_PUBLIC_SUPABASE_*`). Para medir el perf de Angular: `PERF_URL=http://localhost:4300 npm run perf` desde la raíz, contra el build de producción (no `ng serve`).
+
 ## Código compartido
 
 Cachés de canvas `lib/canvas-cache.ts` (capa estática y sprites con glow, SPEC 14). Contrato de motores `lib/game-engine.ts`, registro `lib/game-registry.ts`, reproductor `components/game-player.tsx` / `game-canvas.tsx` (las opciones `live`, p. ej. skin, van en el HUD; las `restart`, en el overlay de pausa), mando táctil `components/touch-controls.tsx` (aspecto Gamepad MK-II, SPEC 13; configurado por `touchControls` en el registro; emite teclas virtuales, solo con `pointer: coarse`; fijo abajo en móvil vertical), UI de scores (`leaderboard`, `hall-of-fame`), acceso a datos `lib/games*`/`lib/scores*` y clientes `lib/supabase/`. Reutilizar antes de crear código nuevo.
@@ -36,7 +53,7 @@ Cachés de canvas `lib/canvas-cache.ts` (capa estática y sprites con glow, SPEC
 ## Tooling de Claude
 
 - Hook `PostToolUse` (`.claude/hooks/format-lint.mjs`): Prettier + ESLint `--fix` tras cada Write/Edit (los `.ts`/`.html` de `angular/` con el ESLint propio de `angular/`, SPEC 24, solo cuando exista su `eslint.config.*`).
-- Producción: Claude solo accede a dev por MCP; prod (Supabase + Netlify) se migra a mano con `references/deploy/prod-runbook.md` (script único `prod-setup.sql` en el SQL Editor de prod) y se verifica con `references/deploy/verify-prod.sql`.
+- Producción: Claude solo accede a dev por MCP; prod (Supabase + Vercel, `vercel.json`) se migra a mano con `references/deploy/prod-runbook.md` (script único `prod-setup.sql` en el SQL Editor de prod) y se verifica con `references/deploy/verify-prod.sql`.
 - MCP (`.mcp.json`): Supabase. Playwright MCP para validar UI (screenshots en `.playwright-screenshots/`).
 - `/telegram-send <mensaje>` (`.claude/skills/telegram-send/`): envía texto a Telegram (Bot API `sendMessage`). Requiere `TELEGRAM_BOT_TOKEN` y `TELEGRAM_CHAT_ID` en el bloque `env` de `.claude/settings.local.json` (ignorado por git); reiniciar Claude Code tras definirlas. En rutinas cloud (`/schedule`) ese archivo no existe: definirlas como variables del entorno cloud (claude.ai/code → Environments) y permitir red a `api.telegram.org`. Los subagentes `security-auditor`, `game-jam`, `game-planner` y `game-expander` avisan por Telegram al terminar con el skill precargado (`skills: [telegram-send]`); si falla, lo indican sin reintentar.
 - Subagente `game-planner` (`.claude/agents/game-planner.md`): planifica qué juego encaja, con memoria persistente en `.claude/agent-memory/game-planner/` y To-Do en `references/game-suggestions-todo.md`. Usar antes de `/add-game`.
@@ -98,6 +115,9 @@ Luego abre `http://192.168.1.50:3000` en el móvil (la IP sale de `ipconfig`). R
 | `19-perfil-contrasena-y-borrar-cuenta.md`      | Cambiar contraseña (con la actual) y eliminar cuenta desde `/perfil`, sin migración                                             |
 | `20-endurecer-auth-ip-origen-pkce.md`          | Endurece auth: IP de cabecera fiable, origen fijo con `NEXT_PUBLIC_SITE_URL`, PKCE por código, control de clave secreta         |
 | `21-color-categoria-en-ui.md`                  | Color de categoría en la UI: etiquetas, hover de tarjeta, JUGAR AHORA, actividad y chips del filtro (`--accent`); sin migración |
+| `22-datos-a-neon.md`                           | Borrador: datos a Neon (se reescribe para Angular tras la SPEC 29)                                                              |
+| `23-auth-a-neon-auth.md`                       | Borrador: auth a Neon Auth (se reescribe para Angular tras la SPEC 29)                                                          |
+| `24-angular-cimientos-y-reproductor.md`        | App Angular SSR en `angular/` con el reproductor de juegos (reutiliza `lib/`); primera de las SPEC 24-29                        |
 | `game-jam/frogger/01-frogger-core.md`          | Frogger: motor TS en `lib/frogger/` (carretera, río, casas, vidas, tiempo)                                                      |
 | `game-jam/frogger/02-frogger-platform.md`      | Frogger en la plataforma: registro, migración `0008`, portada, pausa (botón + `P`/`Esc`) y guardado                             |
 | `game-jam/frogger/03-frogger-hazards-audio.md` | Frogger: peligros extra y audio (pendiente de implementar)                                                                      |
