@@ -13,6 +13,7 @@ import { createAuthRouter } from './server/auth-api';
 import { createAuthNavigationRouter } from './server/auth-navigation';
 import { contactEnvFromProcess, createContactRouter, sendWithResend } from './server/contact-api';
 import { createCsrfMiddleware } from './server/csrf';
+import { apiErrorHandler } from './server/json-errors';
 import { createProfileRouter } from './server/profile-api';
 import { createScoresRouter } from './server/scores-api';
 import { createSessionMiddleware } from './server/session';
@@ -97,12 +98,16 @@ function createReadClient(): ApiClient | null {
 app.use('/api', createCsrfMiddleware(siteUrl));
 
 // Auth (SPEC 26): sesión en cookies httpOnly.
-app.use('/api/auth', express.json(), createAuthRouter({
+app.use(
+  '/api/auth',
+  express.json(),
+  createAuthRouter({
     sessionClient,
     authClient: (req, res) => createAuthActionClient(requireSupabaseEnv(), req, res),
     adminClient: () => createAdminClient(requireSupabaseEnv()),
     siteUrl,
-  }));
+  }),
+);
 
 // Perfil (SPEC 26): usuario, contraseña y borrado; el id sale siempre de la sesión.
 app.use(
@@ -127,6 +132,9 @@ app.use(
 
 // BFF de solo lectura (src/server/api.ts); responde 404 JSON a cualquier otra /api/*.
 app.use('/api', createApiRouter(createReadClient));
+
+// Errores de /api/* (p. ej. JSON mal formado) siempre en JSON, sin traza.
+app.use('/api', apiErrorHandler);
 
 /**
  * Serve static files from /browser

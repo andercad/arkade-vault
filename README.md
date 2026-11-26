@@ -33,9 +33,11 @@ Lista detallada de juegos (desde la BD): `references/implemented-games.md`.
 
 Migración de Next.js a Angular en seis specs, con las dos apps conviviendo (Next sigue siendo la app desplegada hasta la SPEC 28): 24 cimientos y reproductor, 25 resto de pantallas, 26 auth/guardado/contacto, 27 staging en Vercel, 28 cambio de producción con rollback, 29 retirada de Next y tooling. Motivo: formativo (Angular moderno sobre un producto real) y alineación con el stack Angular del equipo.
 
-La SPEC 24 crea `angular/` (Angular 22, SSR, standalone, signals, zoneless) y sirve `/juegos/:id/jugar` con el mismo reproductor que Next (canvas, HUD, skins, pausa, fin y mando táctil MK-II) para los 5 juegos. Reutiliza los motores de `lib/` por el alias `@/lib/*` y el CSS de `app/globals.css`. Un BFF en el Express del SSR lee el catálogo de Supabase: el navegador no habla con la BD. El jugador es siempre invitado hasta la SPEC 26. Mientras duran las SPEC 24-29, los cambios en reproductor, mando táctil y HUD exigen paridad en las dos apps.
+La SPEC 24 crea `angular/` (Angular 22, SSR, standalone, signals, zoneless) y sirve `/juegos/:id/jugar` con el mismo reproductor que Next (canvas, HUD, skins, pausa, fin y mando táctil MK-II) para los 5 juegos. Reutiliza los motores de `lib/` por el alias `@/lib/*` y el CSS de `app/globals.css`. Un BFF en el Express del SSR lee el catálogo de Supabase: el navegador no habla con la BD. Mientras duran las SPEC 24-29, los cambios en reproductor, mando táctil y HUD exigen paridad en las dos apps.
 
 La SPEC 25 añade el resto de pantallas con el mismo DOM y CSS que Next: home (`/`), biblioteca (`/juegos`), detalle (`/juegos/:id`, con 404 real si el id no existe), salón de la fama (`/salon-de-la-fama`, pestañas ARIA y `?juego=<id>`), about (`/about`, prerenderizada) y login (`/login`), más el nav completo con panel móvil. About y login son solo UI: validan y muestran "Disponible próximamente" sin ninguna petición hasta la SPEC 26; `/perfil` y `/auth/*` siguen dando el 404 de Angular. Las páginas se cargan en diferido (`export default` + `loadComponent`) con `rxResource` sobre dos servicios.
+
+La SPEC 26 conecta la sesión: el BFF Express guarda la sesión de Supabase en cookies `httpOnly` (`@supabase/ssr`) y el navegador solo habla con `/api/*` y las rutas de navegación `/auth/oauth/:provider` y `/auth/callback`. Incluye registro, login por email o usuario, Google/GitHub, recuperación de contraseña, guardado de puntuación (`player_name` lo pone el servidor), `/perfil` (usuario, contraseña, borrar cuenta; 302 a `/login` sin sesión) y contacto con Resend. CSRF por `Origin` = `SITE_URL` + solo JSON. Nuevas variables en `angular/.env` (ver `angular/.env.example`): `SUPABASE_SECRET_KEY`, `SITE_URL`, `RESEND_API_KEY`, `CONTACT_TO_EMAIL`, `CONTACT_FROM_EMAIL`. `npm run check:secret-client` cubre también `angular/src/server` y el bundle del navegador.
 
 Endpoints del BFF (solo lectura, clave publicable, sin sesión): `GET /api/games`, `/api/games/:id`, `/api/games/:id/scores?limit=N` (1-12, defecto 10), `/api/scores/recent` (con `ago` calculado en servidor) y `/api/scores/top-today`. Estado de la migración: SPEC 24 y 25 implementadas; siguen la 26 (auth, guardado, contacto), 27, 28 y 29. Deuda conocida: el contraste de color de `app/globals.css` (p. ej. `--ink-faint`) no llega a WCAG AA, igual en Next, y se aborda en una spec de diseño.
 
@@ -97,36 +99,37 @@ Luego abre `http://192.168.1.50:3000` en el móvil (la IP sale de `ipconfig`). R
 
 ## Specs (`specs/`)
 
-| Spec                                           | Contenido                                                                                                                       |
-| ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
-| `01-mvp-pantallas.md`                          | MVP visual: 5 pantallas con datos mock                                                                                          |
-| `02-homepage.md`                               | Home en `/`, Biblioteca movida a `/juegos`, nav completa                                                                        |
-| `03-about-contacto.md`                         | `/about` + formulario de contacto (Resend, Server Action)                                                                       |
-| `04-supabase-cimientos.md`                     | Supabase: clientes, migraciones, tipos generados                                                                                |
-| `05-asteroids.md`                              | Asteroids: primer juego real jugable (motor TS en `lib/asteroids/`)                                                             |
-| `06-leaderboard-y-juegos.md`                   | Tablas `games` y `scores` en Supabase; leaderboard real (solo Asteroids)                                                        |
-| `07-tetris.md`                                 | Tetris (motor TS en `lib/tetris/`) y registro genérico de juegos                                                                |
-| `08-arkanoid.md`                               | Arkanoid (motor TS en `lib/arkanoid/`) con sonido y 5 niveles                                                                   |
-| `09-snake.md`                                  | Snake (motor TS en `lib/snake/`) con sprites de frutas y niveles                                                                |
-| `10-hud-skins-integrados.md`                   | Selector de skin (opciones `live`) integrado en el HUD del reproductor                                                          |
-| `11-fin-leaderboard-y-reset.md`                | Botón del menú de fin al Salón de la fama (`?juego=<id>`) y reset del reproductor al salir                                      |
-| `12-controles-tactiles.md`                     | Mando táctil bajo el canvas (`touchControls` por juego en el registro) y HUD compacto en móvil                                  |
-| `13-gamepad-mk2.md`                            | Aspecto Gamepad MK-II del mando táctil (carcasa neón, cruz con hub, botones A/B), fijo abajo en móvil                           |
-| `14-revision-performance.md`                   | Revisión de performance: ≥58 FPS con CPU ×6 en los 5 juegos (cachés de capa y sprites con glow), `npm run perf`                 |
-| `15-colores-por-categoria.md`                  | Un color fijo por categoría (11↔11): migración `0009`, `CATEGORY_COLOR`, acentos CSS y agentes/skills alineados                 |
-| `16-autenticacion.md`                          | Supabase Auth: registro con confirmación, login email/usuario, Google/GitHub, reset, `profiles` y `scores.user_id`              |
-| `17-medidas-seguridad.md`                      | Seguridad básica: migración `0012`, contraseña fuerte, reenvío de IP en Auth, headers y `/perfil` protegido en `proxy.ts`       |
-| `18-solo-logueados-puntuan.md`                 | Solo con sesión se guarda puntuación: migración `0013`, `user_id not null`, cascade, el invitado juega sin guardar              |
-| `19-perfil-contrasena-y-borrar-cuenta.md`      | Cambiar contraseña (con la actual) y eliminar cuenta desde `/perfil`, sin migración                                             |
-| `20-endurecer-auth-ip-origen-pkce.md`          | Endurece auth: IP de cabecera fiable, origen fijo con `NEXT_PUBLIC_SITE_URL`, PKCE por código, control de clave secreta         |
-| `21-color-categoria-en-ui.md`                  | Color de categoría en la UI: etiquetas, hover de tarjeta, JUGAR AHORA, actividad y chips del filtro (`--accent`); sin migración |
-| `22-datos-a-neon.md`                           | Borrador: datos a Neon (se reescribe para Angular tras la SPEC 29)                                                              |
-| `23-auth-a-neon-auth.md`                       | Borrador: auth a Neon Auth (se reescribe para Angular tras la SPEC 29)                                                          |
-| `24-angular-cimientos-y-reproductor.md`        | App Angular SSR en `angular/` con el reproductor de juegos (reutiliza `lib/`); primera de las SPEC 24-29                        |
-| `25-angular-resto-de-pantallas.md`             | Angular: home, biblioteca, detalle, salón de la fama, about y login (solo UI), nav completo y BFF con 5 endpoints               |
-| `game-jam/frogger/01-frogger-core.md`          | Frogger: motor TS en `lib/frogger/` (carretera, río, casas, vidas, tiempo)                                                      |
-| `game-jam/frogger/02-frogger-platform.md`      | Frogger en la plataforma: registro, migración `0008`, portada, pausa (botón + `P`/`Esc`) y guardado                             |
-| `game-jam/frogger/03-frogger-hazards-audio.md` | Frogger: peligros extra y audio (pendiente de implementar)                                                                      |
+| Spec                                           | Contenido                                                                                                                                |
+| ---------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| `01-mvp-pantallas.md`                          | MVP visual: 5 pantallas con datos mock                                                                                                   |
+| `02-homepage.md`                               | Home en `/`, Biblioteca movida a `/juegos`, nav completa                                                                                 |
+| `03-about-contacto.md`                         | `/about` + formulario de contacto (Resend, Server Action)                                                                                |
+| `04-supabase-cimientos.md`                     | Supabase: clientes, migraciones, tipos generados                                                                                         |
+| `05-asteroids.md`                              | Asteroids: primer juego real jugable (motor TS en `lib/asteroids/`)                                                                      |
+| `06-leaderboard-y-juegos.md`                   | Tablas `games` y `scores` en Supabase; leaderboard real (solo Asteroids)                                                                 |
+| `07-tetris.md`                                 | Tetris (motor TS en `lib/tetris/`) y registro genérico de juegos                                                                         |
+| `08-arkanoid.md`                               | Arkanoid (motor TS en `lib/arkanoid/`) con sonido y 5 niveles                                                                            |
+| `09-snake.md`                                  | Snake (motor TS en `lib/snake/`) con sprites de frutas y niveles                                                                         |
+| `10-hud-skins-integrados.md`                   | Selector de skin (opciones `live`) integrado en el HUD del reproductor                                                                   |
+| `11-fin-leaderboard-y-reset.md`                | Botón del menú de fin al Salón de la fama (`?juego=<id>`) y reset del reproductor al salir                                               |
+| `12-controles-tactiles.md`                     | Mando táctil bajo el canvas (`touchControls` por juego en el registro) y HUD compacto en móvil                                           |
+| `13-gamepad-mk2.md`                            | Aspecto Gamepad MK-II del mando táctil (carcasa neón, cruz con hub, botones A/B), fijo abajo en móvil                                    |
+| `14-revision-performance.md`                   | Revisión de performance: ≥58 FPS con CPU ×6 en los 5 juegos (cachés de capa y sprites con glow), `npm run perf`                          |
+| `15-colores-por-categoria.md`                  | Un color fijo por categoría (11↔11): migración `0009`, `CATEGORY_COLOR`, acentos CSS y agentes/skills alineados                          |
+| `16-autenticacion.md`                          | Supabase Auth: registro con confirmación, login email/usuario, Google/GitHub, reset, `profiles` y `scores.user_id`                       |
+| `17-medidas-seguridad.md`                      | Seguridad básica: migración `0012`, contraseña fuerte, reenvío de IP en Auth, headers y `/perfil` protegido en `proxy.ts`                |
+| `18-solo-logueados-puntuan.md`                 | Solo con sesión se guarda puntuación: migración `0013`, `user_id not null`, cascade, el invitado juega sin guardar                       |
+| `19-perfil-contrasena-y-borrar-cuenta.md`      | Cambiar contraseña (con la actual) y eliminar cuenta desde `/perfil`, sin migración                                                      |
+| `20-endurecer-auth-ip-origen-pkce.md`          | Endurece auth: IP de cabecera fiable, origen fijo con `NEXT_PUBLIC_SITE_URL`, PKCE por código, control de clave secreta                  |
+| `21-color-categoria-en-ui.md`                  | Color de categoría en la UI: etiquetas, hover de tarjeta, JUGAR AHORA, actividad y chips del filtro (`--accent`); sin migración          |
+| `22-datos-a-neon.md`                           | Borrador: datos a Neon (se reescribe para Angular tras la SPEC 29)                                                                       |
+| `23-auth-a-neon-auth.md`                       | Borrador: auth a Neon Auth (se reescribe para Angular tras la SPEC 29)                                                                   |
+| `24-angular-cimientos-y-reproductor.md`        | App Angular SSR en `angular/` con el reproductor de juegos (reutiliza `lib/`); primera de las SPEC 24-29                                 |
+| `25-angular-resto-de-pantallas.md`             | Angular: home, biblioteca, detalle, salón de la fama, about y login (solo UI), nav completo y BFF con 5 endpoints                        |
+| `26-angular-auth-guardado-y-contacto.md`       | Angular: sesión en el BFF (cookies httpOnly), login/registro/OAuth/recuperación, guardado de puntuación, `/perfil` y contacto con Resend |
+| `game-jam/frogger/01-frogger-core.md`          | Frogger: motor TS en `lib/frogger/` (carretera, río, casas, vidas, tiempo)                                                               |
+| `game-jam/frogger/02-frogger-platform.md`      | Frogger en la plataforma: registro, migración `0008`, portada, pausa (botón + `P`/`Esc`) y guardado                                      |
+| `game-jam/frogger/03-frogger-hazards-audio.md` | Frogger: peligros extra y audio (pendiente de implementar)                                                                               |
 
 ### Buenas prácticas
 

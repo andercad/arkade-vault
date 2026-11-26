@@ -31,6 +31,18 @@
 | Panel | Confirm email, min 8 + requisitos, rate limit 10/5 min     | manual | No verificable por MCP                                                                                             | 2026-11-25      |
 | Panel | IP Address Forwarding                                      | 🟡     | Logs muestran IP de cliente (no la del servidor); confirmar en panel                                               | 2026-11-25      |
 | Panel | Redirect URLs, proveedores Google/GitHub                   | manual | No verificable por MCP                                                                                             | 2026-11-25      |
+| App   | SPEC 26 BFF: CSRF (`csrf.ts`)                              | ✅     | curl: POST con Origin ajeno → 403, sin Origin → 403, sin JSON → 415; GET sin comprobación                            | 2026-11-26 16:41 |
+| App   | SPEC 26 BFF: cookies (`supabase.ts:45-55`)                 | 🟡     | `httpOnly`, `sameSite=lax`, `path=/`, `Secure` solo con NODE_ENV=production (`server.ts:69`); Secure en prod no verificado | 2026-11-26 16:41 |
+| App   | SPEC 26 BFF: clave secreta (authClient/adminClient)        | ✅     | solo `auth.*`, `rpc('email_for_username')` y `admin.deleteUser`; `check:secret-client` OK; sin claves en `angular/dist/**/browser`; `.env` fuera de git, `.env.example` sin valores | 2026-11-26 16:41 |
+| App   | SPEC 26 BFF: sesión/`/perfil`                              | ✅     | `curl -I /perfil` sin cookie → 302 `/login`; `/api/auth/me` → `{"user":null}`; `/api/scores` sin sesión → 401       | 2026-11-26 16:41 |
+| App   | SPEC 26 BFF: redirecciones/open redirect                   | ✅     | `auth-navigation.ts`: destinos fijos; `redirectTo`/`emailRedirectTo` con `SITE_URL`; `/auth/oauth/xx` y `/auth/callback` sin code → `/login?error=oauth` | 2026-11-26 16:41 |
+| App   | SPEC 26 BFF: scores/profile (id de sesión)                 | ✅     | `scores-api.ts` `player_name` de `profiles`, clamp 1e6; `profile-api.ts` id de `getUser()`, único `deleteUser` l.161 | 2026-11-26 16:41 |
+| App   | SPEC 26 BFF: contacto (inyección)                          | ✅     | asunto sin CR/LF; email sin `\s` (`lib/contact.ts:13`); texto plano; honeypot; límites 60/120/2000                   | 2026-11-26 16:41 |
+| App   | SPEC 26 BFF: manejo de errores JSON mal formado            | ❌     | `POST /api/contact` con `{bad` → HTML con stack y rutas (dev); sin handler de errores (`server.ts:100-126`)          | 2026-11-26 16:41 |
+| App   | SPEC 26: IP en logs Auth                                   | 🟡     | no verificable con las claves de log disponibles (campos vacíos); ver hallazgo clientIp                              | 2026-11-26 16:41 |
+| BD    | SPEC 26 frente a BD (advisors, RLS, policies, funciones)   | ✅     | advisors solo `auth_leaked_password_protection` (aceptado) + INFO `unused_index`; RLS 3/3; `game_stats` invoker; insert scores = `scores insert usuario`; funciones DEFINER con search_path y solo `service_role`; `ensure_rls` activo; sin deriva (13 migraciones) | 2026-11-26 16:41 |
+| App   | `npm audit --omit=dev` (angular/)                          | ✅     | 0 vulnerabilidades                                                                                                  | 2026-11-26 16:41 |
+| Panel | Redirect URLs `:4200` (callback, reset-password)           | manual | Confirmar en panel (SPEC 26)                                                                                        | 2026-11-26 16:41 |
 
 Leyenda: `✅` correcto · `❌` hallazgo · `🟡` aceptado/parcial · `manual` confirmar en panel · `n/a` no aplica
 
@@ -41,7 +53,12 @@ Leyenda: `✅` correcto · `❌` hallazgo · `🟡` aceptado/parcial · `manual`
 | 2026-11-20 (sin hora) | Primera auditoría. BD limpia; app limpia salvo headers ausentes en dev server activo (a reiniciar)                      | 1 Medio (headers no servidos, por verificar) |
 | 2026-11-20 (sin hora) | Re-auditoría: BD limpia; headers ya servidos tras el cambio a `/:path*`                                                 | 0 (cambio de `next.config.ts` sin commitear) |
 | 2026-11-25 (sin hora) | Auditoría completa SPEC 16-20 (rama spec-20): BD y app limpias, pruebas rollback OK, dev server activo, `next.config.ts` ya commiteado | 0 (3 checks de panel `manual`)               |
+| 2026-11-26 16:41 | Auditoría rama spec-26 (BFF Express Angular): BD limpia; CSRF, sesión, redirects, clave secreta y contacto OK; 2 hallazgos Bajo | 2 Bajo (errores sin handler JSON; clientIp fiable solo tras proxy) |
 
 ## Hallazgos abiertos
 
-(ninguno) — Checks de panel siguen `manual`. Mejoras futuras fuera de alcance (si no están en spec): CSP, HSTS, Permissions-Policy, límite propio de intentos con contraseña errónea (ya aceptado en SPEC 19).
+- **Bajo — JSON mal formado devuelve HTML con stack** (`angular/src/server.ts:100-126`, `express.json()` sin handler). Evidencia: `curl -X POST /api/contact -d '{bad'` con Origin/JSON válidos → HTML con traza y rutas (NODE_ENV≠production; en producción Express oculta la traza). Corrección propuesta: middleware de errores tras los routers `/api`: `app.use('/api', (err, _req, res, next) => { if (res.headersSent) return next(err); res.status(err.status ?? 500).json({ error: err.status === 400 ? 'invalid_json' : 'server_error' }); })`. Sin aplicar.
+- **Bajo — `clientIp` confía en `x-vercel-forwarded-for`/`x-real-ip`** (`angular/src/server/supabase.ts:23-35`). Solo es fiable tras Vercel; si el Express se expone directo, un cliente falsea `sb-forwarded-for` y esquiva el límite 10/5 min. Corrección: en SPEC 27 documentar/forzar el despliegue tras proxy, o leer solo esas cabeceras si `process.env.VERCEL` existe. Sin aplicar.
+- Aceptado/futuro (no hallazgo): sin límite de envíos en `/api/contact` (SPEC 26 Decisiones); enumeración en `signUp` (SPEC 20).
+
+Anterior: (ninguno) — Checks de panel siguen `manual`. Mejoras futuras fuera de alcance (si no están en spec): CSP, HSTS, Permissions-Policy, límite propio de intentos con contraseña errónea (ya aceptado en SPEC 19).

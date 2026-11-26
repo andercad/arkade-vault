@@ -16,6 +16,14 @@
   - [x] Clave secreta solo para `auth.*` (SPEC 20): `npm run check:secret-client` falla si el cliente de `createAuthActionClient` usa `.from(`/`.rpc(` en `app/` o `lib/`
   - [ ] Enumeración de cuentas en `signUp` ("Ese usuario ya existe", "Ese correo ya está registrado") — **riesgo aceptado (SPEC 20)**: UX clara, sin datos sensibles; `signIn` no enumera. Mejora futura: mensajes genéricos
 
+  - [x] App Angular (SPEC 26): sesión en cookies `httpOnly` + `SameSite=Lax` (`Secure` en prod) gestionadas por `@supabase/ssr` en el BFF; el navegador nunca habla con Supabase
+  - [x] CSRF (SPEC 26): `POST`/`PATCH`/`DELETE` de `/api/*` exigen `Origin` = `SITE_URL` (403) y `Content-Type: application/json` (415)
+  - [x] `SITE_URL` fija (SPEC 26) para `emailRedirectTo`, OAuth y `Origin` permitido; obligatoria en producción (el servidor no arranca sin ella)
+  - [x] Clave secreta en Angular (SPEC 26): `angular/src/server/supabase.ts`; `authClient` solo `auth.*`, `adminClient` solo `email_for_username` y `auth.admin.deleteUser`; `npm run check:secret-client` cubre `angular/src/server` y que `SUPABASE_SECRET_KEY`/`RESEND_API_KEY` no estén en `angular/dist/**/browser`
+  - [x] `player_name` de `POST /api/scores` lo pone el servidor desde `profiles` (el cliente no lo envía); `user_id` de la sesión; `score` recortado a 1.000.000
+  - [x] Perfil en Angular (SPEC 26): id siempre de `getUser()`; borrado con confirmación por username; contraseña con re-autenticación y `signOut({ scope: "others" })`
+  - [ ] Límite de envíos del contacto y de intentos de login (Next y Angular), CSP y HSTS — **fuera de alcance (SPEC 26)**: spec de seguridad futura
+
   Ej:
 
 ```ts

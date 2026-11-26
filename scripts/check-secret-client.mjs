@@ -54,11 +54,100 @@ for (const root of ROOTS) {
   }
 }
 
+// SPEC 26: app Angular. Los clientes de clave secreta (`authClient` = auth.*,
+// `adminClient` = email_for_username + auth.admin) llegan inyectados (`deps.authClient(...)`)
+// y las cadenas ocupan varias líneas, así que se analiza el archivo entero.
+const ANGULAR_SERVER = join("angular", "src", "server");
+const ANGULAR_DEFINITION = join(ANGULAR_SERVER, "supabase.ts");
+const ANGULAR_SPEC = /\.spec\.ts$/;
+const SECRET_FACTORY =
+  "(?:createAuthActionClient|createAdminClient|authClient|adminClient)";
+const ALLOWED_RPC = "email_for_username";
+
+/** Número de línea (1-based) de un índice del texto. */
+const lineOf = (src, index) => src.slice(0, index).split("\n").length;
+
+function checkAngularServer() {
+  let files;
+  try {
+    files = [...walk(ANGULAR_SERVER)];
+  } catch {
+    return; // sin angular/src/server (p. ej. checkout parcial)
+  }
+  for (const file of files) {
+    if (file === ANGULAR_DEFINITION || ANGULAR_SPEC.test(file)) continue;
+    const src = readFileSync(file, "utf8");
+    if (!new RegExp(SECRET_FACTORY).test(src)) continue;
+    const report = (index, what) =>
+      violations.push(`${relative(".", file)}:${lineOf(src, index)}  ${what}`);
+
+    // Uso encadenado: deps.adminClient().rpc(...), createAuthActionClient(...).from(...)
+    const chained = new RegExp(
+      `${SECRET_FACTORY}\\s*\\([^)]*\\)\\s*\\)?\\s*\\.(from|rpc)\\s*\\(\\s*(['"\`][^'"\`]*['"\`])?`,
+      "g",
+    );
+    for (const m of src.matchAll(chained)) {
+      const isAllowed = m[1] === "rpc" && m[2]?.slice(1, -1) === ALLOWED_RPC;
+      if (!isAllowed) {
+        report(m.index, `cliente de clave secreta con .${m[1]}(${m[2] ?? ""})`);
+      }
+    }
+
+    // Variable que guarda el cliente: const c = deps.authClient(req, res);
+    const vars = new Set();
+    for (const m of src.matchAll(
+      new RegExp(
+        `(?:const|let|var)\\s+(\\w+)\\s*=\\s*(?:await\\s+)?(?:deps\\.)?${SECRET_FACTORY}\\s*\\([^)]*\\)\\s*;`,
+        "g",
+      ),
+    )) {
+      vars.add(m[1]);
+    }
+    for (const v of vars) {
+      for (const m of src.matchAll(
+        new RegExp(`\\b${v}\\s*\\.(from|rpc)\\s*\\(`, "g"),
+      )) {
+        report(m.index, `'${v}' (clave secreta) con .${m[1]}(`);
+      }
+    }
+  }
+}
+
+// El navegador nunca debe llevar claves del servidor (nombres de variable) en el build.
+const BROWSER_DIST = join("angular", "dist", "arcade-vault-angular", "browser");
+const FORBIDDEN_IN_BUNDLE = ["SUPABASE_SECRET_KEY", "RESEND_API_KEY"];
+
+function checkAngularBundle() {
+  let files;
+  try {
+    files = [...walk(BROWSER_DIST)];
+  } catch {
+    return false; // sin build: no se comprueba
+  }
+  for (const file of files) {
+    const src = readFileSync(file, "utf8");
+    for (const name of FORBIDDEN_IN_BUNDLE) {
+      if (src.includes(name)) {
+        violations.push(`${relative(".", file)}  contiene ${name}`);
+      }
+    }
+  }
+  return true;
+}
+
+checkAngularServer();
+const bundleChecked = checkAngularBundle();
+
 if (violations.length) {
   console.error(
-    "✗ createAuthActionClient (clave secreta) solo puede usarse con auth.*:",
+    "✗ Los clientes de clave secreta solo pueden usarse con auth.* (y email_for_username):",
   );
   for (const v of violations) console.error("  " + v);
   process.exit(1);
 }
-console.log("✓ createAuthActionClient solo se usa con auth.*");
+console.log("✓ Clave secreta solo con auth.* (app/, lib/, angular/src/server)");
+console.log(
+  bundleChecked
+    ? "✓ Sin claves de servidor en angular/dist/**/browser"
+    : "· angular/dist sin compilar: bundle no comprobado",
+);
