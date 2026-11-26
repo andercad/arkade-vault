@@ -20,6 +20,8 @@
       "@library/*": ["./src/app/library/*"],
       "@home/*": ["./src/app/home/*"],
       "@hall-of-fame/*": ["./src/app/hall-of-fame/*"],
+      "@about/*": ["./src/app/about/*"],
+      "@auth/*": ["./src/app/auth/*"],
       "@not-found/*": ["./src/app/not-found/*"]
     }
   },

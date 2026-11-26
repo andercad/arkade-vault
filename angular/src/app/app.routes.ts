@@ -3,9 +3,6 @@ import { Routes } from '@angular/router';
 /** Título por defecto, el mismo que `metadata.title` de Next. */
 const TITLE = 'Arcade Vault';
 
-/** Hasta que exista su pantalla real (pasos 3-6 de la SPEC 25). */
-const provisional = () => import('./provisional/pages/provisional-page/provisional-page');
-
 /** Las páginas son `export default` y se cargan en diferido con `loadComponent`. */
 export const routes: Routes = [
   { path: '', title: TITLE, loadComponent: () => import('@home/pages/home-page/home-page') },
@@ -32,10 +29,9 @@ export const routes: Routes = [
   {
     path: 'about',
     title: 'Acerca de | Arcade Vault',
-    data: { name: 'ACERCA DE' },
-    loadComponent: provisional,
+    loadComponent: () => import('@about/pages/about-page/about-page'),
   },
-  { path: 'login', title: TITLE, data: { name: 'LOGIN' }, loadComponent: provisional },
+  { path: 'login', title: TITLE, loadComponent: () => import('@auth/pages/login-page/login-page') },
   {
     path: '**',
     title: TITLE,

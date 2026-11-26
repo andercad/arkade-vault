@@ -1,0 +1,28 @@
+<section class="about-hero">
+  <div class="kicker pixel neon-yellow"><span aria-hidden="true">▸</span> ACERCA DE</div>
+  <h1 class="about-title">ACERCA DE ARCADE VAULT</h1>
+  <p class="about-mission">
+    ARCADE VAULT nació del amor por los videojuegos clásicos. Nuestra misión es preservar y celebrar
+    los arcades que definieron una generación, haciéndolos accesibles para todos, en cualquier lugar
+    y sin costo.
+  </p>
+
+  <div class="highlight-row">
+    @for (h of highlights; track h.icon; let i = $index) {
+      <div [class]="'highlight ' + h.color" [style.transition-delay.ms]="i * 80">
+        <app-highlight-icon [kind]="h.icon" />
+        <div class="hl-text pixel">{{ h.text }}</div>
+      </div>
+    }
+  </div>
+</section>
+
+<section appReveal class="about-divider" aria-hidden="true">
+  <div class="div-bar"></div>
+  <div class="div-pixels">
+    @for (i of pixels; track i) {
+      <span [style.animation-delay.ms]="i * 80"></span>
+    }
+  </div>
+  <div class="div-bar"></div>
+</section>

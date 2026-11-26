@@ -1,0 +1,107 @@
+@if (forgot()) {
+  <app-forgot-password (back)="forgot.set(false)" />
+} @else {
+  <div class="av-auth-wrap fade-in">
+    <div class="auth-card">
+      <div class="auth-header">
+        <div class="mark"></div>
+        <h2 class="neon-cyan">ARCADE VAULT</h2>
+        <div class="mono auth-version">ACCESO AL SISTEMA · v2.6</div>
+      </div>
+
+      <div class="auth-tabs">
+        <button
+          type="button"
+          [class.on]="tab() === 'in'"
+          [attr.aria-pressed]="tab() === 'in'"
+          (click)="switchTab('in')"
+        >
+          INICIAR SESIÓN
+        </button>
+        <button
+          type="button"
+          [class.on]="tab() === 'up'"
+          [attr.aria-pressed]="tab() === 'up'"
+          (click)="switchTab('up')"
+        >
+          CREAR CUENTA
+        </button>
+      </div>
+
+      <form novalidate (submit)="submit($event)">
+        @if (error(); as message) {
+          <div id="auth-error" class="terminal-error" role="alert">{{ message }}</div>
+        } @else if (notice(); as message) {
+          <div class="terminal-notice" role="status">{{ message }}</div>
+        }
+        <div class="field">
+          <label for="auth-user">{{ tab() === 'in' ? 'Usuario o correo' : 'Usuario' }}</label>
+          <input
+            id="auth-user"
+            autocomplete="username"
+            [placeholder]="tab() === 'in' ? 'px_kai o jugador@vault.gg' : 'px_kai'"
+            [attr.maxlength]="tab() === 'in' ? 254 : 10"
+            [value]="user()"
+            [attr.aria-invalid]="isInvalid('user')"
+            [attr.aria-describedby]="isInvalid('user') ? 'auth-error' : null"
+            (input)="update('user', $event)"
+          />
+        </div>
+        @if (tab() === 'up') {
+          <div class="field slide-in">
+            <label for="auth-email">Correo electrónico</label>
+            <input
+              id="auth-email"
+              type="email"
+              placeholder="jugador@vault.gg"
+              autocomplete="email"
+              [value]="email()"
+              [attr.aria-invalid]="isInvalid('email')"
+              [attr.aria-describedby]="isInvalid('email') ? 'auth-error' : null"
+              (input)="update('email', $event)"
+            />
+          </div>
+        }
+        <div class="field">
+          <label for="auth-pass">Contraseña</label>
+          <input
+            id="auth-pass"
+            type="password"
+            placeholder="••••••••"
+            [attr.autocomplete]="tab() === 'in' ? 'current-password' : 'new-password'"
+            [value]="pass()"
+            [attr.aria-invalid]="isInvalid('pass')"
+            [attr.aria-describedby]="isInvalid('pass') ? 'auth-error' : null"
+            (input)="update('pass', $event)"
+          />
+        </div>
+
+        @if (tab() === 'in') {
+          <button type="button" class="btn ghost forgot-btn" (click)="openForgot()">
+            ¿OLVIDASTE TU CONTRASEÑA?
+          </button>
+        }
+
+        <button class="btn lg submit-btn" type="submit">
+          {{ tab() === 'in' ? 'ENTRAR AL VAULT' : 'CREAR CUENTA' }}
+        </button>
+      </form>
+
+      <button type="button" class="btn ghost guest-btn" (click)="guest()">
+        JUGAR COMO INVITADO
+      </button>
+
+      <div class="auth-divider">O CONTINÚA CON</div>
+      <div class="social">
+        <button class="btn ghost" type="button" (click)="oauth()">
+          <span aria-hidden="true">◆</span> GOOGLE
+        </button>
+        <button class="btn ghost" type="button" (click)="oauth()">
+          <span aria-hidden="true">▣</span> GITHUB
+        </button>
+      </div>
+
+      <div class="auth-terms">AL ENTRAR ACEPTAS LOS TÉRMINOS DEL SALÓN ARCADE</div>
+    </div>
+  </div>
+}
