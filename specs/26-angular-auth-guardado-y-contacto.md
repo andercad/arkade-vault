@@ -1,6 +1,6 @@
 # SPEC 26 — Angular: auth, guardado de puntuación y contacto
 
-> **Estado:** Aprobado
+> **Estado:** Implementado
 >
 > **Depende de:** SPEC 24 (cimientos y reproductor Angular), SPEC 25 (resto de pantallas), SPEC 03 (about/contacto), SPEC 16 (autenticación), SPEC 17 (medidas de seguridad), SPEC 18 (solo logueados puntúan), SPEC 19 (contraseña y borrar cuenta), SPEC 20 (endurecer auth)
 > **Fecha:** 2026-11-26
@@ -221,7 +221,7 @@ Estructura de la skill `angular:angular-conventions`. Alias nuevo en `angular/ts
      - Crear la funcionalidad `profile/` y el alias `@profile/*`; ruta `/perfil` con `authGuard` y modo `Client`; `account-deleted-notice` en la home.
      - Specs: `profile-api` (id solo de `getUser()`, `23505`, solo identidad email, contraseña igual a la actual, repetición distinta, confirmación no coincide, borrado y `signOut` local), `profile-form`, `password-section`, `danger-zone` (foco, `Esc`, error de confirmación), `profile-page`, `account-deleted-notice`.
    - **Verificaciones:**
-     - `/perfil` sin sesión → 302 a `/login`; con sesión muestra avatar y usuario; cambiar usuario actualiza el nav y las puntuaciones antiguas conservan su `player_name`.
+     - `/perfil` sin sesión → 302 a `/login`; con sesión muestra avatar y usuario; cambiar usuario actualiza el nav y las puntuaciones antiguas pasan al nombre nuevo (trigger `0014`).
      - Cambiar contraseña cierra las demás sesiones (otro navegador pierde la sesión) y una contraseña actual errónea no la cambia.
      - Eliminar una cuenta de prueba con un username que no coincide → error; con el correcto → `/?cuenta=eliminada` con aviso, y `auth.users`, `profiles` y `scores` sin filas de ese usuario (`SELECT` en dev).
      - Cuenta OAuth sin contraseña no muestra "Cambiar contraseña".
@@ -278,28 +278,28 @@ La lógica ya compartida de `lib/` (`auth-validation`, `contact`) no se re-teste
 
 ## Criterios de aceptación
 
-- [ ] Registro, login (email o usuario), cierre de sesión, Google/GitHub y recuperación de contraseña funcionan en `:4200`; el navegador solo llama a `/api/*` y a las rutas Express de navegación, nunca a Supabase.
-- [ ] La sesión vive en cookies `httpOnly`, `SameSite=Lax` (`Secure` en producción); el HTML SSR de las páginas ya trae el nav con la cuenta.
-- [ ] Todo `POST`/`PATCH`/`DELETE` de `/api/*` con `Origin` distinto de `SITE_URL` da 403.
-- [ ] `/perfil` sin sesión → 302 real a `/login`; `/login` con sesión → `/`.
-- [ ] Con sesión, la puntuación se guarda con `player_name` del servidor y `user_id` de la sesión; el invitado ve el aviso y no guarda; un `score` > 1.000.000 se recorta.
-- [ ] Usuario inexistente y contraseña incorrecta dan el mismo mensaje; los errores se mapean por código.
-- [ ] Perfil: cambio de usuario, cambio de contraseña (solo identidad email, cierra las demás sesiones) y borrar cuenta (confirmación por username, cascada) con el mismo comportamiento que Next.
-- [ ] Contacto envía por Resend con honeypot y validación de `lib/contact.ts`; sin variables, error genérico y traza en servidor.
-- [ ] `SUPABASE_SECRET_KEY` y `RESEND_API_KEY` no aparecen en `angular/dist/**/browser`; `npm run check:secret-client` cubre `angular/src` y pasa.
-- [ ] Salón: "tu mejor marca" con sesión; nav con avatar y menú de cuenta; aviso `?cuenta=eliminada`.
-- [ ] Aspecto equivalente a Next en nav con cuenta, perfil, modal y menú, escritorio y 390×844.
-- [ ] El único cambio en `lib/` es `lib/auth-errors.ts` y su uso en las Server Actions; la app Next compila, pasa lint y se comporta igual.
-- [ ] **Accesibilidad (WCAG 2.2 AA):**
-  - [ ] Menú de cuenta con `aria-haspopup="menu"`, `aria-expanded`, `Esc` cierra y devuelve el foco, navegación con teclado.
-  - [ ] Modal "Eliminar cuenta" con `role="dialog"`, `aria-modal`, nombre accesible, foco atrapado, `Esc` cierra y el foco vuelve al botón que lo abrió.
-  - [ ] Formularios con `<label>`, `aria-invalid` y `aria-describedby`; errores con `role="alert"`, avisos de éxito con `role="status"`.
-  - [ ] Avatar con `alt` vacío si el nombre ya está al lado, o texto alternativo en caso contrario.
-  - [ ] Objetivos táctiles ≥24×24 px y foco visible.
-  - [ ] axe sin violaciones serias en `/login`, `/perfil` y `/auth/reset-password` (salvo la deuda de contraste ya aceptada de la SPEC 25).
-- [ ] Cada pieza nueva tiene su `.spec.ts`.
-- [ ] `cd angular && ng build && ng test --watch=false && ng lint` pasa; en la raíz `npm run lint && npm run build && npm run check:secret-client` siguen OK.
-- [ ] `CLAUDE.md` y `README.md` actualizados.
+- [x] Registro, login (email o usuario), cierre de sesión, Google/GitHub y recuperación de contraseña funcionan en `:4200`; el navegador solo llama a `/api/*` y a las rutas Express de navegación, nunca a Supabase.
+- [x] La sesión vive en cookies `httpOnly`, `SameSite=Lax` (`Secure` en producción); el HTML SSR de las páginas ya trae el nav con la cuenta.
+- [x] Todo `POST`/`PATCH`/`DELETE` de `/api/*` con `Origin` distinto de `SITE_URL` da 403.
+- [x] `/perfil` sin sesión → 302 real a `/login`; `/login` con sesión → `/`.
+- [x] Con sesión, la puntuación se guarda con `player_name` del servidor y `user_id` de la sesión; el invitado ve el aviso y no guarda; un `score` > 1.000.000 se recorta.
+- [x] Usuario inexistente y contraseña incorrecta dan el mismo mensaje; los errores se mapean por código.
+- [x] Perfil: cambio de usuario, cambio de contraseña (solo identidad email, cierra las demás sesiones) y borrar cuenta (confirmación por username, cascada) con el mismo comportamiento que Next.
+- [x] Contacto envía por Resend con honeypot y validación de `lib/contact.ts`; sin variables, error genérico y traza en servidor.
+- [x] `SUPABASE_SECRET_KEY` y `RESEND_API_KEY` no aparecen en `angular/dist/**/browser`; `npm run check:secret-client` cubre `angular/src` y pasa.
+- [x] Salón: "tu mejor marca" con sesión; nav con avatar y menú de cuenta; aviso `?cuenta=eliminada`.
+- [x] Aspecto equivalente a Next en nav con cuenta, perfil, modal y menú, escritorio y 390×844.
+- [x] El único cambio en `lib/` es `lib/auth-errors.ts` y su uso en las Server Actions; la app Next compila, pasa lint y se comporta igual.
+- [x] **Accesibilidad (WCAG 2.2 AA):**
+  - [x] Menú de cuenta con `aria-haspopup="menu"`, `aria-expanded`, `Esc` cierra y devuelve el foco, navegación con teclado.
+  - [x] Modal "Eliminar cuenta" con `role="dialog"`, `aria-modal`, nombre accesible, foco atrapado, `Esc` cierra y el foco vuelve al botón que lo abrió.
+  - [x] Formularios con `<label>`, `aria-invalid` y `aria-describedby`; errores con `role="alert"`, avisos de éxito con `role="status"`.
+  - [x] Avatar con `alt` vacío si el nombre ya está al lado, o texto alternativo en caso contrario.
+  - [x] Objetivos táctiles ≥24×24 px y foco visible.
+  - [x] axe sin violaciones serias en `/login`, `/perfil` y `/auth/reset-password` (salvo la deuda de contraste ya aceptada de la SPEC 25).
+- [x] Cada pieza nueva tiene su `.spec.ts`.
+- [x] `cd angular && ng build && ng test --watch=false && ng lint` pasa; en la raíz `npm run lint && npm run build && npm run check:secret-client` siguen OK.
+- [x] `CLAUDE.md` y `README.md` actualizados.
 
 ---
 
