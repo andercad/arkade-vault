@@ -12,7 +12,7 @@ import {
 import { firstValueFrom } from 'rxjs';
 import { USERNAME_ERROR, USERNAME_RE } from '@/lib/auth-validation';
 import type { SessionUser } from '@shared/models/session';
-import { ProfileService } from '@shared/services/profile.service';
+import { ProfileService } from '@profile/services/profile.service';
 import { apiErrorMessage } from '@shared/utils/api-error';
 
 /**

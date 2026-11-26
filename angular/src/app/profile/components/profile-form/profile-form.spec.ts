@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { HttpErrorResponse } from '@angular/common/http';
 import { of, throwError } from 'rxjs';
 import type { SessionUser } from '@shared/models/session';
-import { ProfileService } from '@shared/services/profile.service';
+import { ProfileService } from '@profile/services/profile.service';
 import { ProfileFormComponent } from './profile-form';
 
 const USER: SessionUser = { id: 'u1', name: 'ANDER', avatarUrl: null, hasPassword: true };

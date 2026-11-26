@@ -28,8 +28,11 @@ export interface SignUpResult {
  */
 @Injectable({ providedIn: 'root' })
 export class AuthService {
+  // ========== Dependencies ==========
   private readonly http = inject(HttpClient);
   private readonly session = inject(SessionService);
+
+  // ========== HTTP ==========
 
   /** Crea la cuenta; con confirmación de correo activa no abre sesión. */
   signUp(input: SignUpInput): Observable<SignUpResult> {

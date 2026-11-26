@@ -38,11 +38,19 @@
 | App   | SPEC 26 BFF: redirecciones/open redirect                   | ✅     | `auth-navigation.ts`: destinos fijos; `redirectTo`/`emailRedirectTo` con `SITE_URL`; `/auth/oauth/xx` y `/auth/callback` sin code → `/login?error=oauth` | 2026-11-26 16:41 |
 | App   | SPEC 26 BFF: scores/profile (id de sesión)                 | ✅     | `scores-api.ts` `player_name` de `profiles`, clamp 1e6; `profile-api.ts` id de `getUser()`, único `deleteUser` l.161 | 2026-11-26 16:41 |
 | App   | SPEC 26 BFF: contacto (inyección)                          | ✅     | asunto sin CR/LF; email sin `\s` (`lib/contact.ts:13`); texto plano; honeypot; límites 60/120/2000                   | 2026-11-26 16:41 |
-| App   | SPEC 26 BFF: manejo de errores JSON mal formado            | ❌     | `POST /api/contact` con `{bad` → HTML con stack y rutas (dev); sin handler de errores (`server.ts:100-126`)          | 2026-11-26 16:41 |
+| App   | SPEC 26 BFF: manejo de errores JSON mal formado            | ✅     | `POST /api/contact` con `{bad` → 400 JSON `{"error":"Solicitud no válida."}` sin traza; `apiErrorHandler` (`json-errors.ts`) montado en `server.ts:137` | 2026-11-26 |
 | App   | SPEC 26: IP en logs Auth                                   | 🟡     | no verificable con las claves de log disponibles (campos vacíos); ver hallazgo clientIp                              | 2026-11-26 16:41 |
 | BD    | SPEC 26 frente a BD (advisors, RLS, policies, funciones)   | ✅     | advisors solo `auth_leaked_password_protection` (aceptado) + INFO `unused_index`; RLS 3/3; `game_stats` invoker; insert scores = `scores insert usuario`; funciones DEFINER con search_path y solo `service_role`; `ensure_rls` activo; sin deriva (13 migraciones) | 2026-11-26 16:41 |
 | App   | `npm audit --omit=dev` (angular/)                          | ✅     | 0 vulnerabilidades                                                                                                  | 2026-11-26 16:41 |
 | Panel | Redirect URLs `:4200` (callback, reset-password)           | manual | Confirmar en panel (SPEC 26)                                                                                        | 2026-11-26 16:41 |
+
+| BD    | 0014: `sync_scores_player_name()` DEFINER + EXECUTE         | ✅     | `prosecdef=true`, `search_path=""`, owner postgres, public/anon/authenticated=false, service_role=true; SQL con nombres `public.` calificados | 2026-11-26 17:16 |
+| BD    | 0014: trigger `on_profile_username_changed`                | ✅     | `AFTER UPDATE OF username`, `WHEN old IS DISTINCT FROM new`, `tgenabled=O`; solo toca `scores` del `new.id`          | 2026-11-26 17:16 |
+| BD    | 0014: pruebas rollback (abuso vía RPC/RLS)                 | ✅     | rpc como authenticated y anon → 42501; update directo de `scores` propio → 0 filas; update de username propio → 1 fila y 2/2 scores sincronizados, 0 ajenos tocados; update de profile ajeno no probado (solo 1 perfil con datos) | 2026-11-26 17:16 |
+| BD    | 0014: backfill / coherencia                                | ✅     | 0 desajustes `scores.player_name` vs `profiles.username` (2 scores)                                                  | 2026-11-26 17:16 |
+| BD    | Advisors, RLS, policies, SPEC 18, `ensure_rls` (tras 0014) | ✅     | advisors solo `auth_leaked_password_protection` (aceptado) + INFO `unused_index`; RLS 3/3, `game_stats` invoker; policies sin cambios (insert `scores insert usuario`, sin update/delete en scores/games); `user_id` not null + FK cascade; 4 funciones DEFINER con search_path y solo service_role | 2026-11-26 17:16 |
+| BD    | Deriva migraciones (14)                                    | ✅     | 14 en BD ↔ `0001..0014`; 0014 registrada como `sync_player_name` (sin prefijo, cosmético)                           | 2026-11-26 17:16 |
+| App   | Headers y `/perfil` (Next :3000 y Angular :4200)           | ✅     | `curl -I` `/`, `/juegos/asteroids/jugar`: 3 headers; `/perfil` 307/302 → `/login`; `npm audit` 0; `check:secret-client` OK | 2026-11-26 17:16 |
 
 Leyenda: `✅` correcto · `❌` hallazgo · `🟡` aceptado/parcial · `manual` confirmar en panel · `n/a` no aplica
 
@@ -54,10 +62,11 @@ Leyenda: `✅` correcto · `❌` hallazgo · `🟡` aceptado/parcial · `manual`
 | 2026-11-20 (sin hora) | Re-auditoría: BD limpia; headers ya servidos tras el cambio a `/:path*`                                                 | 0 (cambio de `next.config.ts` sin commitear) |
 | 2026-11-25 (sin hora) | Auditoría completa SPEC 16-20 (rama spec-20): BD y app limpias, pruebas rollback OK, dev server activo, `next.config.ts` ya commiteado | 0 (3 checks de panel `manual`)               |
 | 2026-11-26 16:41 | Auditoría rama spec-26 (BFF Express Angular): BD limpia; CSRF, sesión, redirects, clave secreta y contacto OK; 2 hallazgos Bajo | 2 Bajo (errores sin handler JSON; clientIp fiable solo tras proxy) |
+| 2026-11-26 17:16 | Auditoría migración 0014 (sync player_name): función DEFINER con search_path y sin EXECUTE, trigger acotado, sin abuso vía RPC/RLS, sin regresiones SPEC 16/17/18; 0 hallazgos nuevos | 2 Bajo previos (sin cambios) |
+| 2026-11-26 (re-verificación) | Cerrado hallazgo JSON mal formado: `apiErrorHandler` ya montado; `curl` con `{bad` → 400 JSON sin traza. `clientIp` sigue abierto (corrección en SPEC 27) | 1 Bajo (`clientIp`, SPEC 27) |
 
 ## Hallazgos abiertos
 
-- **Bajo — JSON mal formado devuelve HTML con stack** (`angular/src/server.ts:100-126`, `express.json()` sin handler). Evidencia: `curl -X POST /api/contact -d '{bad'` con Origin/JSON válidos → HTML con traza y rutas (NODE_ENV≠production; en producción Express oculta la traza). Corrección propuesta: middleware de errores tras los routers `/api`: `app.use('/api', (err, _req, res, next) => { if (res.headersSent) return next(err); res.status(err.status ?? 500).json({ error: err.status === 400 ? 'invalid_json' : 'server_error' }); })`. Sin aplicar.
 - **Bajo — `clientIp` confía en `x-vercel-forwarded-for`/`x-real-ip`** (`angular/src/server/supabase.ts:23-35`). Solo es fiable tras Vercel; si el Express se expone directo, un cliente falsea `sb-forwarded-for` y esquiva el límite 10/5 min. Corrección: en SPEC 27 documentar/forzar el despliegue tras proxy, o leer solo esas cabeceras si `process.env.VERCEL` existe. Sin aplicar.
 - Aceptado/futuro (no hallazgo): sin límite de envíos en `/api/contact` (SPEC 26 Decisiones); enumeración en `signUp` (SPEC 20).
 

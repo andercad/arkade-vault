@@ -11,7 +11,7 @@ import {
   viewChild,
 } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
-import { ProfileService } from '@shared/services/profile.service';
+import { ProfileService } from '@profile/services/profile.service';
 import { apiErrorMessage } from '@shared/utils/api-error';
 
 const FOCUSABLE = 'button:not([disabled]), input:not([disabled]), a[href]';

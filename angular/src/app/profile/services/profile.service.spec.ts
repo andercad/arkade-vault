@@ -2,7 +2,7 @@ import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { ProfileService } from './profile.service';
-import { SessionService } from './session.service';
+import { SessionService } from '@shared/services/session.service';
 
 describe('ProfileService', () => {
   let service: ProfileService;
@@ -38,7 +38,9 @@ describe('ProfileService', () => {
   it('updateUsername propaga el error sin refrescar', () => {
     let status = 0;
     service.updateUsername('x').subscribe({ error: (e) => (status = e.status) });
-    http.expectOne('/api/profile/username').flush({ error: 'dup' }, { status: 409, statusText: 'C' });
+    http
+      .expectOne('/api/profile/username')
+      .flush({ error: 'dup' }, { status: 409, statusText: 'C' });
     expect(status).toBe(409);
     expect(refresh).not.toHaveBeenCalled();
   });

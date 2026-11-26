@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { map, switchMap, from, type Observable } from 'rxjs';
-import { SessionService } from './session.service';
+import { SessionService } from '@shared/services/session.service';
 
 /** Datos del cambio de contraseña. */
 export interface ChangePasswordInput {
@@ -16,16 +16,17 @@ export interface ChangePasswordInput {
  */
 @Injectable({ providedIn: 'root' })
 export class ProfileService {
+  // ========== Dependencies ==========
   private readonly http = inject(HttpClient);
   private readonly session = inject(SessionService);
+
+  // ========== HTTP ==========
 
   /** Cambia el usuario (el servidor lo pone en mayúsculas) y refresca la sesión; devuelve el nombre nuevo. */
   updateUsername(username: string): Observable<string> {
     return this.http
       .patch<{ name: string }>('/api/profile/username', { username })
-      .pipe(
-        switchMap(({ name }) => from(this.session.refresh()).pipe(map(() => name))),
-      );
+      .pipe(switchMap(({ name }) => from(this.session.refresh()).pipe(map(() => name))));
   }
 
   /** Cambia la contraseña verificando la actual; cierra las sesiones de otros dispositivos. */

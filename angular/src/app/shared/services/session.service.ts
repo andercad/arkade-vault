@@ -21,18 +21,22 @@ const SESSION_KEY = makeStateKey<SessionUser | null>('session-user');
  */
 @Injectable({ providedIn: 'root' })
 export class SessionService {
+  // ========== Dependencies ==========
   private readonly http = inject(HttpClient);
   private readonly transfer = inject(TransferState);
 
+  // ========== State ==========
   private readonly userState = signal<SessionUser | null>(null);
   private readonly loadingState = signal(true);
   private pending: Promise<void> | null = null;
 
+  // ========== Computed ==========
   /** Jugador con sesión, o `null` (invitado). */
   readonly user = this.userState.asReadonly();
   /** `true` hasta conocer si hay sesión. */
   readonly loading = this.loadingState.asReadonly();
 
+  // ========== Lifecycle ==========
   constructor() {
     if (isPlatformServer(inject(PLATFORM_ID))) {
       const context = inject(REQUEST_CONTEXT, { optional: true }) as {
@@ -47,6 +51,8 @@ export class SessionService {
     }
   }
 
+  // ========== Public methods ==========
+
   /** Vuelve a leer la sesión del servidor (tras login, logout o borrado de cuenta). */
   refresh(): Promise<void> {
     this.loadingState.set(true);
@@ -60,6 +66,8 @@ export class SessionService {
   whenLoaded(): Promise<void> {
     return this.pending ?? Promise.resolve();
   }
+
+  // ========== Private methods ==========
 
   private set(user: SessionUser | null): void {
     this.userState.set(user);

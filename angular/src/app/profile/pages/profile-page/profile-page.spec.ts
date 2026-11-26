@@ -6,7 +6,7 @@ import { of } from 'rxjs';
 import type { SessionUser } from '@shared/models/session';
 import { AuthService } from '@shared/services/auth.service';
 import { NavigationService } from '@shared/services/navigation.service';
-import { ProfileService } from '@shared/services/profile.service';
+import { ProfileService } from '@profile/services/profile.service';
 import { SessionService } from '@shared/services/session.service';
 import ProfilePageComponent from './profile-page';
 

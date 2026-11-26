@@ -1,7 +1,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { of, throwError } from 'rxjs';
-import { ProfileService } from '@shared/services/profile.service';
+import { ProfileService } from '@profile/services/profile.service';
 import { PasswordSectionComponent } from './password-section';
 
 describe('PasswordSectionComponent', () => {

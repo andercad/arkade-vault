@@ -13,14 +13,19 @@ import { afterNextRender, DestroyRef, Directive, ElementRef, inject, signal } fr
   host: { class: 'reveal', '[class.in]': 'visible()' },
 })
 export class RevealDirective {
+  // ========== Dependencies ==========
   private readonly el = inject<ElementRef<HTMLElement>>(ElementRef);
   private readonly destroyRef = inject(DestroyRef);
 
+  // ========== State ==========
   protected readonly visible = signal(false);
 
+  // ========== Lifecycle ==========
   constructor() {
     afterNextRender(() => this.observe());
   }
+
+  // ========== Private methods ==========
 
   private observe(): void {
     const reduced = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;

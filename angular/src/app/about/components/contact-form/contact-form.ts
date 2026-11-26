@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { validateContact } from '@/lib/contact';
-import { ContactService } from '@shared/services/contact.service';
+import { ContactService } from '@about/services/contact.service';
 import { apiErrorMessage } from '@shared/utils/api-error';
 
 type Field = 'name' | 'email' | 'message';

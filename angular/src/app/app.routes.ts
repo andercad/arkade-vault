@@ -1,27 +1,24 @@
 import { Routes } from '@angular/router';
-import { authGuard } from '@shared/guards/auth.guard';
-import { guestGuard } from '@shared/guards/guest.guard';
+import { authGuard } from '@auth/guards/auth.guard';
 
 /** Título por defecto, el mismo que `metadata.title` de Next. */
 const TITLE = 'Arcade Vault';
 
-/** Las páginas son `export default` y se cargan en diferido con `loadComponent`. */
+/**
+ * Una entrada por funcionalidad, siempre en diferido. `play` va antes que `library` porque
+ * `/juegos/:id/jugar` comparte prefijo con `/juegos/:id`. La entrada de `auth` tiene prefijo
+ * vacío (sus URL no comparten prefijo) y debe ir antes del comodín.
+ */
 export const routes: Routes = [
   { path: '', title: TITLE, loadComponent: () => import('@home/pages/home-page/home-page') },
-  {
-    path: 'juegos',
-    title: TITLE,
-    loadComponent: () => import('@library/pages/library-page/library-page'),
-  },
   {
     path: 'juegos/:id/jugar',
     title: TITLE,
     loadComponent: () => import('@play/pages/play-page/play-page'),
   },
   {
-    path: 'juegos/:id',
-    title: TITLE,
-    loadComponent: () => import('@library/pages/game-detail-page/game-detail-page'),
+    path: 'juegos',
+    loadChildren: () => import('@library/library.routes').then((m) => m.LIBRARY_ROUTES),
   },
   {
     path: 'salon-de-la-fama',
@@ -34,21 +31,14 @@ export const routes: Routes = [
     loadComponent: () => import('@about/pages/about-page/about-page'),
   },
   {
-    path: 'login',
-    title: TITLE,
-    canMatch: [guestGuard],
-    loadComponent: () => import('@auth/pages/login-page/login-page'),
-  },
-  {
     path: 'perfil',
     title: TITLE,
     canMatch: [authGuard],
     loadComponent: () => import('@profile/pages/profile-page/profile-page'),
   },
   {
-    path: 'auth/reset-password',
-    title: TITLE,
-    loadComponent: () => import('@auth/pages/reset-password-page/reset-password-page'),
+    path: '',
+    loadChildren: () => import('@auth/auth.routes').then((m) => m.AUTH_ROUTES),
   },
   {
     path: '**',

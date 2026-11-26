@@ -7,7 +7,10 @@ import type { ScoreRow } from '@/lib/scores';
 /** Lectura de juegos y rankings a través del BFF (`/api/games*`); el navegador no habla con Supabase. */
 @Injectable({ providedIn: 'root' })
 export class GamesService {
+  // ========== Dependencies ==========
   private readonly http = inject(HttpClient);
+
+  // ========== HTTP ==========
 
   /** Catálogo completo ordenado por `sort_order`. */
   getGames(): Observable<Game[]> {
