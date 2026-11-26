@@ -1,8 +1,8 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 import type { ScoreRow } from '@/lib/scores';
 import { formatScore } from '@shared/utils/format';
-import { DataErrorComponent } from '../data-error/data-error';
-import { ScoreEmptyComponent } from '../score-empty/score-empty';
+import { DataErrorComponent } from '@shared/components/data-error/data-error';
+import { ScoreEmptyComponent } from '@shared/components/score-empty/score-empty';
 
 /**
  * Ranking de un juego. `rows === null` → error de lectura; `rows` vacío → aún sin puntuaciones.

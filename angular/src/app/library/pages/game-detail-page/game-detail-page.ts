@@ -4,7 +4,7 @@ import { rxResource } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
 import { formatPlays } from '@/lib/games';
 import { DataErrorComponent } from '@shared/components/data-error/data-error';
-import { LeaderboardComponent } from '@shared/components/leaderboard/leaderboard';
+import { LeaderboardComponent } from '@library/components/leaderboard/leaderboard';
 import { LoadingComponent } from '@shared/components/loading/loading';
 import { NotFoundComponent } from '@shared/components/not-found/not-found';
 import { GamesService } from '@shared/services/games.service';

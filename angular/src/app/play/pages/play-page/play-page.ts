@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, inject, input } from '@an
 import { rxResource } from '@angular/core/rxjs-interop';
 import { getGameDefinition } from '@/lib/game-registry';
 import { DataErrorComponent } from '@shared/components/data-error/data-error';
-import { GamePlayerComponent } from '@shared/components/game-player/game-player';
+import { GamePlayerComponent } from '@play/components/game-player/game-player';
 import { NotFoundComponent } from '@shared/components/not-found/not-found';
 import { GamesService } from '@shared/services/games.service';
 
