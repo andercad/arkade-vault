@@ -1,9 +1,10 @@
 import { Component } from '@angular/core';
-import { RouterLink, RouterOutlet } from '@angular/router';
+import { RouterOutlet } from '@angular/router';
+import { NavComponent } from '@shared/components/nav/nav';
 
-/** Shell de la app: fondo, cabecera mínima (logo), contenido de ruta y footer. */
+/** Shell de la app: fondo, nav, contenido de ruta y footer. */
 @Component({
-  imports: [RouterOutlet, RouterLink],
+  imports: [RouterOutlet, NavComponent],
   selector: 'app-root',
   templateUrl: './app.html',
   styleUrl: './app.css',

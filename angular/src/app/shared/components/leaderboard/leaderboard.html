@@ -1,0 +1,18 @@
+<h3>MEJORES PUNTUACIONES</h3>
+@let data = rows();
+@if (data === null) {
+  <app-data-error title="NO SE PUDO CARGAR EL RANKING" hint="Recarga la página en unos segundos." />
+} @else if (data.length === 0) {
+  <app-score-empty [playHref]="playHref()" />
+} @else {
+  @for (r of items(); track r.key) {
+    <div [class]="r.cls">
+      <div class="rk">#{{ r.rank }}</div>
+      <div class="pl">
+        {{ r.name }}
+        <div class="lb-date">{{ r.date }}</div>
+      </div>
+      <div class="sc">{{ r.score }}</div>
+    </div>
+  }
+}

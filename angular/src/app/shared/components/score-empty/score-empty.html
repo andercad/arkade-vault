@@ -1,0 +1,12 @@
+<p class="se-title">AÚN SIN PUNTUACIONES</p>
+<p class="se-hint">Juega una partida y deja tu nombre en el primer puesto.</p>
+@for (n of ghosts; track n) {
+  <div class="ghost-row" aria-hidden="true">
+    <span>#0{{ n }}</span>
+    <span class="nm">---</span>
+    <span class="sc">------</span>
+  </div>
+}
+@if (playHref(); as href) {
+  <a [routerLink]="href" class="btn se-cta">▶ JUGAR</a>
+}
