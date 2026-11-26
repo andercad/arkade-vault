@@ -19,6 +19,7 @@
       "@play/*": ["./src/app/play/*"],
       "@library/*": ["./src/app/library/*"],
       "@home/*": ["./src/app/home/*"],
+      "@hall-of-fame/*": ["./src/app/hall-of-fame/*"],
       "@not-found/*": ["./src/app/not-found/*"]
     }
   },

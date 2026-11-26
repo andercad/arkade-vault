@@ -27,8 +27,7 @@ export const routes: Routes = [
   {
     path: 'salon-de-la-fama',
     title: TITLE,
-    data: { name: 'SALÓN DE LA FAMA' },
-    loadComponent: provisional,
+    loadComponent: () => import('@hall-of-fame/pages/hall-of-fame-page/hall-of-fame-page'),
   },
   {
     path: 'about',

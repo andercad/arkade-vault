@@ -1,0 +1,14 @@
+.champion-label {
+  font-size: 9px;
+  color: var(--gold);
+  letter-spacing: 0.18em;
+}
+
+.champion-rank {
+  font-size: 36px;
+  margin-top: 4px;
+}
+
+.champion-score {
+  font-size: 20px;
+}

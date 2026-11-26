@@ -1,0 +1,7 @@
+@if (champion()) {
+  <div class="pixel champion-label">CAMPEÓN</div>
+}
+<div class="rank-num" [class.champion-rank]="champion()">{{ place() }}</div>
+<div class="name">{{ row()?.name ?? '---' }}</div>
+<div class="score" [class.champion-score]="champion()">{{ score() }}</div>
+<div class="date">{{ row()?.date ?? '' }}</div>

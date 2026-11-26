@@ -1,0 +1,12 @@
+:host {
+  display: block;
+}
+
+.hall-sub {
+  font-size: 10px;
+}
+
+.back-link {
+  text-align: center;
+  margin-top: 32px;
+}
