@@ -67,6 +67,14 @@ describe('GameDetailPageComponent', () => {
     expect(values[1]).toBe('12.345');
   });
 
+  it('la dificultad se anuncia como imagen con nombre accesible y sus estrellas son decorativas', async () => {
+    const el = await render('snake', {});
+    const difficulty = el.querySelector('.stat-difficulty') as HTMLElement;
+    expect(difficulty.getAttribute('role')).toBe('img');
+    expect(difficulty.getAttribute('aria-label')).toBe('Dificultad: 3 de 5 estrellas');
+    expect(difficulty.querySelector('[aria-hidden="true"]')).toBeTruthy();
+  });
+
   it('JUGAR AHORA y VOLVER AL VAULT enlazan bien, con el acento del juego', async () => {
     const el = await render('snake', {});
     const play = el.querySelector('a.pulse') as HTMLAnchorElement;

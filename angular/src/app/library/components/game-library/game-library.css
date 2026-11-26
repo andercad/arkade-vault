@@ -14,3 +14,8 @@
   color: var(--magenta);
   margin-bottom: 12px;
 }
+
+/* Objetivo táctil ≥24 px (WCAG 2.5.8); la caja `.av-search` mide 48 px, el aspecto no cambia. */
+.av-search input {
+  min-height: 24px;
+}

@@ -33,7 +33,11 @@ Lista detallada de juegos (desde la BD): `references/implemented-games.md`.
 
 Migración de Next.js a Angular en seis specs, con las dos apps conviviendo (Next sigue siendo la app desplegada hasta la SPEC 28): 24 cimientos y reproductor, 25 resto de pantallas, 26 auth/guardado/contacto, 27 staging en Vercel, 28 cambio de producción con rollback, 29 retirada de Next y tooling. Motivo: formativo (Angular moderno sobre un producto real) y alineación con el stack Angular del equipo.
 
-La SPEC 24 crea `angular/` (Angular 22, SSR, standalone, signals, zoneless) y sirve `/juegos/:id/jugar` con el mismo reproductor que Next (canvas, HUD, skins, pausa, fin y mando táctil MK-II) para los 5 juegos. Reutiliza los motores de `lib/` por el alias `@/lib/*` y el CSS de `app/globals.css`. Un BFF en el Express del SSR (`GET /api/games/:id`) lee el catálogo de Supabase: el navegador no habla con la BD. El jugador es siempre invitado hasta la SPEC 26; el resto de rutas devuelven la página 404 de Angular hasta la SPEC 25. Mientras duran las SPEC 24-29, los cambios en reproductor, mando táctil y HUD exigen paridad en las dos apps.
+La SPEC 24 crea `angular/` (Angular 22, SSR, standalone, signals, zoneless) y sirve `/juegos/:id/jugar` con el mismo reproductor que Next (canvas, HUD, skins, pausa, fin y mando táctil MK-II) para los 5 juegos. Reutiliza los motores de `lib/` por el alias `@/lib/*` y el CSS de `app/globals.css`. Un BFF en el Express del SSR lee el catálogo de Supabase: el navegador no habla con la BD. El jugador es siempre invitado hasta la SPEC 26. Mientras duran las SPEC 24-29, los cambios en reproductor, mando táctil y HUD exigen paridad en las dos apps.
+
+La SPEC 25 añade el resto de pantallas con el mismo DOM y CSS que Next: home (`/`), biblioteca (`/juegos`), detalle (`/juegos/:id`, con 404 real si el id no existe), salón de la fama (`/salon-de-la-fama`, pestañas ARIA y `?juego=<id>`), about (`/about`, prerenderizada) y login (`/login`), más el nav completo con panel móvil. About y login son solo UI: validan y muestran "Disponible próximamente" sin ninguna petición hasta la SPEC 26; `/perfil` y `/auth/*` siguen dando el 404 de Angular. Las páginas se cargan en diferido (`export default` + `loadComponent`) con `rxResource` sobre dos servicios.
+
+Endpoints del BFF (solo lectura, clave publicable, sin sesión): `GET /api/games`, `/api/games/:id`, `/api/games/:id/scores?limit=N` (1-12, defecto 10), `/api/scores/recent` (con `ago` calculado en servidor) y `/api/scores/top-today`. Estado de la migración: SPEC 24 y 25 implementadas; siguen la 26 (auth, guardado, contacto), 27, 28 y 29. Deuda conocida: el contraste de color de `app/globals.css` (p. ej. `--ink-faint`) no llega a WCAG AA, igual en Next, y se aborda en una spec de diseño.
 
 ```bash
 cd angular
@@ -118,6 +122,7 @@ Luego abre `http://192.168.1.50:3000` en el móvil (la IP sale de `ipconfig`). R
 | `22-datos-a-neon.md`                           | Borrador: datos a Neon (se reescribe para Angular tras la SPEC 29)                                                              |
 | `23-auth-a-neon-auth.md`                       | Borrador: auth a Neon Auth (se reescribe para Angular tras la SPEC 29)                                                          |
 | `24-angular-cimientos-y-reproductor.md`        | App Angular SSR en `angular/` con el reproductor de juegos (reutiliza `lib/`); primera de las SPEC 24-29                        |
+| `25-angular-resto-de-pantallas.md`             | Angular: home, biblioteca, detalle, salón de la fama, about y login (solo UI), nav completo y BFF con 5 endpoints               |
 | `game-jam/frogger/01-frogger-core.md`          | Frogger: motor TS en `lib/frogger/` (carretera, río, casas, vidas, tiempo)                                                      |
 | `game-jam/frogger/02-frogger-platform.md`      | Frogger en la plataforma: registro, migración `0008`, portada, pausa (botón + `P`/`Esc`) y guardado                             |
 | `game-jam/frogger/03-frogger-hazards-audio.md` | Frogger: peligros extra y audio (pendiente de implementar)                                                                      |
