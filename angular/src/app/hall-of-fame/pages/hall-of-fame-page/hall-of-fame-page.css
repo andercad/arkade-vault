@@ -10,3 +10,13 @@
   text-align: center;
   margin-top: 32px;
 }
+
+.tr.you .rk,
+.tr.you .pl,
+.tr.you .sc {
+  color: var(--yellow);
+}
+
+.tr.you .sc {
+  text-shadow: 0 0 6px rgba(245, 255, 0, 0.5);
+}

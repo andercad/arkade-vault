@@ -1,8 +1,10 @@
+import { signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { Observable, of, Subject, throwError } from 'rxjs';
 import type { Game } from '@/lib/games';
 import type { ScoreRow } from '@/lib/scores';
+import { SessionService } from '@shared/services/session.service';
 import { GamesService } from '@shared/services/games.service';
 import HallOfFamePageComponent from './hall-of-fame-page';
 
@@ -36,12 +38,14 @@ describe('HallOfFamePageComponent', () => {
   let fixture: ComponentFixture<HallOfFamePageComponent>;
   let el: HTMLElement;
   const getTopScores = vi.fn();
+  const user = signal<{ name: string } | null>(null);
 
   async function render(fakes: Fakes = {}, juego?: string, settle = true): Promise<void> {
     getTopScores.mockImplementation(fakes.getTopScores ?? (() => of(FULL)));
     TestBed.configureTestingModule({
       providers: [
         provideRouter([]),
+        { provide: SessionService, useValue: { user } },
         {
           provide: GamesService,
           useValue: { getGames: fakes.getGames ?? (() => of(GAMES)), getTopScores },
@@ -58,7 +62,10 @@ describe('HallOfFamePageComponent', () => {
     }
   }
 
-  beforeEach(() => getTopScores.mockReset());
+  beforeEach(() => {
+    getTopScores.mockReset();
+    user.set(null);
+  });
 
   const tabs = () => Array.from(el.querySelectorAll<HTMLButtonElement>('[role="tab"]'));
   const selected = () => tabs().find((t) => t.getAttribute('aria-selected') === 'true');
@@ -247,5 +254,29 @@ describe('HallOfFamePageComponent', () => {
     await render();
     expect(el.querySelector('h1')?.textContent).toBe('SALÓN DE LA FAMA');
     expect(el.querySelector('a.btn.lg')?.getAttribute('href')).toBe('/juegos');
+  });
+
+  describe('tu mejor marca', () => {
+    const mine = () => el.querySelector('.tr.you');
+
+    it('con sesión y fila en el top muestra la marca (nombre en mayúsculas, máx. 10)', async () => {
+      user.set({ name: 'Bob' });
+      await render();
+      expect(el.querySelector('.you-label')?.textContent).toContain('TU MEJOR MARCA EN SNAKE');
+      expect(mine()?.querySelector('.pl')?.textContent).toBe('BOB');
+      expect(mine()?.querySelector('.rk')?.textContent).toBe('#02');
+    });
+
+    it('con sesión pero sin fila en el top no la muestra', async () => {
+      user.set({ name: 'ZED' });
+      await render();
+      expect(mine()).toBeNull();
+      expect(el.querySelector('.you-label')).toBeNull();
+    });
+
+    it('invitado: sin marca', async () => {
+      await render();
+      expect(mine()).toBeNull();
+    });
   });
 });

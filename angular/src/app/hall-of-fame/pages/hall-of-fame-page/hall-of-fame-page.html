@@ -58,6 +58,15 @@
               <div class="dt">{{ r.date }}</div>
             </div>
           }
+          @if (mine(); as me) {
+            <div class="tr you-label">▸ TU MEJOR MARCA EN {{ game.title }}</div>
+            <div class="tr you" [style.animation-delay.ms]="me.delay">
+              <div class="rk">#{{ me.rank }}</div>
+              <div class="pl">{{ me.name }}</div>
+              <div class="sc">{{ me.score }}</div>
+              <div class="dt">{{ me.date }}</div>
+            </div>
+          }
         }
       </div>
     </div>

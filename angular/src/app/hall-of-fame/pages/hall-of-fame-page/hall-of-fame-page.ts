@@ -16,6 +16,7 @@ import { DataErrorComponent } from '@shared/components/data-error/data-error';
 import { LoadingComponent } from '@shared/components/loading/loading';
 import { ScoreEmptyComponent } from '@shared/components/score-empty/score-empty';
 import { GamesService } from '@shared/services/games.service';
+import { SessionService } from '@shared/services/session.service';
 import { formatScore } from '@shared/utils/format';
 import { PodiumSlotComponent } from '../../components/podium-slot/podium-slot';
 
@@ -48,6 +49,7 @@ type Rankings = Record<string, ScoreRow[] | null>;
 })
 export default class HallOfFamePageComponent {
   private readonly gamesService = inject(GamesService);
+  private readonly session = inject(SessionService);
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
 
   // ========== Inputs ==========
@@ -78,6 +80,21 @@ export default class HallOfFamePageComponent {
     const rankings = this.rankings.value();
     if (!id || !rankings) return [];
     return rankings[id] ?? null;
+  });
+  /** Marca del jugador con sesión, solo si su nombre aparece en el top real. */
+  protected readonly mine = computed(() => {
+    const name = this.session.user()?.name.toUpperCase().slice(0, 10);
+    const rows = this.rows();
+    const found = name && rows ? rows.find((r) => r.name === name) : undefined;
+    return found
+      ? {
+          rank: String(found.rank).padStart(2, '0'),
+          name: found.name,
+          score: formatScore(found.score),
+          date: found.date,
+          delay: (rows?.length ?? 0) * ROW_STEP_MS + ROW_STEP_MS,
+        }
+      : undefined;
   });
   protected readonly slots = computed(() => {
     const rows = this.rows() ?? [];

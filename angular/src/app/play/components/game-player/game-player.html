@@ -16,7 +16,7 @@
     <div class="hud-stats">
       <div class="hud-stat">
         <div class="l">Jugador</div>
-        <div class="v" style="color: var(--ink)">INVITADO</div>
+        <div class="v" style="color: var(--ink)">{{ playerName() }}</div>
       </div>
       <div class="hud-stat">
         <div class="l">Puntuación</div>
@@ -47,7 +47,7 @@
         #canvas
         [definition]="definition()"
         (stateChange)="snap.set($event)"
-        (gameOver)="over.set(true)"
+        (gameOver)="onGameOver($event)"
       />
       @if (paused()) {
         <div class="crt-content pause-overlay">
@@ -83,12 +83,31 @@
         <h2 id="final-title">FIN DEL JUEGO</h2>
         <div class="final-label">PUNTUACIÓN FINAL</div>
         <div class="final">{{ formatScore(snap().score) }}</div>
-        <div>
-          <div class="pixel final-notice">INICIA SESIÓN PARA GUARDAR TU PUNTUACIÓN</div>
-          <div class="input-row">
-            <a routerLink="/login" class="btn yellow">INICIAR SESIÓN</a>
+        @if (!user()) {
+          <div>
+            <div class="pixel final-notice">INICIA SESIÓN PARA GUARDAR TU PUNTUACIÓN</div>
+            <div class="input-row">
+              <a routerLink="/login" class="btn yellow">INICIAR SESIÓN</a>
+            </div>
           </div>
-        </div>
+        } @else {
+          <div role="status">
+            @switch (saveState()) {
+              @case ('saving') {
+                <div class="pixel final-notice">GUARDANDO…</div>
+              }
+              @case ('saved') {
+                <div class="toast-saved">▸ PUNTUACIÓN GUARDADA_</div>
+              }
+            }
+          </div>
+          @if (saveState() === 'error') {
+            <div role="alert" class="pixel save-error">NO SE PUDO GUARDAR · REINTENTA</div>
+            <div class="input-row">
+              <button type="button" class="btn yellow" (click)="save()">GUARDAR PUNTUACIÓN</button>
+            </div>
+          }
+        }
         <div class="actions">
           <button type="button" class="btn" (click)="restart()">JUGAR DE NUEVO</button>
           <a routerLink="/salon-de-la-fama" [queryParams]="{ juego: game().id }" class="btn yellow">

@@ -49,4 +49,21 @@ describe('ScoresService', () => {
     http.expectOne('/api/scores/top-today').flush({}, { status: 500, statusText: 'Error' });
     expect(failed).toBe(true);
   });
+
+  it('submitScore hace POST /api/scores con gameId y score (sin nombre)', () => {
+    let done = false;
+    service.submitScore('snake', 120).subscribe(() => (done = true));
+    const req = http.expectOne('/api/scores');
+    expect(req.request.method).toBe('POST');
+    expect(req.request.body).toEqual({ gameId: 'snake', score: 120 });
+    req.flush(null, { status: 201, statusText: 'Created' });
+    expect(done).toBe(true);
+  });
+
+  it('submitScore propaga el error', () => {
+    let status = 0;
+    service.submitScore('snake', 1).subscribe({ error: (e) => (status = e.status) });
+    http.expectOne('/api/scores').flush({ error: 'x' }, { status: 401, statusText: 'No' });
+    expect(status).toBe(401);
+  });
 });

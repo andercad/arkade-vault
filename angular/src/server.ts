@@ -12,6 +12,7 @@ import { createApiRouter, type ApiClient } from './server/api';
 import { createAuthRouter } from './server/auth-api';
 import { createAuthNavigationRouter } from './server/auth-navigation';
 import { createCsrfMiddleware } from './server/csrf';
+import { createScoresRouter } from './server/scores-api';
 import { createSessionMiddleware } from './server/session';
 import {
   createAdminClient,
@@ -100,6 +101,9 @@ app.use('/api/auth', express.json(), createAuthRouter({
     adminClient: () => createAdminClient(requireSupabaseEnv()),
     siteUrl,
   }));
+
+// Guardado de puntuación (SPEC 26): exige sesión; player_name lo pone el servidor.
+app.use('/api/scores', express.json(), createScoresRouter({ sessionClient }));
 
 // BFF de solo lectura (src/server/api.ts); responde 404 JSON a cualquier otra /api/*.
 app.use('/api', createApiRouter(createReadClient));

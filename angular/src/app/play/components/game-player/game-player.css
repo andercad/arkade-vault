@@ -23,3 +23,9 @@
   font-size: 10px;
   color: var(--yellow);
 }
+
+.save-error {
+  font-size: 10px;
+  color: var(--magenta);
+  margin-top: 12px;
+}
