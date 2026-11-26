@@ -10,6 +10,7 @@ import { ChangeDetectionStrategy, Component, computed, input } from '@angular/co
 @Component({
   selector: 'app-data-error',
   templateUrl: './data-error.html',
+  styleUrl: './data-error.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { role: 'alert', '[class]': 'hostClass()' },
 })

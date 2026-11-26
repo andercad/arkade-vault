@@ -1,3 +1,7 @@
+:host {
+  display: block;
+}
+
 .lb-date {
   font-size: 10px;
   color: var(--ink-faint);

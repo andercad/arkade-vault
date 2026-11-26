@@ -1,0 +1,7 @@
+@if (catalog.isLoading()) {
+  <app-loading />
+} @else if (catalog.error()) {
+  <app-data-error />
+} @else if (catalog.value(); as games) {
+  <app-game-library [games]="games" />
+}

@@ -9,13 +9,21 @@ const provisional = () => import('./provisional/pages/provisional-page/provision
 /** Las páginas son `export default` y se cargan en diferido con `loadComponent`. */
 export const routes: Routes = [
   { path: '', title: TITLE, data: { name: 'INICIO' }, loadComponent: provisional },
-  { path: 'juegos', title: TITLE, data: { name: 'BIBLIOTECA' }, loadComponent: provisional },
+  {
+    path: 'juegos',
+    title: TITLE,
+    loadComponent: () => import('@library/pages/library-page/library-page'),
+  },
   {
     path: 'juegos/:id/jugar',
     title: TITLE,
     loadComponent: () => import('@play/pages/play-page/play-page'),
   },
-  { path: 'juegos/:id', title: TITLE, data: { name: 'DETALLE' }, loadComponent: provisional },
+  {
+    path: 'juegos/:id',
+    title: TITLE,
+    loadComponent: () => import('@library/pages/game-detail-page/game-detail-page'),
+  },
   {
     path: 'salon-de-la-fama',
     title: TITLE,

@@ -1,0 +1,16 @@
+:host {
+  display: block;
+}
+
+.no-results {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 80px;
+  color: var(--ink-faint);
+}
+
+.no-results-title {
+  font-size: 14px;
+  color: var(--magenta);
+  margin-bottom: 12px;
+}

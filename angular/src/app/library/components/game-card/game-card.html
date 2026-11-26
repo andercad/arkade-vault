@@ -1,0 +1,21 @@
+<div class="cover">
+  <div [class]="'cover-bg ' + game().cover"></div>
+  <div [class]="'label accent-' + game().color">{{ game().cat }}</div>
+</div>
+<div class="meta">
+  <div class="title">{{ game().title }}</div>
+  <div class="desc">{{ game().short }}</div>
+  <div class="row">
+    <div class="score-badge">
+      <span>MEJOR PUNTUACIÓN</span>
+      <b>{{ best() }}</b>
+    </div>
+    <a
+      [routerLink]="href()"
+      [class]="'btn ' + game().color"
+      [attr.aria-label]="'Jugar ' + game().title"
+      (click)="$event.stopPropagation()"
+      >JUGAR</a
+    >
+  </div>
+</div>

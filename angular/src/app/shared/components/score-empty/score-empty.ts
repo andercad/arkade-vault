@@ -12,6 +12,7 @@ import { RouterLink } from '@angular/router';
   selector: 'app-score-empty',
   imports: [RouterLink],
   templateUrl: './score-empty.html',
+  styleUrl: './score-empty.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'score-empty' },
 })

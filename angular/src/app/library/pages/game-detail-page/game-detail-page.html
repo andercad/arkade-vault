@@ -1,0 +1,49 @@
+@if (game.isLoading()) {
+  <app-loading />
+} @else if (game.error()) {
+  <app-data-error />
+} @else if (game.value(); as g) {
+  <div class="av-detail fade-in">
+    <div>
+      <div class="detail-cover">
+        <div [class]="'cover-bg ' + g.cover"></div>
+      </div>
+      <div class="detail-info detail-info-gap">
+        <div class="detail-tags">
+          <span [class]="'accent-' + g.color">{{ g.cat }}</span>
+          <span>1 JUGADOR</span>
+          <span>TECLADO / TÁCTIL</span>
+          <span>RETRO 1985</span>
+        </div>
+        <h2 class="neon-cyan">{{ g.title }}</h2>
+        <p>{{ g.long }}</p>
+        <div class="stat-strip">
+          <div>
+            <div class="l">Partidas</div>
+            <div class="v">{{ plays() }}</div>
+          </div>
+          <div>
+            <div class="l">Mejor global</div>
+            <div class="v stat-best">{{ best() }}</div>
+          </div>
+          <div>
+            <div class="l">Dificultad</div>
+            <div class="v stat-difficulty" aria-label="Dificultad: 3 de 5 estrellas">
+              <span aria-hidden="true">★ ★ ★ ☆ ☆</span>
+            </div>
+          </div>
+        </div>
+        <div class="detail-actions">
+          <a [routerLink]="playHref()" [class]="'btn xl pulse ' + g.color">▶ JUGAR AHORA</a>
+          <a routerLink="/juegos" class="btn ghost lg">VOLVER AL VAULT</a>
+        </div>
+      </div>
+    </div>
+
+    <aside aria-label="Ranking">
+      <app-leaderboard [rows]="rows()" [playHref]="playHref()" />
+    </aside>
+  </div>
+} @else {
+  <app-not-found />
+}

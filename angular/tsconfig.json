@@ -17,6 +17,7 @@
       "@/lib/*": ["../lib/*"],
       "@shared/*": ["./src/app/shared/*"],
       "@play/*": ["./src/app/play/*"],
+      "@library/*": ["./src/app/library/*"],
       "@not-found/*": ["./src/app/not-found/*"]
     }
   },

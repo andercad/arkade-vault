@@ -1,0 +1,42 @@
+<section class="av-hero">
+  <h1 class="flicker">ARCADE VAULT</h1>
+  <div class="sub">
+    INSERTA UNA MONEDA PARA JUGAR <span class="blink" aria-hidden="true">_</span>
+  </div>
+</section>
+
+<div class="av-filters">
+  <div class="av-search">
+    <span class="ico" aria-hidden="true">⌕</span>
+    <input
+      type="search"
+      aria-label="Buscar un juego por nombre"
+      placeholder="Buscar un juego por nombre…"
+      [value]="query()"
+      (input)="onQuery($event)"
+    />
+  </div>
+  <div class="av-chips" role="group" aria-label="Filtrar por categoría">
+    @for (chip of chips(); track chip.label) {
+      <button
+        type="button"
+        [class]="chip.cls"
+        [attr.aria-pressed]="chip.pressed"
+        (click)="category.set(chip.label)"
+      >
+        {{ chip.label }}
+      </button>
+    }
+  </div>
+</div>
+
+<div class="av-grid">
+  @for (game of filtered(); track game.id) {
+    <app-game-card [game]="game" />
+  } @empty {
+    <div class="no-results" role="status">
+      <div class="pixel no-results-title">NO HAY RESULTADOS</div>
+      <div>Intenta otra búsqueda o categoría.</div>
+    </div>
+  }
+</div>

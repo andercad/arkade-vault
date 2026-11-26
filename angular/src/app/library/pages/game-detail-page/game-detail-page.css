@@ -1,0 +1,13 @@
+.detail-info-gap {
+  margin-top: 20px;
+}
+
+.stat-best {
+  color: var(--magenta);
+  text-shadow: 0 0 6px rgba(255, 0, 110, 0.5);
+}
+
+.stat-difficulty {
+  color: var(--yellow);
+  text-shadow: 0 0 6px rgba(245, 255, 0, 0.5);
+}
