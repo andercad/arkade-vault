@@ -36,11 +36,11 @@ Leyenda: `✅` correcto · `❌` hallazgo · `🟡` aceptado/parcial · `manual`
 
 ## Historial de auditorías
 
-| Fecha      | Resumen                                                                                                                 | Abiertos                                     |
-| ---------- | ----------------------------------------------------------------------------------------------------------------------- | -------------------------------------------- |
-| 2026-11-20 | Primera auditoría. BD limpia; app limpia salvo headers ausentes en dev server activo (a reiniciar)                      | 1 Medio (headers no servidos, por verificar) |
-| 2026-11-20 | Re-auditoría: BD limpia; headers ya servidos tras el cambio a `/:path*`                                                 | 0 (cambio de `next.config.ts` sin commitear) |
-| 2026-11-25 | Auditoría completa SPEC 16-20 (rama spec-20): BD y app limpias, pruebas rollback OK, dev server activo, `next.config.ts` ya commiteado | 0 (3 checks de panel `manual`)               |
+| Fecha y hora          | Resumen                                                                                                                 | Abiertos                                     |
+| ---------------- | ----------------------------------------------------------------------------------------------------------------------- | -------------------------------------------- |
+| 2026-11-20 (sin hora) | Primera auditoría. BD limpia; app limpia salvo headers ausentes en dev server activo (a reiniciar)                      | 1 Medio (headers no servidos, por verificar) |
+| 2026-11-20 (sin hora) | Re-auditoría: BD limpia; headers ya servidos tras el cambio a `/:path*`                                                 | 0 (cambio de `next.config.ts` sin commitear) |
+| 2026-11-25 (sin hora) | Auditoría completa SPEC 16-20 (rama spec-20): BD y app limpias, pruebas rollback OK, dev server activo, `next.config.ts` ya commiteado | 0 (3 checks de panel `manual`)               |
 
 ## Hallazgos abiertos
 

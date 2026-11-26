@@ -53,11 +53,11 @@ Leyenda: `Δ A11y/BP/SEO` = score Angular − score Next (puntos; negativo = Ang
 
 ## Historial de auditorías
 
-| Fecha | App | Resumen | Abiertos |
-| ----- | --- | ------- | -------- |
-| 2026-11-26 | angular | 6 rutas x mobile/desktop. Scores 95-100 (solo contraste aceptado). Peor LCP: `/login` mobile 4,08-4,83 s. `/` mobile 2,35 y 3,63 s (varianza). Consola limpia. | 2 (Medio) |
+| Fecha y hora | App | Resumen | Abiertos |
+| ------------ | --- | ------- | -------- |
+| 2026-11-26 (sin hora) | angular | 6 rutas x mobile/desktop. Scores 95-100 (solo contraste aceptado). Peor LCP: `/login` mobile 4,08-4,83 s. `/` mobile 2,35 y 3,63 s (varianza). Consola limpia. | 2 (Medio) |
 
-Leyenda: `Fecha` de la auditoría · `App` auditada (`angular`/`next`/`ambas`) · `Resumen` rutas auditadas, peor score y peor LCP · `Abiertos` nº de hallazgos abiertos al cerrar (por severidad Alto/Medio/Bajo).
+Leyenda: `Fecha y hora` de lanzamiento de la auditoría (`date "+%Y-%m-%d %H:%M"`) · `App` auditada (`angular`/`next`/`ambas`) · `Resumen` rutas auditadas, peor score y peor LCP · `Abiertos` nº de hallazgos abiertos al cerrar (por severidad Alto/Medio/Bajo).
 
 ## Hallazgos abiertos
 

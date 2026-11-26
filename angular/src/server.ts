@@ -5,10 +5,14 @@ import {
   writeResponseToNodeResponse,
 } from '@angular/ssr/node';
 import { createClient } from '@supabase/supabase-js';
-import express from 'express';
+import express, { type Request, type Response } from 'express';
 import { join } from 'node:path';
 import type { Database } from '@/lib/supabase/database.types';
 import { createApiRouter, type ApiClient } from './server/api';
+import { createAuthRouter } from './server/auth-api';
+import { createCsrfMiddleware } from './server/csrf';
+import { createSessionMiddleware } from './server/session';
+import { createSessionClient, type DbClient, type SupabaseEnv } from './server/supabase';
 
 // Variables de angular/.env (SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY). Opcional: en
 // producción llegan del entorno del proceso.
@@ -33,6 +37,35 @@ app.use((_req, res, next) => {
   next();
 });
 
+const isProduction = process.env['NODE_ENV'] === 'production';
+
+// SITE_URL (SPEC 20/26): origen público sin "/" final; fija redirecciones y el Origin
+// permitido. Obligatoria en producción; en desarrollo, el puerto de `ng serve`.
+const siteUrl = (process.env['SITE_URL'] ?? (isProduction ? '' : 'http://localhost:4200')).replace(
+  /\/+$/,
+  '',
+);
+if (!siteUrl) throw new Error('Falta SITE_URL en el entorno (obligatoria en producción).');
+
+/** Configuración de Supabase para sesión y auth; `null` si faltan las variables. */
+function supabaseEnv(): SupabaseEnv | null {
+  const url = process.env['SUPABASE_URL'];
+  const publishableKey = process.env['SUPABASE_PUBLISHABLE_KEY'];
+  if (!url || !publishableKey) return null;
+  return {
+    url,
+    publishableKey,
+    secretKey: process.env['SUPABASE_SECRET_KEY'],
+    secureCookies: isProduction,
+  };
+}
+
+/** Cliente de sesión de la petición (cookies); `null` sin configuración. */
+function sessionClient(req: Request, res: Response): DbClient | null {
+  const env = supabaseEnv();
+  return env ? createSessionClient(env, req, res) : null;
+}
+
 /** Cliente Supabase de solo lectura; `null` si faltan las variables de entorno. */
 function createReadClient(): ApiClient | null {
   const url = process.env['SUPABASE_URL'];
@@ -42,6 +75,12 @@ function createReadClient(): ApiClient | null {
     auth: { persistSession: false, autoRefreshToken: false },
   });
 }
+
+// Las mutaciones de /api/* exigen Origin == SITE_URL y JSON (CSRF).
+app.use('/api', createCsrfMiddleware(siteUrl));
+
+// Auth (SPEC 26): sesión en cookies httpOnly.
+app.use('/api/auth', express.json(), createAuthRouter({ sessionClient }));
 
 // BFF de solo lectura (src/server/api.ts); responde 404 JSON a cualquier otra /api/*.
 app.use('/api', createApiRouter(createReadClient));
@@ -57,12 +96,16 @@ app.use(
   }),
 );
 
+// Sesión: refresca cookies, deja res.locals.user y protege /perfil (302 a /login).
+app.use(createSessionMiddleware(sessionClient));
+
 /**
- * Handle all other requests by rendering the Angular application.
+ * Handle all other requests by rendering the Angular application. El jugador resuelto va
+ * en `REQUEST_CONTEXT` (lo lee `SessionService`).
  */
 app.use((req, res, next) => {
   angularApp
-    .handle(req)
+    .handle(req, { user: res.locals['user'] ?? null })
     .then((response) => (response ? writeResponseToNodeResponse(response, res) : next()))
     .catch(next);
 });
