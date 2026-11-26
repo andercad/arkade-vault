@@ -6,7 +6,7 @@ import { ScoresService } from '@shared/services/scores.service';
 import HomePageComponent from './home-page';
 
 describe('HomePageComponent', () => {
-  async function render(): Promise<HTMLElement> {
+  async function render(cuenta?: string): Promise<HTMLElement> {
     TestBed.configureTestingModule({
       providers: [
         provideRouter([]),
@@ -18,6 +18,7 @@ describe('HomePageComponent', () => {
       ],
     });
     const fixture = TestBed.createComponent(HomePageComponent);
+    if (cuenta) fixture.componentRef.setInput('cuenta', cuenta);
     fixture.detectChanges();
     await fixture.whenStable();
     fixture.detectChanges();
@@ -44,6 +45,7 @@ describe('HomePageComponent', () => {
       c.tagName.toLowerCase(),
     );
     expect(tags).toEqual([
+      'app-account-deleted-notice',
       'section',
       'app-features-section',
       'app-games-section',
@@ -52,5 +54,17 @@ describe('HomePageComponent', () => {
       'app-pricing-section',
       'app-final-cta-section',
     ]);
+  });
+
+  it('sin ?cuenta=eliminada no muestra el aviso de cuenta borrada', async () => {
+    const el = await render();
+    expect(el.querySelector('app-account-deleted-notice [role="status"]')).toBeNull();
+  });
+
+  it('con ?cuenta=eliminada muestra el aviso', async () => {
+    const el = await render('eliminada');
+    expect(el.querySelector('app-account-deleted-notice [role="status"]')?.textContent).toContain(
+      'Cuenta eliminada',
+    );
   });
 });

@@ -1,0 +1,25 @@
+.danger-zone {
+  margin-top: 28px;
+  padding-top: 18px;
+  border-top: 1px dashed var(--red);
+}
+
+.danger-title {
+  font-size: 11px;
+  color: var(--red);
+  letter-spacing: 0.16em;
+  margin-bottom: 10px;
+}
+
+.full {
+  width: 100%;
+}
+
+.delete-text {
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.confirm-field {
+  text-align: left;
+}

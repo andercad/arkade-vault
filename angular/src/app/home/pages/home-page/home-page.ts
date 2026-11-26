@@ -1,5 +1,6 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { AccountDeletedNoticeComponent } from '../../components/account-deleted-notice/account-deleted-notice';
 import { ActivitySectionComponent } from '../../components/activity-section/activity-section';
 import { FeaturesSectionComponent } from '../../components/features-section/features-section';
 import { FinalCtaSectionComponent } from '../../components/final-cta-section/final-cta-section';
@@ -13,6 +14,7 @@ import { StatsSectionComponent } from '../../components/stats-section/stats-sect
   selector: 'app-home-page',
   imports: [
     RouterLink,
+    AccountDeletedNoticeComponent,
     SilhouettesComponent,
     FeaturesSectionComponent,
     GamesSectionComponent,
@@ -24,4 +26,8 @@ import { StatsSectionComponent } from '../../components/stats-section/stats-sect
   templateUrl: './home-page.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export default class HomePageComponent {}
+export default class HomePageComponent {
+  // ========== Inputs ==========
+  /** Query param `?cuenta=` (binding de la ruta): `eliminada` muestra el aviso. */
+  readonly cuenta = input<string>();
+}

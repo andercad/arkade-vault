@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { authGuard } from '@shared/guards/auth.guard';
 import { guestGuard } from '@shared/guards/guest.guard';
 
 /** Título por defecto, el mismo que `metadata.title` de Next. */
@@ -37,6 +38,12 @@ export const routes: Routes = [
     title: TITLE,
     canMatch: [guestGuard],
     loadComponent: () => import('@auth/pages/login-page/login-page'),
+  },
+  {
+    path: 'perfil',
+    title: TITLE,
+    canMatch: [authGuard],
+    loadComponent: () => import('@profile/pages/profile-page/profile-page'),
   },
   {
     path: 'auth/reset-password',

@@ -1,0 +1,28 @@
+<div class="av-auth-wrap fade-in">
+  <div class="auth-card">
+    @if (user(); as u) {
+      <div class="auth-header">
+        <div class="avatar-wrap">
+          <app-avatar [name]="u.name" [avatarUrl]="u.avatarUrl" [size]="88" />
+        </div>
+        <h1 class="neon-cyan profile-name">{{ u.name }}</h1>
+        <div class="mono profile-sub">PERFIL DE JUGADOR</div>
+      </div>
+
+      <app-profile-form [user]="u" [(dirty)]="dirty" />
+
+      @if (u.hasPassword) {
+        <app-password-section />
+      }
+
+      <button type="button" class="btn ghost full" (click)="leave()">
+        {{ dirty() ? 'SALIR SIN GUARDAR' : 'SALIR' }}
+      </button>
+      <button type="button" class="btn ghost full" (click)="logout()">CERRAR SESIÓN</button>
+
+      <app-danger-zone [username]="u.name" (deleted)="onDeleted()" />
+    } @else if (loading()) {
+      <p class="mono loading-text" role="status">Cargando perfil…</p>
+    }
+  </div>
+</div>

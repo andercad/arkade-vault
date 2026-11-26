@@ -1,0 +1,47 @@
+<div class="danger-zone">
+  <div class="mono danger-title">ZONA PELIGROSA</div>
+  <button #trigger type="button" class="btn red full" (click)="show()">ELIMINAR CUENTA</button>
+
+  @if (open()) {
+    <div class="modal-bd" (mousedown)="onBackdrop($event)">
+      <form
+        #dialog
+        class="modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="delete-title"
+        novalidate
+        (keydown)="trapFocus($event)"
+        (submit)="submit($event)"
+      >
+        <h2 id="delete-title">ELIMINAR CUENTA</h2>
+        <p class="mono delete-text">
+          Esta acción es irreversible: se borran tu perfil y todas tus puntuaciones.
+        </p>
+        @if (error(); as message) {
+          <div id="delete-error" class="terminal-error" role="alert">{{ message }}</div>
+        }
+        <div class="field confirm-field">
+          <label for="delete-confirm">Escribe tu usuario para confirmar</label>
+          <input
+            #field
+            id="delete-confirm"
+            autocomplete="off"
+            [disabled]="pending()"
+            [attr.aria-invalid]="error() ? true : null"
+            [attr.aria-describedby]="error() ? 'delete-error' : null"
+            (input)="onInput($event)"
+          />
+        </div>
+        <div class="actions">
+          <button type="button" class="btn ghost" [disabled]="pending()" (click)="close()">
+            CANCELAR
+          </button>
+          <button type="submit" class="btn red" [disabled]="pending()">
+            {{ pending() ? 'ELIMINANDO…' : 'ELIMINAR' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  }
+</div>

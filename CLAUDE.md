@@ -95,10 +95,14 @@ Migración Next → Angular en seis specs con las dos apps conviviendo (Next sig
 Solo para `angular/` (SPEC 24+); la app Next no se rige por este bloque.
 
 - tests: required # specs unitarios (`.spec.ts`) junto a cada componente, servicio, guard, pipe y directiva nuevos o modificados; runner del CLI (`ng test`), configurado en el paso 1 de la SPEC 24
+- coverage: 80
 - a11y: WCAG-2.2-AA
 - docs: jsdoc
 - i18n: none # monolingüe (es); textos en plantillas
 - workspace: app # app única en `angular/` (`package.json` propio)
+- structure: features
+- templates: external
+- routes: convention
 - verify: cd angular && ng build && ng test --watch=false && ng lint # (ESLint de `angular/`: SPEC 24, paso 1); en la raíz, `npm run lint && npm run build` deben seguir OK
 
 ### Al implementar código Angular

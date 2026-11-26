@@ -1,0 +1,23 @@
+<form novalidate (submit)="submit($event)">
+  @if (error(); as message) {
+    <div id="username-error" class="terminal-error" role="alert">{{ message }}</div>
+  } @else if (saved()) {
+    <div class="terminal-notice" role="status">Usuario actualizado.</div>
+  }
+  <div class="field">
+    <label for="profile-username">Usuario</label>
+    <input
+      id="profile-username"
+      maxlength="10"
+      autocomplete="username"
+      [value]="value()"
+      [disabled]="pending()"
+      [attr.aria-invalid]="error() ? true : null"
+      [attr.aria-describedby]="error() ? 'username-error' : null"
+      (input)="onInput($event)"
+    />
+  </div>
+  <button class="btn lg submit-btn" type="submit" [disabled]="pending() || !changed()">
+    {{ pending() ? 'GUARDANDO…' : 'GUARDAR USUARIO' }}
+  </button>
+</form>

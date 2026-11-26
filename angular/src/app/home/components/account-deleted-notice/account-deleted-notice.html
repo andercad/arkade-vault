@@ -1,0 +1,6 @@
+@if (visible()) {
+  <div class="terminal-notice notice" role="status">
+    Cuenta eliminada. Tus datos y puntuaciones se han borrado.
+    <button type="button" class="btn ghost ok-btn" (click)="dismissed.set(true)">OK</button>
+  </div>
+}
