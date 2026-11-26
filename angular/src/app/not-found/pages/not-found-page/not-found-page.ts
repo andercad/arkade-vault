@@ -8,4 +8,4 @@ import { NotFoundComponent } from '@shared/components/not-found/not-found';
   templateUrl: './not-found-page.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class NotFoundPageComponent {}
+export default class NotFoundPageComponent {}

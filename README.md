@@ -127,6 +127,7 @@ Luego abre `http://192.168.1.50:3000` en el móvil (la IP sale de `ipconfig`). R
 - Una spec por cambio, numerada `NN-nombre.md`, en `specs/`.
 - Cabecera fija: **Estado**, **Depende de**, **Fecha**, **Objetivo**.
 - Secciones: Por qué existe, Alcance (dentro / fuera), Plan de implementación, Criterios de aceptación, Decisiones, Riesgos.
+- Cada paso del plan: título en negrita + lista `Acciones` + lista `Verificaciones` (≥1 item cada una, verificaciones observables). Formato en `.claude/rules/spec-plan-format.md` (la skill `/spec` externa no se modifica).
 - Alcance pequeño; lo demás va explícito en "Fuera de alcance" para specs futuras.
 - Crear con `/spec`, implementar con `/spec-impl`, un commit por paso (`NN-nombre: Paso N`).
 - Marcar **Estado: Implementado** al terminar; actualizar la spec si cambian decisiones.

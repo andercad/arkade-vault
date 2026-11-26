@@ -2,11 +2,24 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable, catchError, of, throwError } from 'rxjs';
 import type { Game } from '@/lib/games';
+import type { ScoreRow } from '@/lib/scores';
 
-/** Lectura de juegos a través del BFF (`/api/games/:id`); el navegador no habla con Supabase. */
+/** Lectura de juegos y rankings a través del BFF (`/api/games*`); el navegador no habla con Supabase. */
 @Injectable({ providedIn: 'root' })
 export class GamesService {
   private readonly http = inject(HttpClient);
+
+  /** Catálogo completo ordenado por `sort_order`. */
+  getGames(): Observable<Game[]> {
+    return this.http.get<Game[]>('/api/games');
+  }
+
+  /** Top `limit` (1-12) del ranking de un juego. */
+  getTopScores(id: string, limit: number): Observable<ScoreRow[]> {
+    return this.http.get<ScoreRow[]>(`/api/games/${encodeURIComponent(id)}/scores`, {
+      params: { limit },
+    });
+  }
 
   /** Devuelve el juego, `null` si no existe (404) y propaga cualquier otro error. */
   getGame(id: string): Observable<Game | null> {

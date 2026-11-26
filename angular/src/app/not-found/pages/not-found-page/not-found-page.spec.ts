@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
-import { NotFoundPageComponent } from './not-found-page';
+import NotFoundPageComponent from './not-found-page';
 
 describe('NotFoundPageComponent', () => {
   it('pinta el aviso «no encontrado»', () => {

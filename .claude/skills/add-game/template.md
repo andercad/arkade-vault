@@ -54,35 +54,74 @@ Estructura de archivos nueva y convenciones (teclas, constantes del original con
 
 ## Plan de implementación
 
+Cada paso lleva dos listas: **Acciones** y **Verificaciones** (observables: comando, URL, consulta o comportamiento).
+
 1. **Lectura previa.**
-   - Leer en `node_modules/next/dist/docs/` lo relativo a Client Components y `useEffect`/refs (AGENTS.md).
-   - Revisar `components/game-player.tsx` y el CSS de `.crt-screen`.
-   - Verificación: sin cambios de código; `git status` limpio.
+   - **Acciones:**
+     - Leer en `node_modules/next/dist/docs/` lo relativo a Client Components y `useEffect`/refs (AGENTS.md).
+     - Revisar `components/game-player.tsx` y el CSS de `.crt-screen`.
+   - **Verificaciones:**
+     - Sin cambios de código.
+     - `git status` limpio.
 2. **Contrato común** _(solo si `lib/game-registry.ts` no existe)_.
-   - Crear `lib/game-engine.ts` (`GameEngine`, `GameSnapshot` con `score`, `status` y `hud` de pares etiqueta/valor, `GameCallbacks`) y `lib/game-registry.ts` (id → `create`, ancho, alto, `aria`).
-   - Crear `components/game-canvas.tsx` genérico y dejar `GamePlayer` sin ramas por id; adaptar Asteroids sin cambiar su comportamiento.
-   - Verificación: Asteroids pasa los criterios de SPEC 05.
+   - **Acciones:**
+     - Crear `lib/game-engine.ts` (`GameEngine`, `GameSnapshot` con `score`, `status` y `hud` de pares etiqueta/valor, `GameCallbacks`).
+     - Crear `lib/game-registry.ts` (id → `create`, ancho, alto, `aria`).
+     - Crear `components/game-canvas.tsx` genérico y dejar `GamePlayer` sin ramas por id.
+     - Adaptar Asteroids sin cambiar su comportamiento.
+   - **Verificaciones:**
+     - Asteroids pasa los criterios de SPEC 05.
 3. **Constantes, utils y tipos.**
-   - Crear `lib/<slug>/constants.ts`, `utils.ts` y `types.ts`.
-   - Verificación: `npx tsc --noEmit`.
+   - **Acciones:**
+     - Crear `lib/<slug>/constants.ts`, `utils.ts` y `types.ts`.
+   - **Verificaciones:**
+     - `npx tsc --noEmit` sin errores.
 4. **Entidades** _(si aplica)_.
-   - Crear `lib/<slug>/entities.ts`.
-   - Verificación: `npx tsc --noEmit` y `npm run lint`.
+   - **Acciones:**
+     - Crear `lib/<slug>/entities.ts`.
+   - **Verificaciones:**
+     - `npx tsc --noEmit` sin errores.
+     - `npm run lint` sin errores.
 5. **Motor.**
-   - Crear `lib/<slug>/engine.ts`: estado, update/draw, input con cleanup, `pause/resume/restart/end/destroy`, snapshot solo ante cambios.
-   - Verificación: `npx tsc --noEmit` y `npm run lint`.
+   - **Acciones:**
+     - Crear `lib/<slug>/engine.ts` con estado, update/draw e input con cleanup.
+     - Implementar `pause/resume/restart/end/destroy`.
+     - Emitir snapshot solo ante cambios.
+   - **Verificaciones:**
+     - `npx tsc --noEmit` sin errores.
+     - `npm run lint` sin errores.
 6. **Registro del juego.**
-   - Registrar el juego en `lib/game-registry.ts`, incluido `touchControls` (solo las direcciones y acciones que usa el juego).
-   - Verificación: `/juegos/<slug>/jugar` monta el canvas y, con emulación táctil, aparece el mando.
+   - **Acciones:**
+     - Registrar el juego en `lib/game-registry.ts`.
+     - Definir `touchControls` (solo las direcciones y acciones que usa el juego).
+   - **Verificaciones:**
+     - `/juegos/<slug>/jugar` monta el canvas.
+     - Con emulación táctil aparece el mando.
 7. **Migración seed.**
-   - Crear `supabase/migrations/NNNN_seed_<slug>.sql` con el `color` de `CATEGORY_COLOR[<CAT>]` (mapa de `checklist.md`), aplicarla con `apply_migration` y regenerar `database.types.ts` si hace falta.
-   - Verificación: `list_migrations`, `select id, cat, color from games` (color = el del mapa) y `get_advisors`.
+   - **Acciones:**
+     - Crear `supabase/migrations/NNNN_seed_<slug>.sql` con el `color` de `CATEGORY_COLOR[<CAT>]` (mapa de `checklist.md`).
+     - Aplicarla con `apply_migration`.
+     - Regenerar `database.types.ts` si hace falta.
+   - **Verificaciones:**
+     - `list_migrations` muestra la migración.
+     - `select id, cat, color from games` devuelve el color del mapa.
+     - `get_advisors` sin avisos nuevos.
 8. **Portada y CSS.**
-   - Añadir `.cover-<slug>` y el CSS del canvas/escalado en `app/globals.css` (`/frontend-design`).
-   - Verificación: tarjeta visible en `/juegos` y sin desbordar a 375 px.
+   - **Acciones:**
+     - Añadir `.cover-<slug>` en `app/globals.css` (`/frontend-design`).
+     - Añadir el CSS del canvas/escalado en `app/globals.css`.
+   - **Verificaciones:**
+     - Tarjeta visible en `/juegos`.
+     - Sin desbordar a 375 px.
 9. **Verificación en navegador y documentación.**
-   - Probar con Playwright (guardar score "TEST", ver leaderboard), borrar las filas de prueba de `scores` y actualizar `CLAUDE.md` y `README.md`.
-   - Verificación: ambos mencionan la spec; `npm run lint` y `npm run build` pasan.
+   - **Acciones:**
+     - Probar con Playwright: guardar score "TEST" y ver el leaderboard.
+     - Borrar las filas de prueba de `scores`.
+     - Actualizar `CLAUDE.md` y `README.md`.
+   - **Verificaciones:**
+     - `CLAUDE.md` y `README.md` mencionan la spec.
+     - `npm run lint` pasa.
+     - `npm run build` pasa.
 
 Cada paso = un commit `NN-<slug>: Paso N`.
 

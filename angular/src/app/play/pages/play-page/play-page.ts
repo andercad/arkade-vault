@@ -18,7 +18,7 @@ import { GamesService } from '@shared/services/games.service';
   styleUrl: './play-page.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class PlayPageComponent {
+export default class PlayPageComponent {
   // ========== Dependencies ==========
   private readonly games = inject(GamesService);
 

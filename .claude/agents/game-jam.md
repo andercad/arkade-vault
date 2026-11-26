@@ -64,14 +64,18 @@ Solo escribes specs en `specs/game-jam/`. No tocas código, migraciones, `refere
    (tipos TS, estructura de archivos nueva y convenciones: teclas, constantes con su valor, puntuación, rango de score)
    ## Plan de implementación
    1. **<Título corto del paso>.**
-      - <acción concreta: archivos a crear/modificar y qué hacen>
-      - Verificación: <comando o comprobación observable>
+      - **Acciones:**
+        - <acción concreta: archivos a crear/modificar y qué hacen>
+      - **Verificaciones:**
+        - <comando o comprobación observable>
    2. **<Título corto del paso>.**
-      - <acción concreta>
-      - Verificación: <comando o comprobación observable>
+      - **Acciones:**
+        - <acción concreta>
+      - **Verificaciones:**
+        - <comando o comprobación observable>
 
    Cada paso = un commit `<id>-NN: Paso N`.
-   (formato obligatorio: título en negrita terminado en punto; 1+ sub-bullets de acción; último sub-bullet siempre `Verificación:`; comandos y rutas entre backticks)
+   (formato obligatorio: título en negrita terminado en punto; sub-lista `**Acciones:**` con 1+ items y sub-lista `**Verificaciones:**` con 1+ items observables, siempre en ese orden; comandos y rutas entre backticks)
    ## Criterios de aceptación
    **Genéricos:** - [ ] …
    **Específicos de <Juego>:** - [ ] …

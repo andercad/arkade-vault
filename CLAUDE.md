@@ -18,6 +18,7 @@ Buenas prácticas:
 
 - Una spec por cambio: `specs/NN-nombre.md`. Crear con `/spec`, implementar con `/spec-impl`.
 - Cabecera: Estado, Depende de, Fecha, Objetivo. Secciones: Por qué, Alcance (dentro/fuera), Plan, Criterios de aceptación, Decisiones, Riesgos.
+- Plan de implementación: cada paso lleva lista `Acciones` + lista `Verificaciones`. Formato en `.claude/rules/spec-plan-format.md` (la skill `/spec` es externa y no se edita).
 - No salir del alcance; lo extra va a "Fuera de alcance" / spec futura.
 - Un commit por paso (`NN-nombre: Paso N`). Al terminar, Estado → Implementado.
 
