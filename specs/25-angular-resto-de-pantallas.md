@@ -1,6 +1,6 @@
 # SPEC 25 — Angular: resto de pantallas
 
-> **Estado:** Aprobado
+> **Estado:** Implementado
 >
 > **Depende de:** SPEC 24 (cimientos y reproductor Angular), SPEC 02 (home), SPEC 03 (about/contacto), SPEC 06 (leaderboard y juegos), SPEC 15 (color por categoría), SPEC 21 (color de categoría en la UI)
 > **Fecha:** 2026-11-25
@@ -217,27 +217,28 @@ La lógica ya compartida de `lib/` (validadores, `toGame`, `formatPlays`, `timeA
 
 ## Criterios de aceptación
 
-- [ ] `/`, `/juegos`, `/juegos/:id`, `/salon-de-la-fama` se renderizan en servidor; `/about` se prerenderiza; `/login` y `/juegos/:id/jugar` en cliente.
-- [ ] Los cinco endpoints del BFF devuelven los códigos y datos descritos; el navegador solo llama a `/api/*`.
-- [ ] `/juegos/xxx` y cualquier ruta desconocida devuelven HTTP 404 con la página "no encontrada"; `/perfil` sigue en 404.
-- [ ] El HTML servido de home, biblioteca, detalle y salón contiene los datos (SSR); tras hidratar no se repiten las peticiones ni hay errores de hidratación.
-- [ ] Biblioteca: búsqueda y chips de categoría filtran como en Next.
-- [ ] Detalle: un fallo del ranking no tumba la ficha; un fallo de lectura del juego muestra `DataError`.
-- [ ] Salón: `?juego=<id>` elige la pestaña; desconocido → la primera; error y vacío por pestaña.
-- [ ] Contacto y login validan igual que Next y muestran "Disponible próximamente" sin ninguna petición de red.
-- [ ] Aspecto equivalente a Next en las seis pantallas, escritorio y 390×844.
-- [ ] El único cambio en `lib/` es `lib/score-format.ts` y su uso en `lib/scores.server.ts`; la app Next compila y pasa lint.
-- [ ] **Accesibilidad (WCAG 2.2 AA):**
-  - [ ] Nav: hamburguesa con `aria-expanded`/`aria-controls`, foco al abrir el panel y retorno al cerrar, `Esc` cierra.
-  - [ ] Pestañas del salón con roles `tablist`/`tab`/`tabpanel`, flechas y `Home`/`End`.
-  - [ ] Chips de categoría con `aria-pressed`; buscador con etiqueta accesible.
-  - [ ] Formularios con `<label>`, `aria-invalid` y `aria-describedby`; avisos con `role="status"` (errores con `role="alert"`).
-  - [ ] Elementos decorativos (siluetas, flecha de scroll) con `aria-hidden`.
-  - [ ] `Reveal` respeta `prefers-reduced-motion`.
-  - [ ] Objetivos táctiles ≥24×24 px; foco visible; axe sin violaciones serias.
-- [ ] Cada pieza nueva tiene su `.spec.ts`.
-- [ ] `cd angular && ng build && ng test --watch=false && ng lint` pasa; en la raíz `npm run lint && npm run build` siguen OK.
-- [ ] `CLAUDE.md` y `README.md` actualizados.
+- [x] `/`, `/juegos`, `/juegos/:id`, `/salon-de-la-fama` se renderizan en servidor; `/about` se prerenderiza; `/login` y `/juegos/:id/jugar` en cliente.
+- [x] Los cinco endpoints del BFF devuelven los códigos y datos descritos; el navegador solo llama a `/api/*`.
+- [x] `/juegos/xxx` y cualquier ruta desconocida devuelven HTTP 404 con la página "no encontrada"; `/perfil` sigue en 404.
+- [x] El HTML servido de home, biblioteca, detalle y salón contiene los datos (SSR); tras hidratar no se repiten las peticiones ni hay errores de hidratación.
+- [x] Biblioteca: búsqueda y chips de categoría filtran como en Next.
+- [x] Detalle: un fallo del ranking no tumba la ficha; un fallo de lectura del juego muestra `DataError`.
+- [x] Salón: `?juego=<id>` elige la pestaña; desconocido → la primera; error y vacío por pestaña.
+- [x] Contacto y login validan igual que Next y muestran "Disponible próximamente" sin ninguna petición de red.
+- [x] Aspecto equivalente a Next en las seis pantallas, escritorio y 390×844.
+- [x] El único cambio en `lib/` es `lib/score-format.ts` y su uso en `lib/scores.server.ts`; la app Next compila y pasa lint.
+- [x] **Accesibilidad (WCAG 2.2 AA):**
+  - [x] Nav: hamburguesa con `aria-expanded`/`aria-controls`, foco al abrir el panel y retorno al cerrar, `Esc` cierra.
+  - [x] Pestañas del salón con roles `tablist`/`tab`/`tabpanel`, flechas y `Home`/`End`.
+  - [x] Chips de categoría con `aria-pressed`; buscador con etiqueta accesible.
+  - [x] Formularios con `<label>`, `aria-invalid` y `aria-describedby`; avisos con `role="status"` (errores con `role="alert"`).
+  - [x] Elementos decorativos (siluetas, flecha de scroll) con `aria-hidden`.
+  - [x] `Reveal` respeta `prefers-reduced-motion`.
+  - [x] Objetivos táctiles ≥24×24 px y foco visible.
+  - [ ] axe sin violaciones serias: **pendiente solo el contraste de color** (`--ink-faint`, filas fantasma de `ScoreEmpty`, `.tk-mid`), que vive en `app/globals.css` y es idéntico en Next; diferido a una spec de diseño por decisión del usuario (ver Decisiones). Sin contraste, axe sale limpio en las seis pantallas (WCAG 2.2 AA y buenas prácticas; único aviso moderado: falta `h1` en detalle y login).
+- [x] Cada pieza nueva tiene su `.spec.ts`.
+- [x] `cd angular && ng build && ng test --watch=false && ng lint` pasa; en la raíz `npm run lint && npm run build` siguen OK.
+- [x] `CLAUDE.md` y `README.md` actualizados.
 
 ---
 
@@ -253,6 +254,8 @@ La lógica ya compartida de `lib/` (validadores, `toGame`, `formatPlays`, `timeA
 - **Sí:** `lib/score-format.ts` como único cambio en `lib/`. Razón: `scores.server.ts` depende de `next/server`.
 - **No:** endpoint de contacto, sesión ni guardado de puntuación. Razón: SPEC 26.
 - **No:** CSS por componente. Razón: se mantiene `globals.css` compartido.
+- **Diferido (paso 7):** el contraste de color de `globals.css` (`--ink-faint` 2.39:1, filas fantasma 1.33/1.68, `.tk-mid` 4.36 frente al mínimo de 4.5) no se corrige aquí. Razón: el CSS es compartido con Next (congelación de UI y paridad) y el riesgo ya preveía documentarlo; se aborda en una spec de diseño. El detalle y el login siguen con `h2` (sin `h1`) por la misma razón.
+- **Desviaciones de implementación:** las páginas cargan con `rxResource` sobre los servicios (no `httpResource`), igual que `play-page`; se añadió `shared/components/loading` y `:host { display: block }` en `leaderboard`, `score-empty` y `data-error`; `/about` muestra también el mensaje de error de validación (Next solo hacía temblar el formulario); `tsconfig.json` de Angular relaja `noPropertyAccessFromIndexSignature` (importaba `lib/scores.ts`, que usa `process.env.X`).
 
 ---
 
