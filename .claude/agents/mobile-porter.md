@@ -1,6 +1,6 @@
 ---
 name: mobile-porter
-description: Porta y revisa un juego concreto de Arcade Vault para que se vea y juegue bien en móvil (táctil, vertical 390×844) y siga igual en escritorio, siguiendo la SPEC 12 (mando táctil). Trabaja un juego a la vez. Mapea las teclas del motor a `touchControls` en el registro, ajusta CSS móvil si desborda, verifica con Playwright y registra el estado en references/games-mobile-status.md. Úsalo cuando el usuario diga "porta <juego> a móvil", "revisa el móvil de <juego>", "añade controles táctiles a <juego>" o similar.
+description: 'Porta y revisa un juego concreto de Arcade Vault para que se vea y juegue bien en móvil (táctil, vertical 390×844) y siga igual en escritorio, siguiendo la SPEC 12 (mando táctil). Trabaja un juego a la vez. Mapea las teclas del motor a `touchControls` en el registro, ajusta CSS móvil si desborda, verifica con Playwright y registra el estado en references/games-mobile-status.md. Úsalo cuando el usuario diga "porta <juego> a móvil", "revisa el móvil de <juego>", "añade controles táctiles a <juego>" o similar.'
 tools: Read, Write, Edit, Glob, Grep, Bash, mcp__playwright__browser_navigate, mcp__playwright__browser_snapshot, mcp__playwright__browser_take_screenshot, mcp__playwright__browser_resize, mcp__playwright__browser_click, mcp__playwright__browser_press_key, mcp__playwright__browser_evaluate, mcp__playwright__browser_run_code_unsafe, mcp__playwright__browser_close
 model: sonnet
 ---
@@ -68,12 +68,12 @@ Resumen en 4-6 líneas:
 
 ## Estado por juego
 
-| Juego     | touchControls | Táctil verificado | Sin scroll 390×844 | Escritorio OK | Notas | Última actualización |
-| --------- | ------------- | ----------------- | ------------------ | ------------- | ----- | -------------------- |
-| asteroids | ✅            | ✅                | ✅                 | ✅            | SPEC 12 | 2026-11-17         |
-| tetris    | ✅            | ✅                | ✅                 | ✅            | SPEC 12 | 2026-11-17         |
-| arkanoid  | ✅            | ✅                | ✅                 | ✅            | SPEC 12 | 2026-11-17         |
-| snake     | ✅            | ✅                | ✅                 | ✅            | SPEC 12 | 2026-11-17         |
+| Juego     | touchControls | Táctil verificado | Sin scroll 390×844 | Escritorio OK | Notas   | Última actualización |
+| --------- | ------------- | ----------------- | ------------------ | ------------- | ------- | -------------------- |
+| asteroids | ✅            | ✅                | ✅                 | ✅            | SPEC 12 | 2026-11-17           |
+| tetris    | ✅            | ✅                | ✅                 | ✅            | SPEC 12 | 2026-11-17           |
+| arkanoid  | ✅            | ✅                | ✅                 | ✅            | SPEC 12 | 2026-11-17           |
+| snake     | ✅            | ✅                | ✅                 | ✅            | SPEC 12 | 2026-11-17           |
 
 Leyenda: `✅` aplicado y verificado · `🟡` en progreso · `—` pendiente
 ```

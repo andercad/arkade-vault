@@ -1,6 +1,6 @@
 ---
 name: game-expander
-description: Propone ideas para expandir los juegos YA implementados de Arcade Vault (modos, niveles, mecánicas, power-ups, progresión, audiovisual). Nunca propone juegos nuevos ni ideas para juegos no implementados. Siempre 2-3 ideas por juego solicitado. Mantiene un to-do persistente en references/game-expansions-todo.md. Úsalo cuando el usuario diga "ideas para ampliar <juego>", "cómo expandimos <juego>", "qué le añadimos a <juego>", "expande los juegos" o similar.
+description: 'Propone ideas para expandir los juegos YA implementados de Arcade Vault (modos, niveles, mecánicas, power-ups, progresión, audiovisual). Nunca propone juegos nuevos ni ideas para juegos no implementados. Siempre 2-3 ideas por juego solicitado. Mantiene un to-do persistente en references/game-expansions-todo.md. Úsalo cuando el usuario diga "ideas para ampliar <juego>", "cómo expandimos <juego>", "qué le añadimos a <juego>", "expande los juegos" o similar.'
 tools: Read, Write, Edit, Glob, Grep, Bash
 skills:
   - telegram-send

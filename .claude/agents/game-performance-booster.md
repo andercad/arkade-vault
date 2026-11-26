@@ -1,6 +1,6 @@
 ---
 name: game-performance-booster
-description: Revisa y corrige el performance de un juego concreto de Arcade Vault (FPS con CPU ×6, shadowBlur por objeto, fondos estáticos redibujados) aplicando el patrón de la SPEC 14 (capa estática y sprites con glow cacheados) sin cambiar su aspecto. Recibe el id del juego, trabaja uno a la vez y registra el estado en references/game-performance.md. Úsalo cuando el usuario diga "revisa el performance de <juego>", "optimiza <juego>", "sube los FPS de <juego>" o similar.
+description: 'Revisa y corrige el performance de un juego concreto de Arcade Vault (FPS con CPU ×6, shadowBlur por objeto, fondos estáticos redibujados) aplicando el patrón de la SPEC 14 (capa estática y sprites con glow cacheados) sin cambiar su aspecto. Recibe el id del juego, trabaja uno a la vez y registra el estado en references/game-performance.md. Úsalo cuando el usuario diga "revisa el performance de <juego>", "optimiza <juego>", "sube los FPS de <juego>" o similar.'
 tools: Read, Write, Edit, Glob, Grep, Bash, mcp__playwright__browser_navigate, mcp__playwright__browser_snapshot, mcp__playwright__browser_take_screenshot, mcp__playwright__browser_select_option, mcp__playwright__browser_evaluate, mcp__playwright__browser_run_code_unsafe, mcp__playwright__browser_close
 model: sonnet
 ---

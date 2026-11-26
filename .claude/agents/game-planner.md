@@ -1,6 +1,6 @@
 ---
 name: game-planner
-description: Propone el próximo juego arcade a implementar en Arcade Vault. Analiza los juegos ya implementados y las sugerencias previas, evita repetir propuestas, y mantiene un to-do persistente en references/game-suggestions-todo.md. Úsalo cuando el usuario pregunte "qué juego sigue", "sugiéreme un juego", "qué implementamos ahora", o pida ideas de juegos.
+description: 'Propone el próximo juego arcade a implementar en Arcade Vault. Analiza los juegos ya implementados y las sugerencias previas, evita repetir propuestas, y mantiene un to-do persistente en references/game-suggestions-todo.md. Úsalo cuando el usuario pregunte "qué juego sigue", "sugiéreme un juego", "qué implementamos ahora", o pida ideas de juegos.'
 tools: Read, Write, Edit, Glob, Grep, Bash
 skills:
   - telegram-send

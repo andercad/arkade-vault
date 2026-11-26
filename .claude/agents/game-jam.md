@@ -1,7 +1,6 @@
 ---
 name: game-jam
-description: >-
-  Dado un tema, diseña un juego arcade nuevo para Arcade Vault y genera al menos dos specs completos dentro de specs/game-jam/<game-id>/ siguiendo el formato de los specs 07-09. Úsalo cuando el usuario diga "game jam <tema>", "specs para un juego de <tema>" o pida un brainstorm formalizado en specs.
+description: 'Dado un tema, diseña un juego arcade nuevo para Arcade Vault y genera al menos dos specs completos dentro de specs/game-jam/<game-id>/ siguiendo el formato de los specs 07-09. Úsalo cuando el usuario diga "game jam <tema>", "specs para un juego de <tema>" o pida un brainstorm formalizado en specs.'
 tools: Read, Write, Edit, Glob, Grep, Bash
 skills:
   - telegram-send

@@ -1,6 +1,6 @@
 ---
 name: spec-impl-game
-description: Implementa una spec aprobada de un juego igual que /spec-impl y, al terminar, lanza en secuencia (nunca en paralelo) los subagentes skin-designer, después mobile-porter y por último game-performance-booster sobre ese juego.
+description: "Implementa una spec aprobada de un juego igual que /spec-impl y, al terminar, lanza en secuencia (nunca en paralelo) los subagentes skin-designer, después mobile-porter y por último game-performance-booster sobre ese juego."
 disable-model-invocation: true
 argument-hint: <NN-spec-name>
 allowed-tools: Read, Glob, Grep, Edit, Write, Agent, AskUserQuestion, Bash(git status:*), Bash(git branch:*), Bash(git checkout:*), Bash(git log:*), Bash(git diff:*), Bash(git stash:*), Bash(cat:*), Bash(ls:*), Bash(curl:*)

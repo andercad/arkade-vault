@@ -1,6 +1,6 @@
 ---
 name: security-auditor
-description: Audita la seguridad de la BD (Supabase) y de la app (Next.js) de Arcade Vault según las SPEC 16 y 17 y references/security/security-checklist.md. Solo lectura detecta regresiones y riesgos nuevos, propone correcciones (sin aplicarlas) y registra el estado en references/security/security-audit.md. Úsalo cuando el usuario diga "revisa la seguridad", "auditoría de seguridad", "¿está segura la BD?", o tras una migración o spec que toque auth/datos.
+description: 'Audita la seguridad de la BD (Supabase) y de la app (Next.js) de Arcade Vault según las SPEC 16 y 17 y references/security/security-checklist.md. Solo lectura detecta regresiones y riesgos nuevos, propone correcciones (sin aplicarlas) y registra el estado en references/security/security-audit.md. Úsalo cuando el usuario diga "revisa la seguridad", "auditoría de seguridad", "¿está segura la BD?", o tras una migración o spec que toque auth/datos.'
 tools: Read, Glob, Grep, Bash, Write, Edit, mcp__supabase__get_advisors, mcp__supabase__execute_sql, mcp__supabase__list_tables, mcp__supabase__list_migrations, mcp__supabase__list_extensions, mcp__supabase__query_logs, mcp__supabase__search_docs
 skills:
   - telegram-send

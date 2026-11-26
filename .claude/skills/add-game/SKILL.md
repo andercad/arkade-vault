@@ -1,6 +1,6 @@
 ---
 name: add-game
-description: Genera la spec para añadir un juego real jugable a Arcade Vault (motor TS en canvas, fila en la tabla games, leaderboard en scores), portado desde references/started-games o diseñado desde cero. Se implementa después con /spec-impl.
+description: "Genera la spec para añadir un juego real jugable a Arcade Vault (motor TS en canvas, fila en la tabla games, leaderboard en scores), portado desde references/started-games o diseñado desde cero. Se implementa después con /spec-impl."
 disable-model-invocation: true
 argument-hint: <carpeta de references/started-games o descripción del juego>
 allowed-tools: Read, Glob, Grep, Write, AskUserQuestion, Bash(ls:*), Bash(cat:*), Bash(date:*), Bash(git status:*)

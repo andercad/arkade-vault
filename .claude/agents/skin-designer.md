@@ -1,6 +1,6 @@
 ---
 name: skin-designer
-description: Aplica los 3 skins canónicos (classic, retro, neon) a un juego concreto de Arcade Vault indicado por el usuario. Trabaja un juego a la vez — no audita ni modifica otros. Implementa en lib/<juego>/skins.ts + motor + entrada del registro (lib/game-registry.ts) siguiendo el patrón de Tetris, y registra el progreso en references/games-with-themes.md. Úsalo cuando el usuario diga "aplica skins a <juego>", "añade skin <x> a <juego>", "diseña los skins de <juego>" o similar.
+description: 'Aplica los 3 skins canónicos (classic, retro, neon) a un juego concreto de Arcade Vault indicado por el usuario. Trabaja un juego a la vez — no audita ni modifica otros. Implementa en lib/<juego>/skins.ts + motor + entrada del registro (lib/game-registry.ts) siguiendo el patrón de Tetris, y registra el progreso en references/games-with-themes.md. Úsalo cuando el usuario diga "aplica skins a <juego>", "añade skin <x> a <juego>", "diseña los skins de <juego>" o similar.'
 tools: Read, Write, Edit, Glob, Grep, mcp__playwright__browser_navigate, mcp__playwright__browser_snapshot, mcp__playwright__browser_take_screenshot, mcp__playwright__browser_select_option, mcp__playwright__browser_click, mcp__playwright__browser_press_key, mcp__playwright__browser_close
 model: sonnet
 ---
@@ -69,12 +69,12 @@ Resumen en 4-6 líneas:
 
 ## Estado por juego
 
-| Juego     | classic | retro | neon | Skins extra  | Dark-mode revisado | Última actualización |
-| --------- | ------- | ----- | ---- | ------------ | ------------------ | -------------------- |
+| Juego     | classic | retro | neon | Skins extra   | Dark-mode revisado | Última actualización |
+| --------- | ------- | ----- | ---- | ------------- | ------------------ | -------------------- |
 | tetris    | —       | ✅    | ✅   | pastel, pixel | parcial            | —                    |
-| arkanoid  | —       | —     | —    | —            | —                  | —                    |
-| asteroids | —       | —     | —    | —            | —                  | —                    |
-| snake     | —       | —     | —    | —            | —                  | —                    |
+| arkanoid  | —       | —     | —    | —             | —                  | —                    |
+| asteroids | —       | —     | —    | —             | —                  | —                    |
+| snake     | —       | —     | —    | —             | —                  | —                    |
 
 Leyenda: `✅` aplicado y verificado · `🟡` en progreso · `—` pendiente
 ```
