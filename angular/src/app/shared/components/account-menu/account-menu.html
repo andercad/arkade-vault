@@ -1,0 +1,21 @@
+<div class="account">
+  <button
+    #trigger
+    type="button"
+    class="account-trigger"
+    aria-haspopup="menu"
+    [attr.aria-expanded]="open()"
+    [attr.aria-label]="'Cuenta de ' + user().name"
+    (click)="toggle()"
+  >
+    <app-avatar [name]="user().name" [avatarUrl]="user().avatarUrl" />
+    <span class="account-name">{{ user().name }}</span>
+    <span class="account-caret" aria-hidden="true"></span>
+  </button>
+  @if (open()) {
+    <div #menu class="account-menu" role="menu" tabindex="-1" (keydown)="onMenuKey($event)">
+      <a routerLink="/perfil" role="menuitem" (click)="close()">Perfil</a>
+      <button type="button" role="menuitem" class="out" (click)="signOut()">Cerrar sesión</button>
+    </div>
+  }
+</div>

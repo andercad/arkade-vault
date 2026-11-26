@@ -3,16 +3,16 @@
 import { createAuthActionClient, createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import {
-  PASSWORD_ERROR,
   validateSignIn,
   validateSignUp,
   type AuthResult,
 } from "@/lib/auth-validation";
-
-const GENERIC_ERROR = "No se pudo completar la operación. Inténtalo de nuevo.";
-const INVALID_CREDENTIALS = "Usuario o contraseña incorrectos.";
-const RATE_LIMIT_ERROR =
-  "Demasiados intentos. Espera unos minutos y vuelve a probar.";
+import {
+  GENERIC_ERROR,
+  INVALID_CREDENTIALS,
+  signInError,
+  signUpError,
+} from "@/lib/auth-errors";
 
 function field(formData: FormData, name: string): string {
   const v = formData.get(name);
@@ -60,21 +60,8 @@ export async function signUp(formData: FormData): Promise<AuthResult> {
     },
   });
   if (error) {
-    if (error.code === "user_already_exists" || error.code === "email_exists") {
-      return { ok: false, error: "Ese correo ya está registrado." };
-    }
-    if (error.code === "weak_password") {
-      return { ok: false, error: PASSWORD_ERROR };
-    }
-    if (error.code === "over_request_rate_limit") {
-      return { ok: false, error: RATE_LIMIT_ERROR };
-    }
-    if (error.code === "over_email_send_rate_limit") {
-      return {
-        ok: false,
-        error: "Demasiados correos enviados. Inténtalo más tarde.",
-      };
-    }
+    const known = signUpError(error.code);
+    if (known) return { ok: false, error: known };
     console.error("[auth] Error en signUp:", error);
     return { ok: false, error: GENERIC_ERROR };
   }
@@ -119,15 +106,8 @@ export async function signIn(formData: FormData): Promise<AuthResult> {
     password,
   });
   if (error) {
-    if (error.code === "over_request_rate_limit") {
-      return { ok: false, error: RATE_LIMIT_ERROR };
-    }
-    if (error.code === "email_not_confirmed") {
-      return { ok: false, error: "Confirma tu email antes de entrar." };
-    }
-    if (error.code === "invalid_credentials") {
-      return { ok: false, error: INVALID_CREDENTIALS };
-    }
+    const known = signInError(error.code);
+    if (known) return { ok: false, error: known };
     console.error("[auth] Error en signIn:", error);
     return { ok: false, error: GENERIC_ERROR };
   }

@@ -9,6 +9,10 @@ import {
   viewChild,
 } from '@angular/core';
 import { IsActiveMatchOptions, RouterLink, RouterLinkActive } from '@angular/router';
+import { AuthService } from '@shared/services/auth.service';
+import { SessionService } from '@shared/services/session.service';
+import { AccountMenuComponent } from '../account-menu/account-menu';
+import { AvatarComponent } from '../avatar/avatar';
 
 interface NavLink {
   path: string;
@@ -18,9 +22,10 @@ interface NavLink {
 }
 
 /**
- * Navegación principal: logo, enlaces con estado activo, créditos, botón de sesión y panel
- * móvil. El panel se abre con la hamburguesa; `Esc`, el *backdrop* o un enlace lo cierran y
- * el foco vuelve al botón. Sin sesión hasta la SPEC 26: el botón es siempre «Iniciar Sesión».
+ * Navegación principal: logo, enlaces con estado activo, créditos, cuenta y panel móvil. Con
+ * sesión muestra el menú de cuenta (en el panel, perfil y «Cerrar sesión»); sin ella, «Iniciar
+ * Sesión»; mientras se resuelve la sesión no muestra ninguno. El panel se abre con la
+ * hamburguesa; `Esc`, el *backdrop* o un enlace lo cierran y el foco vuelve al botón.
  * @example
  * ```html
  * <app-nav />
@@ -28,13 +33,15 @@ interface NavLink {
  */
 @Component({
   selector: 'app-nav',
-  imports: [RouterLink, RouterLinkActive],
+  imports: [RouterLink, RouterLinkActive, AccountMenuComponent, AvatarComponent],
   templateUrl: './nav.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { '(document:keydown.escape)': 'close()' },
 })
 export class NavComponent {
   private readonly injector = inject(Injector);
+  private readonly auth = inject(AuthService);
+  protected readonly session = inject(SessionService);
 
   // ========== Constants ==========
   protected readonly links: readonly NavLink[] = [
@@ -71,6 +78,11 @@ export class NavComponent {
     afterNextRender(() => this.panel().nativeElement.querySelector<HTMLElement>('a')?.focus(), {
       injector: this.injector,
     });
+  }
+
+  /** Cierra la sesión; `SessionService` se refresca y el nav vuelve a invitado. */
+  protected signOut(): void {
+    this.auth.signOut().subscribe();
   }
 
   /** Cierra el panel (si está abierto) y devuelve el foco a la hamburguesa. */

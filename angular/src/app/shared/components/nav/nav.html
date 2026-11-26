@@ -19,7 +19,11 @@
     <span class="coin" aria-hidden="true"></span>
     <span>CRÉDITOS · 03</span>
   </div>
-  <a routerLink="/login" class="btn auth-btn">Iniciar Sesión</a>
+  @if (session.user(); as user) {
+    <app-account-menu [user]="user" (signedOut)="signOut()" />
+  } @else if (!session.loading()) {
+    <a routerLink="/login" class="btn auth-btn">Iniciar Sesión</a>
+  }
   <button
     #hamburger
     type="button"
@@ -53,9 +57,23 @@
       >{{ link.label }}</a
     >
   }
-  <a routerLink="/login" routerLinkActive="active" ariaCurrentWhenActive="page" (click)="close()"
-    >Iniciar Sesión</a
-  >
+  @if (session.user(); as user) {
+    <a routerLink="/perfil" class="panel-user" (click)="close()">
+      <app-avatar [name]="user.name" [avatarUrl]="user.avatarUrl" [size]="36" />
+      <span>{{ user.name }}</span>
+    </a>
+    <button
+      type="button"
+      class="signout"
+      (click)="close(); signOut()"
+    >
+      Cerrar sesión
+    </button>
+  } @else if (!session.loading()) {
+    <a routerLink="/login" routerLinkActive="active" ariaCurrentWhenActive="page" (click)="close()"
+      >Iniciar Sesión</a
+    >
+  }
   <div style="flex: 1"></div>
   <div
     class="pixel"

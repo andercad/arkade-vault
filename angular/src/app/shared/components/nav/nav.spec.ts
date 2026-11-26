@@ -1,7 +1,13 @@
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
+import type { SessionUser } from '@shared/models/session';
+import { AuthService } from '@shared/services/auth.service';
+import { SessionService } from '@shared/services/session.service';
+import { of } from 'rxjs';
 import { NavComponent } from './nav';
+
+const USER: SessionUser = { id: 'u1', name: 'ANDER', avatarUrl: null, hasPassword: true };
 
 @Component({ template: '' })
 class DummyComponent {}
@@ -10,6 +16,9 @@ describe('NavComponent', () => {
   let fixture: ComponentFixture<NavComponent>;
   let el: HTMLElement;
   let router: Router;
+  const user = signal<SessionUser | null>(null);
+  const loading = signal(false);
+  const signOutCall = vi.fn(() => of(undefined));
 
   const routes = ['', 'juegos', 'juegos/:id', 'salon-de-la-fama', 'about', 'login'].map((path) => ({
     path,
@@ -17,7 +26,16 @@ describe('NavComponent', () => {
   }));
 
   beforeEach(async () => {
-    TestBed.configureTestingModule({ providers: [provideRouter(routes)] });
+    user.set(null);
+    loading.set(false);
+    signOutCall.mockClear();
+    TestBed.configureTestingModule({
+      providers: [
+        provideRouter(routes),
+        { provide: SessionService, useValue: { user, loading } },
+        { provide: AuthService, useValue: { signOut: signOutCall } },
+      ],
+    });
     router = TestBed.inject(Router);
     fixture = TestBed.createComponent(NavComponent);
     el = fixture.nativeElement as HTMLElement;
@@ -122,5 +140,57 @@ describe('NavComponent', () => {
     document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
     expect(document.activeElement).toBe(outside);
     outside.remove();
+  });
+
+  describe('cuenta', () => {
+    async function render(): Promise<void> {
+      fixture.detectChanges();
+      await fixture.whenStable();
+    }
+
+    it('con sesión muestra el menú de cuenta en vez de «Iniciar Sesión»', async () => {
+      user.set(USER);
+      await render();
+      expect(el.querySelector('app-account-menu .account-name')?.textContent).toBe('ANDER');
+      expect(el.querySelector('a.auth-btn')).toBeNull();
+      expect(el.querySelector('.av-mobile-panel a[href="/login"]')).toBeNull();
+    });
+
+    it('el panel móvil con sesión muestra perfil con avatar y «Cerrar sesión»', async () => {
+      user.set(USER);
+      await render();
+      const profile = panel().querySelector('a.panel-user') as HTMLAnchorElement;
+      expect(profile.getAttribute('href')).toBe('/perfil');
+      expect(profile.textContent).toContain('ANDER');
+      expect(profile.querySelector('.av-avatar')).toBeTruthy();
+      expect(panel().querySelector('button.signout')?.textContent?.trim()).toBe('Cerrar sesión');
+    });
+
+    it('«Cerrar sesión» del panel cierra el panel y llama a AuthService.signOut', async () => {
+      user.set(USER);
+      await render();
+      await openPanel();
+      (panel().querySelector('button.signout') as HTMLButtonElement).click();
+      fixture.detectChanges();
+      expect(signOutCall).toHaveBeenCalledTimes(1);
+      expect(panel().classList.contains('open')).toBe(false);
+    });
+
+    it('«Cerrar sesión» del menú de cuenta llama a AuthService.signOut', async () => {
+      user.set(USER);
+      await render();
+      (el.querySelector('.account-trigger') as HTMLButtonElement).click();
+      fixture.detectChanges();
+      (el.querySelector('.account-menu .out') as HTMLButtonElement).click();
+      expect(signOutCall).toHaveBeenCalledTimes(1);
+    });
+
+    it('mientras carga la sesión no muestra cuenta ni «Iniciar Sesión»', async () => {
+      loading.set(true);
+      await render();
+      expect(el.querySelector('app-account-menu')).toBeNull();
+      expect(el.querySelector('a.auth-btn')).toBeNull();
+      expect(panel().querySelector('a.panel-user, button.signout, a[href="/login"]')).toBeNull();
+    });
   });
 });

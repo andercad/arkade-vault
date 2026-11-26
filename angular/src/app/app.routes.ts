@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { guestGuard } from '@shared/guards/guest.guard';
 
 /** Título por defecto, el mismo que `metadata.title` de Next. */
 const TITLE = 'Arcade Vault';
@@ -31,7 +32,12 @@ export const routes: Routes = [
     title: 'Acerca de | Arcade Vault',
     loadComponent: () => import('@about/pages/about-page/about-page'),
   },
-  { path: 'login', title: TITLE, loadComponent: () => import('@auth/pages/login-page/login-page') },
+  {
+    path: 'login',
+    title: TITLE,
+    canMatch: [guestGuard],
+    loadComponent: () => import('@auth/pages/login-page/login-page'),
+  },
   {
     path: '**',
     title: TITLE,

@@ -1,0 +1,13 @@
+<span
+  [class]="'av-avatar tone-' + tone()"
+  [style.width.px]="size()"
+  [style.height.px]="size()"
+  [style.font-size.px]="fontSize()"
+  aria-hidden="true"
+>
+  @if (photo(); as url) {
+    <img [src]="url" alt="" referrerpolicy="no-referrer" (error)="failedUrl.set(url)" />
+  } @else {
+    {{ initials() }}
+  }
+</span>

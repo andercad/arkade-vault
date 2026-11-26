@@ -7,11 +7,15 @@ import {
   validatePassword,
   type AuthResult,
 } from "@/lib/auth-validation";
+import {
+  CURRENT_PASSWORD_ERROR,
+  GENERIC_ERROR,
+  SAME_PASSWORD_ERROR,
+  updatePasswordError,
+  verifyPasswordError,
+} from "@/lib/auth-errors";
 
-const GENERIC_ERROR = "No se pudo completar la operación. Inténtalo de nuevo.";
 const NO_SESSION = "Inicia sesión para continuar.";
-const RATE_LIMIT_ERROR =
-  "Demasiados intentos. Espera unos minutos y vuelve a probar.";
 
 // SPEC 19: borra la cuenta del usuario de la sesión. El cascade (0010, 0013)
 // elimina su profiles y sus scores.
@@ -74,7 +78,7 @@ export async function changePassword(formData: FormData): Promise<AuthResult> {
   if (!hasPassword || !user.email) return { ok: false, error: GENERIC_ERROR };
 
   if (!current) {
-    return { ok: false, error: "La contraseña actual no es correcta." };
+    return { ok: false, error: CURRENT_PASSWORD_ERROR };
   }
   const weak = validatePassword(password);
   if (weak) return { ok: false, error: PASSWORD_ERROR };
@@ -82,10 +86,7 @@ export async function changePassword(formData: FormData): Promise<AuthResult> {
     return { ok: false, error: "Las contraseñas no coinciden." };
   }
   if (password === current) {
-    return {
-      ok: false,
-      error: "La nueva contraseña debe ser distinta de la anterior.",
-    };
+    return { ok: false, error: SAME_PASSWORD_ERROR };
   }
 
   // Solo para auth.*: la clave secreta salta RLS y reenvía la IP (SPEC 17).
@@ -97,30 +98,16 @@ export async function changePassword(formData: FormData): Promise<AuthResult> {
     password: current,
   });
   if (verifyError) {
-    if (verifyError.code === "over_request_rate_limit") {
-      return { ok: false, error: RATE_LIMIT_ERROR };
-    }
-    if (verifyError.code === "invalid_credentials") {
-      return { ok: false, error: "La contraseña actual no es correcta." };
-    }
+    const known = verifyPasswordError(verifyError.code);
+    if (known) return { ok: false, error: known };
     console.error("[perfil] Error al verificar la contraseña:", verifyError);
     return { ok: false, error: GENERIC_ERROR };
   }
 
   const { error: updateError } = await authClient.auth.updateUser({ password });
   if (updateError) {
-    if (updateError.code === "same_password") {
-      return {
-        ok: false,
-        error: "La nueva contraseña debe ser distinta de la anterior.",
-      };
-    }
-    if (updateError.code === "weak_password") {
-      return { ok: false, error: PASSWORD_ERROR };
-    }
-    if (updateError.code === "over_request_rate_limit") {
-      return { ok: false, error: RATE_LIMIT_ERROR };
-    }
+    const known = updatePasswordError(updateError.code);
+    if (known) return { ok: false, error: known };
     console.error("[perfil] Error al cambiar la contraseña:", updateError);
     return { ok: false, error: GENERIC_ERROR };
   }

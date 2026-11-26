@@ -1,5 +1,21 @@
 @if (forgot()) {
   <app-forgot-password (back)="forgot.set(false)" />
+} @else if (sentTo(); as address) {
+  <div class="av-auth-wrap fade-in">
+    <div class="auth-card">
+      <div class="auth-header">
+        <div class="mark"></div>
+        <h2 class="neon-cyan">REVISA TU CORREO</h2>
+      </div>
+      <p class="mono sent-text" role="status">
+        Te hemos enviado un enlace de confirmación a <strong>{{ address }}</strong
+        >. Ábrelo para activar tu cuenta y entrar al Vault.
+      </p>
+      <button type="button" class="btn ghost sent-back" (click)="backToSignIn()">
+        VOLVER A INICIAR SESIÓN
+      </button>
+    </div>
+  </div>
 } @else {
   <div class="av-auth-wrap fade-in">
     <div class="auth-card">
@@ -82,7 +98,7 @@
           </button>
         }
 
-        <button class="btn lg submit-btn" type="submit">
+        <button class="btn lg submit-btn" type="submit" [disabled]="pending()">
           {{ tab() === 'in' ? 'ENTRAR AL VAULT' : 'CREAR CUENTA' }}
         </button>
       </form>

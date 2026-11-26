@@ -12,7 +12,13 @@ import { createApiRouter, type ApiClient } from './server/api';
 import { createAuthRouter } from './server/auth-api';
 import { createCsrfMiddleware } from './server/csrf';
 import { createSessionMiddleware } from './server/session';
-import { createSessionClient, type DbClient, type SupabaseEnv } from './server/supabase';
+import {
+  createAdminClient,
+  createAuthActionClient,
+  createSessionClient,
+  type DbClient,
+  type SupabaseEnv,
+} from './server/supabase';
 
 // Variables de angular/.env (SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY). Opcional: en
 // producción llegan del entorno del proceso.
@@ -60,6 +66,13 @@ function supabaseEnv(): SupabaseEnv | null {
   };
 }
 
+/** Configuración obligatoria para las rutas de auth (lanza si falta). */
+function requireSupabaseEnv(): SupabaseEnv {
+  const env = supabaseEnv();
+  if (!env) throw new Error('Faltan SUPABASE_URL y SUPABASE_PUBLISHABLE_KEY en el entorno.');
+  return env;
+}
+
 /** Cliente de sesión de la petición (cookies); `null` sin configuración. */
 function sessionClient(req: Request, res: Response): DbClient | null {
   const env = supabaseEnv();
@@ -80,7 +93,12 @@ function createReadClient(): ApiClient | null {
 app.use('/api', createCsrfMiddleware(siteUrl));
 
 // Auth (SPEC 26): sesión en cookies httpOnly.
-app.use('/api/auth', express.json(), createAuthRouter({ sessionClient }));
+app.use('/api/auth', express.json(), createAuthRouter({
+    sessionClient,
+    authClient: (req, res) => createAuthActionClient(requireSupabaseEnv(), req, res),
+    adminClient: () => createAdminClient(requireSupabaseEnv()),
+    siteUrl,
+  }));
 
 // BFF de solo lectura (src/server/api.ts); responde 404 JSON a cualquier otra /api/*.
 app.use('/api', createApiRouter(createReadClient));
