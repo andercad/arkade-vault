@@ -41,6 +41,19 @@ export class AuthService {
     return this.http.post<void>('/api/auth/sign-in', input);
   }
 
+  /** Pide el correo de recuperación; responde igual exista o no la cuenta. */
+  forgotPassword(email: string): Observable<void> {
+    return this.http.post<void>('/api/auth/forgot-password', { email });
+  }
+
+  /**
+   * Canjea el `code` del enlace de recuperación y fija la nueva contraseña en una sola llamada.
+   * El código es de un solo uso: también deja la sesión abierta.
+   */
+  recover(code: string, password: string): Observable<void> {
+    return this.http.post<void>('/api/auth/recovery', { code, password });
+  }
+
   /** Cierra la sesión y refresca `SessionService` (el nav vuelve a invitado). */
   signOut(): Observable<void> {
     return this.http

@@ -39,6 +39,11 @@ export const routes: Routes = [
     loadComponent: () => import('@auth/pages/login-page/login-page'),
   },
   {
+    path: 'auth/reset-password',
+    title: TITLE,
+    loadComponent: () => import('@auth/pages/reset-password-page/reset-password-page'),
+  },
+  {
     path: '**',
     title: TITLE,
     loadComponent: () => import('@not-found/pages/not-found-page/not-found-page'),

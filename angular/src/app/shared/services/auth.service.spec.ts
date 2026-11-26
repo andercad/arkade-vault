@@ -54,6 +54,44 @@ describe('AuthService', () => {
     expect(status).toBe(401);
   });
 
+  it('forgotPassword hace POST /api/auth/forgot-password con el correo', () => {
+    service.forgotPassword('kai@vault.gg').subscribe();
+    const req = http.expectOne('/api/auth/forgot-password');
+    expect(req.request.method).toBe('POST');
+    expect(req.request.body).toEqual({ email: 'kai@vault.gg' });
+    req.flush(null, { status: 204, statusText: 'No Content' });
+  });
+
+  it('forgotPassword propaga el 429', () => {
+    let status = 0;
+    service.forgotPassword('kai@vault.gg').subscribe({
+      error: (e: { status: number }) => (status = e.status),
+    });
+    http
+      .expectOne('/api/auth/forgot-password')
+      .flush({ error: 'x' }, { status: 429, statusText: 'Too Many Requests' });
+    expect(status).toBe(429);
+  });
+
+  it('recover hace POST /api/auth/recovery con código y contraseña', () => {
+    service.recover('abc', 'Aa1!aaaa').subscribe();
+    const req = http.expectOne('/api/auth/recovery');
+    expect(req.request.method).toBe('POST');
+    expect(req.request.body).toEqual({ code: 'abc', password: 'Aa1!aaaa' });
+    req.flush(null, { status: 204, statusText: 'No Content' });
+  });
+
+  it('recover propaga el error del servidor', () => {
+    let status = 0;
+    service.recover('abc', 'x').subscribe({
+      error: (e: { status: number }) => (status = e.status),
+    });
+    http
+      .expectOne('/api/auth/recovery')
+      .flush({ error: 'x' }, { status: 400, statusText: 'Bad Request' });
+    expect(status).toBe(400);
+  });
+
   it('signOut hace POST /api/auth/sign-out y refresca la sesión', async () => {
     const done = new Promise<void>((resolve) => service.signOut().subscribe(() => resolve()));
     http.expectOne('/api/auth/sign-out').flush(null, { status: 204, statusText: 'No Content' });

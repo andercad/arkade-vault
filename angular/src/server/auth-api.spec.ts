@@ -20,6 +20,10 @@ interface Fakes {
   rpcCalls: unknown[];
   authClientUsed: number;
   sessionNull: boolean;
+  reset: { error: Err };
+  exchange: { error: Err };
+  update: { error: Err };
+  calls: { reset: unknown[]; exchange: unknown[]; update: unknown[] };
 }
 
 const fresh = (): Fakes => ({
@@ -35,6 +39,10 @@ const fresh = (): Fakes => ({
   rpcCalls: [],
   authClientUsed: 0,
   sessionNull: false,
+  reset: { error: null },
+  exchange: { error: null },
+  update: { error: null },
+  calls: { reset: [], exchange: [], update: [] },
 });
 
 describe('createAuthRouter', () => {
@@ -52,6 +60,18 @@ describe('createAuthRouter', () => {
       signOut: () => {
         f.signOutCalled++;
         return Promise.resolve({ error: null });
+      },
+      resetPasswordForEmail: (...args: unknown[]) => {
+        f.calls.reset.push(args);
+        return Promise.resolve(f.reset);
+      },
+      exchangeCodeForSession: (code: string) => {
+        f.calls.exchange.push(code);
+        return Promise.resolve(f.exchange);
+      },
+      updateUser: (arg: unknown) => {
+        f.calls.update.push(arg);
+        return Promise.resolve(f.update);
       },
     },
     from: () => ({
@@ -310,6 +330,106 @@ describe('createAuthRouter', () => {
     it('sin configuración también responde 204', async () => {
       f.sessionNull = true;
       expect((await post('sign-out', {})).status).toBe(204);
+    });
+  });
+
+  describe('POST /forgot-password', () => {
+    it.each(['', 'no-es-correo'])('correo inválido %j → 400 sin tocar Auth', async (email) => {
+      const res = await post('forgot-password', { email });
+      expect(res.status).toBe(400);
+      expect(f.calls.reset).toEqual([]);
+    });
+
+    it('correo válido → 204 con redirectTo de SITE_URL (nunca del Origin)', async () => {
+      const res = await post('forgot-password', { email: '  kai@vault.gg ' });
+      expect(res.status).toBe(204);
+      expect(f.calls.reset).toEqual([
+        ['kai@vault.gg', { redirectTo: 'https://arcade.test/auth/reset-password' }],
+      ]);
+    });
+
+    it.each([
+      ['over_email_send_rate_limit', 'Demasiados correos enviados. Inténtalo más tarde.'],
+      ['over_request_rate_limit', 'Demasiados intentos. Espera unos minutos y vuelve a probar.'],
+    ])('%s → 429', async (code, message) => {
+      f.reset = { error: { code } };
+      const res = await post('forgot-password', { email: 'kai@vault.gg' });
+      expect(res.status).toBe(429);
+      expect(await json(res)).toEqual({ error: message });
+    });
+
+    it('error desconocido → 500 y se registra', async () => {
+      f.reset = { error: { code: 'otra_cosa' } };
+      expect((await post('forgot-password', { email: 'kai@vault.gg' })).status).toBe(500);
+      expect(logged).toHaveBeenCalled();
+    });
+
+    it('sin configuración → 500 genérico', async () => {
+      f.sessionNull = true;
+      expect((await post('forgot-password', { email: 'kai@vault.gg' })).status).toBe(500);
+    });
+  });
+
+  describe('POST /recovery', () => {
+    const valid = { code: 'abc', password: 'Aa1!aaaa' };
+
+    it('sin código → 400 y no toca Auth', async () => {
+      const res = await post('recovery', { ...valid, code: '' });
+      expect(res.status).toBe(400);
+      expect(f.calls.exchange).toEqual([]);
+    });
+
+    it('contraseña débil → 400 sin consumir el código', async () => {
+      const res = await post('recovery', { ...valid, password: 'x' });
+      expect(res.status).toBe(400);
+      expect(f.calls.exchange).toEqual([]);
+    });
+
+    it('canjea el código y fija la contraseña → 204', async () => {
+      const res = await post('recovery', valid);
+      expect(res.status).toBe(204);
+      expect(f.calls.exchange).toEqual(['abc']);
+      expect(f.calls.update).toEqual([{ password: 'Aa1!aaaa' }]);
+    });
+
+    it('código inválido, caducado o usado → 400 y no cambia la contraseña', async () => {
+      f.exchange = { error: { code: 'flow_state_not_found' } };
+      const res = await post('recovery', valid);
+      expect(res.status).toBe(400);
+      expect(((await json(res)) as { error: string }).error).toContain('no es válido');
+      expect(f.calls.update).toEqual([]);
+    });
+
+    it('same_password → 400 con su mensaje', async () => {
+      f.update = { error: { code: 'same_password' } };
+      const res = await post('recovery', valid);
+      expect(res.status).toBe(400);
+      expect(await json(res)).toEqual({
+        error: 'La nueva contraseña debe ser distinta de la anterior.',
+      });
+    });
+
+    it('weak_password del servidor → 400 con el mensaje de contraseña', async () => {
+      f.update = { error: { code: 'weak_password' } };
+      const res = await post('recovery', valid);
+      expect(res.status).toBe(400);
+      expect(((await json(res)) as { error: string }).error).toContain('al menos 8 caracteres');
+    });
+
+    it('límite de intentos → 429', async () => {
+      f.update = { error: { code: 'over_request_rate_limit' } };
+      expect((await post('recovery', valid)).status).toBe(429);
+    });
+
+    it('error desconocido → 500 genérico', async () => {
+      f.update = { error: { code: 'otra_cosa' } };
+      expect((await post('recovery', valid)).status).toBe(500);
+      expect(logged).toHaveBeenCalled();
+    });
+
+    it('sin configuración → 500 genérico', async () => {
+      f.sessionNull = true;
+      expect((await post('recovery', valid)).status).toBe(500);
     });
   });
 });

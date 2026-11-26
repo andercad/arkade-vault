@@ -1,6 +1,18 @@
 import { Router, type Request, type Response } from 'express';
-import { validateSignIn, validateSignUp } from '@/lib/auth-validation';
-import { GENERIC_ERROR, INVALID_CREDENTIALS, signInError, signUpError } from '@/lib/auth-errors';
+import {
+  EMAIL_ERROR,
+  isValidEmail,
+  validatePassword,
+  validateSignIn,
+  validateSignUp,
+} from '@/lib/auth-validation';
+import {
+  GENERIC_ERROR,
+  INVALID_CREDENTIALS,
+  signInError,
+  signUpError,
+  updatePasswordError,
+} from '@/lib/auth-errors';
 import { resolveSessionUser } from './session';
 import type { DbClient } from './supabase';
 
@@ -25,7 +37,12 @@ const STATUS_BY_CODE: Record<string, number> = {
   over_email_send_rate_limit: 429,
   email_not_confirmed: 401,
   invalid_credentials: 401,
+  same_password: 400,
 };
+
+/** Enlace de recuperación inválido, caducado o ya usado. */
+const INVALID_LINK =
+  'El enlace no es válido o ha caducado. Pide uno nuevo desde el inicio de sesión.';
 
 /** Campo de texto del cuerpo JSON; vacío si no es una cadena. */
 export function textField(body: unknown, name: string): string {
@@ -147,6 +164,63 @@ export function createAuthRouter(deps: AuthDeps): Router {
       res.status(204).end();
     } catch (error) {
       console.error('[auth] Error en signOut:', error);
+      fail(res, 500, GENERIC_ERROR);
+    }
+  });
+
+  // POST /api/auth/forgot-password { email } → 204 (igual exista o no la cuenta)
+  router.post('/forgot-password', async (req, res) => {
+    const email = textField(req.body, 'email');
+    if (!isValidEmail(email)) return fail(res, 400, EMAIL_ERROR);
+    try {
+      // Cliente con cookies: el verificador PKCE queda en el navegador que lo pide y
+      // `/api/auth/recovery` lo necesita para canjear el código.
+      const supabase = deps.sessionClient(req, res);
+      if (!supabase) return fail(res, 500, GENERIC_ERROR);
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${deps.siteUrl}/auth/reset-password`,
+      });
+      if (error) {
+        if (
+          error.code === 'over_email_send_rate_limit' ||
+          error.code === 'over_request_rate_limit'
+        ) {
+          return authFailure(res, 'resetPasswordForEmail', error, signUpError(error.code));
+        }
+        console.error('[auth] Error en resetPasswordForEmail:', error);
+        return fail(res, 500, 'No se pudo enviar el correo. Inténtalo de nuevo.');
+      }
+      res.status(204).end();
+    } catch (error) {
+      console.error('[auth] Error en resetPasswordForEmail:', error);
+      fail(res, 500, 'No se pudo enviar el correo. Inténtalo de nuevo.');
+    }
+  });
+
+  // POST /api/auth/recovery { code, password } → 204 (canjea el código y fija la contraseña)
+  router.post('/recovery', async (req, res) => {
+    const code = textField(req.body, 'code');
+    const rawPassword = (req.body as Record<string, unknown> | undefined)?.['password'];
+    const password = typeof rawPassword === 'string' ? rawPassword : '';
+    if (!code) return fail(res, 400, INVALID_LINK);
+    const weak = validatePassword(password);
+    if (weak) return fail(res, 400, weak);
+
+    try {
+      const supabase = deps.sessionClient(req, res);
+      if (!supabase) return fail(res, 500, GENERIC_ERROR);
+      const exchange = await supabase.auth.exchangeCodeForSession(code);
+      if (exchange.error) {
+        console.error('[auth] exchangeCodeForSession (recovery):', exchange.error.message);
+        return fail(res, 400, INVALID_LINK);
+      }
+      const { error } = await supabase.auth.updateUser({ password });
+      if (error) {
+        return authFailure(res, 'updateUser (recovery)', error, updatePasswordError(error.code));
+      }
+      res.status(204).end();
+    } catch (error) {
+      console.error('[auth] Error en recovery:', error);
       fail(res, 500, GENERIC_ERROR);
     }
   });

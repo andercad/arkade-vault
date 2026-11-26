@@ -154,11 +154,11 @@ describe('AuthFormComponent', () => {
       expect(signIn).toHaveBeenCalledTimes(1);
     });
 
-    it('Google y GitHub avisan «Disponible próximamente» sin petición', () => {
+    it('Google y GitHub navegan (navegación completa) a /auth/oauth/:provider', () => {
       click('GOOGLE');
-      expect(status()).toContain('Disponible próximamente');
+      expect(assign).toHaveBeenLastCalledWith('/auth/oauth/google');
       click('GITHUB');
-      expect(status()).toContain('Disponible próximamente');
+      expect(assign).toHaveBeenLastCalledWith('/auth/oauth/github');
       http.expectNone(() => true);
     });
 

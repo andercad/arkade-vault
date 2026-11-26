@@ -10,6 +10,7 @@ import { join } from 'node:path';
 import type { Database } from '@/lib/supabase/database.types';
 import { createApiRouter, type ApiClient } from './server/api';
 import { createAuthRouter } from './server/auth-api';
+import { createAuthNavigationRouter } from './server/auth-navigation';
 import { createCsrfMiddleware } from './server/csrf';
 import { createSessionMiddleware } from './server/session';
 import {
@@ -113,6 +114,9 @@ app.use(
     redirect: false,
   }),
 );
+
+// Rutas Express de navegación de auth (OAuth y callback); el resto de /auth/* es de Angular.
+app.use('/auth', createAuthNavigationRouter({ sessionClient, siteUrl }));
 
 // Sesión: refresca cookies, deja res.locals.user y protege /perfil (302 a /login).
 app.use(createSessionMiddleware(sessionClient));

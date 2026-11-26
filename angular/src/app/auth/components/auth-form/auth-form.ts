@@ -17,8 +17,6 @@ import { ForgotPasswordComponent } from '../forgot-password/forgot-password';
 type Tab = 'in' | 'up';
 type Field = 'user' | 'email' | 'pass';
 
-/** Aviso de las acciones que aún no están conectadas (OAuth, recuperación: paso 3 de la SPEC 26). */
-const SOON = 'Disponible próximamente.';
 /** Valores válidos de relleno para comprobar un campo aislado con las reglas de `lib/`. */
 const OK_EMAIL = 'a@b.co';
 const OK_USERNAME = 'abc';
@@ -29,7 +27,7 @@ const OK_PASSWORD = 'Aa1!aaaa';
  * con `lib/auth-validation.ts` antes de enviar a `AuthService`, botones Google/GitHub,
  * «¿Olvidaste tu contraseña?» y «Jugar como invitado». Tras entrar hace una navegación completa
  * a `/` para releer la sesión; un registro que exige confirmar el correo muestra «Revisa tu
- * correo». Google/GitHub y la recuperación avisan «Disponible próximamente» (paso 3).
+ * correo». Google/GitHub navegan a `/auth/oauth/:provider` (ruta Express).
  */
 @Component({
   selector: 'app-auth-form',
@@ -121,10 +119,9 @@ export class AuthFormComponent {
     this.tab.set('in');
   }
 
-  protected oauth(): void {
-    this.error.set(null);
-    this.invalid.set([]);
-    this.notice.set(SOON);
+  /** Inicia OAuth con una navegación completa: el servidor guarda el verificador PKCE. */
+  protected oauth(provider: 'google' | 'github'): void {
+    this.navigation.assign(`/auth/oauth/${provider}`);
   }
 
   protected guest(): void {

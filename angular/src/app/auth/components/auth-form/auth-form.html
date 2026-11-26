@@ -8,8 +8,8 @@
         <h2 class="neon-cyan">REVISA TU CORREO</h2>
       </div>
       <p class="mono sent-text" role="status">
-        Te hemos enviado un enlace de confirmación a <strong>{{ address }}</strong
-        >. Ábrelo para activar tu cuenta y entrar al Vault.
+        Te hemos enviado un enlace de confirmación a <strong>{{ address }}</strong>. Ábrelo para
+        activar tu cuenta y entrar al Vault.
       </p>
       <button type="button" class="btn ghost sent-back" (click)="backToSignIn()">
         VOLVER A INICIAR SESIÓN
@@ -109,10 +109,10 @@
 
       <div class="auth-divider">O CONTINÚA CON</div>
       <div class="social">
-        <button class="btn ghost" type="button" (click)="oauth()">
+        <button class="btn ghost" type="button" (click)="oauth('google')">
           <span aria-hidden="true">◆</span> GOOGLE
         </button>
-        <button class="btn ghost" type="button" (click)="oauth()">
+        <button class="btn ghost" type="button" (click)="oauth('github')">
           <span aria-hidden="true">▣</span> GITHUB
         </button>
       </div>

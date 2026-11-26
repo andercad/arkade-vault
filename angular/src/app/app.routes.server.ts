@@ -5,6 +5,8 @@ export const serverRoutes: ServerRoute[] = [
   { path: 'juegos/:id/jugar', renderMode: RenderMode.Client },
   // Acceso: formulario sin datos ni SEO, en el cliente.
   { path: 'login', renderMode: RenderMode.Client },
+  // Recuperación de contraseña: formulario con `?code`, en el cliente.
+  { path: 'auth/reset-password', renderMode: RenderMode.Client },
   // Sin datos: se genera en el build.
   { path: 'about', renderMode: RenderMode.Prerender },
   // Con datos del BFF: servidor.
