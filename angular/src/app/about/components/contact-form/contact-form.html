@@ -1,57 +1,92 @@
 <form class="contact-form" [class.shake]="shake()" novalidate (submit)="submit($event)">
-  <div class="field">
-    <label for="contact-name">NOMBRE</label>
-    <input
-      id="contact-name"
-      name="name"
-      placeholder="px_kai"
-      autocomplete="name"
-      [value]="values().name"
-      [attr.aria-invalid]="isInvalid('name')"
-      [attr.aria-describedby]="isInvalid('name') ? 'contact-error' : null"
-      (input)="update('name', $event)"
-    />
-  </div>
-  <div class="field">
-    <label for="contact-email">CORREO ELECTRÓNICO</label>
-    <input
-      id="contact-email"
-      name="email"
-      type="email"
-      placeholder="jugador@vault.gg"
-      autocomplete="email"
-      [value]="values().email"
-      [attr.aria-invalid]="isInvalid('email')"
-      [attr.aria-describedby]="isInvalid('email') ? 'contact-error' : null"
-      (input)="update('email', $event)"
-    />
-  </div>
-  <div class="field">
-    <label for="contact-message">MENSAJE</label>
-    <textarea
-      id="contact-message"
-      name="message"
-      rows="5"
-      placeholder="Cuéntanos qué tienes en mente…"
-      [value]="values().message"
-      [attr.aria-invalid]="isInvalid('message')"
-      [attr.aria-describedby]="isInvalid('message') ? 'contact-error' : null"
-      (input)="update('message', $event)"
-    ></textarea>
-  </div>
+  @if (sent(); as name) {
+    <div class="terminal-success">
+      <div class="term-bar" aria-hidden="true">
+        <span class="dot r"></span>
+        <span class="dot y"></span>
+        <span class="dot g"></span>
+        <span class="term-title">VAULT-OS // TERMINAL</span>
+      </div>
+      <div class="term-body">
+        <div class="line">
+          <span class="prompt">vault&#64;arcade:~$</span> ./send_message --to=team
+        </div>
+        <div class="line dim">[OK] Conectando con servidor…</div>
+        <div class="line dim">[OK] Validando contenido…</div>
+        <div class="line dim">[OK] Transmitiendo paquete…</div>
+        <div class="line success" role="status">
+          &gt; MENSAJE RECIBIDO. TE RESPONDEREMOS PRONTO. GRACIAS, {{ name.toUpperCase() }}.<span
+            class="caret"
+            aria-hidden="true"
+            >_</span
+          >
+        </div>
+        <div class="reset-row">
+          <button class="btn ghost" type="button" (click)="reset()">ENVIAR OTRO MENSAJE</button>
+        </div>
+      </div>
+    </div>
+  } @else {
+    <div class="field">
+      <label for="contact-name">NOMBRE</label>
+      <input
+        id="contact-name"
+        name="name"
+        placeholder="px_kai"
+        autocomplete="name"
+        [value]="values().name"
+        [attr.aria-invalid]="isInvalid('name')"
+        [attr.aria-describedby]="isInvalid('name') ? 'contact-error' : null"
+        (input)="update('name', $event)"
+      />
+    </div>
+    <div class="field">
+      <label for="contact-email">CORREO ELECTRÓNICO</label>
+      <input
+        id="contact-email"
+        name="email"
+        type="email"
+        placeholder="jugador@vault.gg"
+        autocomplete="email"
+        [value]="values().email"
+        [attr.aria-invalid]="isInvalid('email')"
+        [attr.aria-describedby]="isInvalid('email') ? 'contact-error' : null"
+        (input)="update('email', $event)"
+      />
+    </div>
+    <div class="field">
+      <label for="contact-message">MENSAJE</label>
+      <textarea
+        id="contact-message"
+        name="message"
+        rows="5"
+        placeholder="Cuéntanos qué tienes en mente…"
+        [value]="values().message"
+        [attr.aria-invalid]="isInvalid('message')"
+        [attr.aria-describedby]="isInvalid('message') ? 'contact-error' : null"
+        (input)="update('message', $event)"
+      ></textarea>
+    </div>
 
-  <!-- Honeypot: oculto para humanos (lo usará el envío real de la SPEC 26) -->
-  <div class="hp-field" aria-hidden="true">
-    <label for="contact-website">WEBSITE</label>
-    <input id="contact-website" name="website" tabindex="-1" autocomplete="off" value="" />
-  </div>
+    <!-- Honeypot: oculto para humanos -->
+    <div class="hp-field" aria-hidden="true">
+      <label for="contact-website">WEBSITE</label>
+      <input
+        id="contact-website"
+        name="website"
+        tabindex="-1"
+        autocomplete="off"
+        [value]="website()"
+        (input)="updateWebsite($event)"
+      />
+    </div>
 
-  @if (error(); as message) {
-    <div id="contact-error" class="terminal-error" role="alert">[ERROR] {{ message }}</div>
+    @if (error(); as message) {
+      <div id="contact-error" class="terminal-error" role="alert">[ERROR] {{ message }}</div>
+    }
+
+    <button class="btn xl press submit-btn" type="submit" [disabled]="pending()">
+      {{ pending() ? 'ENVIANDO…' : '▶ ENVIAR MENSAJE' }}
+    </button>
   }
-  @if (soon()) {
-    <div class="terminal-notice" role="status">Disponible próximamente.</div>
-  }
-
-  <button class="btn xl press submit-btn" type="submit">▶ ENVIAR MENSAJE</button>
 </form>

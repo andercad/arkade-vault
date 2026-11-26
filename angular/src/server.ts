@@ -11,6 +11,7 @@ import type { Database } from '@/lib/supabase/database.types';
 import { createApiRouter, type ApiClient } from './server/api';
 import { createAuthRouter } from './server/auth-api';
 import { createAuthNavigationRouter } from './server/auth-navigation';
+import { contactEnvFromProcess, createContactRouter, sendWithResend } from './server/contact-api';
 import { createCsrfMiddleware } from './server/csrf';
 import { createProfileRouter } from './server/profile-api';
 import { createScoresRouter } from './server/scores-api';
@@ -116,6 +117,13 @@ app.use(
 
 // Guardado de puntuación (SPEC 26): exige sesión; player_name lo pone el servidor.
 app.use('/api/scores', express.json(), createScoresRouter({ sessionClient }));
+
+// Contacto (SPEC 26): Resend con honeypot y validación de lib/contact.ts.
+app.use(
+  '/api/contact',
+  express.json(),
+  createContactRouter({ env: () => contactEnvFromProcess(), send: sendWithResend }),
+);
 
 // BFF de solo lectura (src/server/api.ts); responde 404 JSON a cualquier otra /api/*.
 app.use('/api', createApiRouter(createReadClient));

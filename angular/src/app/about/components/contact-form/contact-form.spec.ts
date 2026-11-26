@@ -95,31 +95,79 @@ describe('ContactFormComponent', () => {
     expect(field('name').getAttribute('aria-invalid')).toBe('false');
   });
 
-  it('envío válido → «Disponible próximamente» (role=status), sin errores y sin petición HTTP', () => {
+  it('envío válido → POST con honeypot vacío, «enviado» con el nombre y sin errores', () => {
     fill(VALID);
     submit();
-    expect(el.querySelector('[role="status"]')?.textContent).toContain('Disponible próximamente');
+    const req = http.expectOne('/api/contact');
+    expect(req.request.method).toBe('POST');
+    expect(req.request.body).toEqual({ ...VALID, website: '' });
+    expect(el.querySelector('button[type="submit"]')?.textContent).toContain('ENVIANDO');
+    expect(el.querySelector('button[type="submit"]')?.hasAttribute('disabled')).toBe(true);
+    req.flush(null, { status: 204, statusText: 'No Content' });
+    fixture.detectChanges();
+    expect(el.querySelector('[role="status"]')?.textContent).toContain('GRACIAS, KAI');
     expect(el.querySelector('[role="alert"]')).toBeNull();
-    for (const id of ['name', 'email', 'message']) {
-      expect(field(id).getAttribute('aria-invalid')).toBe('false');
-    }
-    http.expectNone(() => true);
+    expect(el.querySelector('#contact-name')).toBeNull();
   });
 
-  it('corregir tras un error limpia el error y muestra el aviso', () => {
-    submit();
+  it('un segundo envío mientras se envía no repite la petición', () => {
     fill(VALID);
     submit();
-    expect(el.querySelector('[role="alert"]')).toBeNull();
-    expect(el.querySelector('[role="status"]')).toBeTruthy();
+    submit();
+    http.expectOne('/api/contact').flush(null, { status: 204, statusText: 'No Content' });
   });
 
-  it('un error posterior oculta el aviso de próximamente', () => {
+  it('el honeypot rellenado viaja en el cuerpo', () => {
+    fill(VALID);
+    const hp = field('website');
+    hp.value = 'http://spam.test';
+    hp.dispatchEvent(new Event('input'));
+    submit();
+    expect(http.expectOne('/api/contact').request.body.website).toBe('http://spam.test');
+  });
+
+  it('«enviar otro mensaje» devuelve el formulario vacío', () => {
     fill(VALID);
     submit();
-    fill({ message: '' });
-    submit();
+    http.expectOne('/api/contact').flush(null, { status: 204, statusText: 'No Content' });
+    fixture.detectChanges();
+    (el.querySelector('button.ghost') as HTMLButtonElement).click();
+    fixture.detectChanges();
+    expect(field('name').value).toBe('');
+    expect(field('message').value).toBe('');
     expect(el.querySelector('[role="status"]')).toBeNull();
+  });
+
+  it('error del servidor → mensaje en role=alert, conserva los datos y reactiva el botón', () => {
+    fill(VALID);
+    submit();
+    http
+      .expectOne('/api/contact')
+      .flush({ error: 'No se pudo enviar el mensaje. Inténtalo de nuevo más tarde.' }, { status: 500, statusText: 'Error' });
+    fixture.detectChanges();
+    expect(el.querySelector('[role="alert"]')?.textContent).toContain('No se pudo enviar el mensaje');
+    expect(field('name').value).toBe('Kai');
+    expect(el.querySelector('button[type="submit"]')?.hasAttribute('disabled')).toBe(false);
+  });
+
+  it('error sin cuerpo (red) → mensaje genérico', () => {
+    fill(VALID);
+    submit();
+    http.expectOne('/api/contact').error(new ProgressEvent('error'));
+    fixture.detectChanges();
     expect(el.querySelector('[role="alert"]')).toBeTruthy();
+  });
+
+  it('formulario inválido no hace petición', () => {
+    submit();
+    http.expectNone('/api/contact');
+  });
+
+  it('corregir tras un error de validación limpia el error', () => {
+    submit();
+    fill(VALID);
+    submit();
+    expect(el.querySelector('[role="alert"]')).toBeNull();
+    http.expectOne('/api/contact').flush(null, { status: 204, statusText: 'No Content' });
   });
 });
