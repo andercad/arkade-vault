@@ -1,0 +1,19 @@
+<section appReveal class="home-section">
+  <div class="section-head">
+    <div class="kicker pixel neon-cyan" aria-hidden="true">// 02</div>
+    <h2 class="section-title">JUEGOS DISPONIBLES AHORA</h2>
+    <div class="section-rule"></div>
+  </div>
+  @if (catalog.error()) {
+    <app-data-error />
+  } @else {
+    <div class="mini-rail">
+      @for (game of featured(); track game.id) {
+        <app-mini-card [game]="game" />
+      }
+    </div>
+  }
+  <div class="all-link">
+    <a routerLink="/juegos" class="btn lg">VER TODOS LOS JUEGOS →</a>
+  </div>
+</section>

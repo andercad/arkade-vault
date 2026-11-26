@@ -1,0 +1,5 @@
+/* Los títulos son h3 (estructura de encabezados); se neutralizan sus estilos por defecto. */
+.ac-title {
+  margin: 0;
+  font-weight: inherit;
+}

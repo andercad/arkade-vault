@@ -8,7 +8,7 @@ const provisional = () => import('./provisional/pages/provisional-page/provision
 
 /** Las páginas son `export default` y se cargan en diferido con `loadComponent`. */
 export const routes: Routes = [
-  { path: '', title: TITLE, data: { name: 'INICIO' }, loadComponent: provisional },
+  { path: '', title: TITLE, loadComponent: () => import('@home/pages/home-page/home-page') },
   {
     path: 'juegos',
     title: TITLE,

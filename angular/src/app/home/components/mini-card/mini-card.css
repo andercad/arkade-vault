@@ -1,0 +1,9 @@
+/* El host es la caja `.mini-card` (hijo de la rejilla); el enlace la rellena entera. */
+:host {
+  display: block;
+}
+
+.mini-link {
+  display: block;
+  color: inherit;
+}

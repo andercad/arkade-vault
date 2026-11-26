@@ -1,0 +1,35 @@
+<section appReveal class="home-section">
+  <div class="section-head">
+    <div class="kicker pixel neon-green" aria-hidden="true">// 04</div>
+    <h2 class="section-title">PRECIOS</h2>
+    <div class="section-rule"></div>
+  </div>
+  <div class="pricing-grid">
+    <div class="price-card">
+      <div class="pc-label pixel">PLAN ÚNICO</div>
+      <div class="pc-name pixel">JUGADOR VAULT</div>
+      <div class="pc-amount">
+        <span class="pc-amount-n">$0</span>
+        <span class="pc-amount-u">/ SIEMPRE</span>
+      </div>
+      <div class="pc-tag">SIN TRUCOS · SIN LETRA PEQUEÑA</div>
+      <ul class="pc-list">
+        @for (p of features; track p) {
+          <li><span aria-hidden="true">✔</span> {{ p }}</li>
+        }
+      </ul>
+      <a routerLink="/login" class="btn xl pulse pc-cta">EMPEZAR GRATIS →</a>
+      <div class="pc-foot">No pedimos tarjeta. Nunca lo haremos.</div>
+      <div class="pc-stamp pixel" aria-hidden="true">FREE<br />PLAY</div>
+    </div>
+
+    <div class="pricing-faq">
+      @for (f of faq; track f.q) {
+        <div class="faq-item">
+          <div class="faq-q pixel">{{ f.q }}</div>
+          <div class="faq-a">{{ f.a }}</div>
+        </div>
+      }
+    </div>
+  </div>
+</section>

@@ -1,0 +1,11 @@
+<section appReveal class="home-stats">
+  <div class="stats-inner">
+    @for (st of stats; track st.n; let i = $index) {
+      <div class="stat-block" [style.transition-delay.ms]="i * 90">
+        <div class="stat-n neon-yellow">{{ st.n }}</div>
+        <div class="stat-u pixel">{{ st.u }}</div>
+        <div class="stat-s">{{ st.s }}</div>
+      </div>
+    }
+  </div>
+</section>

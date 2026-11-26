@@ -1,0 +1,59 @@
+<section appReveal class="home-section">
+  <div class="section-head">
+    <div class="kicker pixel neon-yellow" aria-hidden="true">// 03</div>
+    <h2 class="section-title">ACTIVIDAD EN VIVO</h2>
+    <div class="section-rule"></div>
+  </div>
+  <div class="activity-grid">
+    <div class="activity-card">
+      <div class="ac-head">
+        <h3 class="ac-title pixel">▸ ÚLTIMAS PUNTUACIONES</h3>
+      </div>
+      @if (recent.error()) {
+        <app-data-error title="NO SE PUDO CARGAR" />
+      } @else if (!recent.isLoading()) {
+        @if (recentRows().length === 0) {
+          <app-score-empty playHref="/juegos" />
+        } @else {
+          <div class="ticker">
+            @for (r of recentRows(); track r.key) {
+              <div class="tick-row" [style.animation-delay.ms]="r.delay">
+                <span class="tk-p">{{ r.player }}</span>
+                <span [class]="r.midClass">▸ {{ r.gameTitle }}</span>
+                <span class="tk-s">+{{ r.score }}</span>
+                <span class="tk-t">{{ r.ago }}</span>
+              </div>
+            }
+          </div>
+        }
+      }
+    </div>
+
+    <div class="activity-card">
+      <div class="ac-head">
+        <h3 class="ac-title pixel neon-magenta">▸ TOP JUGADORES · HOY</h3>
+        <a routerLink="/salon-de-la-fama" class="lb-link">VER SALÓN →</a>
+      </div>
+      @if (topToday.error()) {
+        <app-data-error title="NO SE PUDO CARGAR" />
+      } @else if (!topToday.isLoading()) {
+        @if (topRows().length === 0) {
+          <app-score-empty playHref="/juegos" />
+        } @else {
+          <div class="top-list">
+            @for (r of topRows(); track r.key) {
+              <div [class]="r.cls">
+                <span class="tp-rk">#{{ r.rank }}</span>
+                <span class="tp-bar">
+                  <span class="tp-fill" [style.width.%]="r.width"></span>
+                </span>
+                <span class="tp-p">{{ r.player }}</span>
+                <span class="tp-s">{{ r.score }}</span>
+              </div>
+            }
+          </div>
+        }
+      }
+    </div>
+  </div>
+</section>

@@ -18,6 +18,7 @@
       "@shared/*": ["./src/app/shared/*"],
       "@play/*": ["./src/app/play/*"],
       "@library/*": ["./src/app/library/*"],
+      "@home/*": ["./src/app/home/*"],
       "@not-found/*": ["./src/app/not-found/*"]
     }
   },

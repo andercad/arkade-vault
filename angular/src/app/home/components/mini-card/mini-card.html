@@ -1,0 +1,9 @@
+<a [routerLink]="href()" class="mini-link">
+  <div class="mini-cover">
+    <div [class]="'cover-bg ' + game().cover"></div>
+  </div>
+  <div class="mini-meta">
+    <div class="mini-title">{{ game().title }}</div>
+    <div [class]="'mini-cat accent-' + game().color">{{ game().cat }}</div>
+  </div>
+</a>

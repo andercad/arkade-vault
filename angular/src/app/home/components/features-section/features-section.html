@@ -1,0 +1,16 @@
+<section appReveal class="home-section">
+  <div class="section-head">
+    <div class="kicker pixel neon-magenta" aria-hidden="true">// 01</div>
+    <h2 class="section-title">¿POR QUÉ ARCADE VAULT?</h2>
+    <div class="section-rule"></div>
+  </div>
+  <div class="feature-grid">
+    @for (f of features; track f.title; let i = $index) {
+      <div [class]="'feature-card ' + f.color" [style.transition-delay.ms]="i * 80">
+        <app-feature-icon [kind]="f.icon" />
+        <div class="ft-title pixel">{{ f.title }}</div>
+        <div class="ft-desc">{{ f.desc }}</div>
+      </div>
+    }
+  </div>
+</section>
