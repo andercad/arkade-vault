@@ -43,7 +43,6 @@
 | BD    | SPEC 26 frente a BD (advisors, RLS, policies, funciones)   | ✅     | advisors solo `auth_leaked_password_protection` (aceptado) + INFO `unused_index`; RLS 3/3; `game_stats` invoker; insert scores = `scores insert usuario`; funciones DEFINER con search_path y solo `service_role`; `ensure_rls` activo; sin deriva (13 migraciones) | 2026-11-26 16:41 |
 | App   | `npm audit --omit=dev` (angular/)                          | ✅     | 0 vulnerabilidades                                                                                                  | 2026-11-26 16:41 |
 | Panel | Redirect URLs `:4200` (callback, reset-password)           | manual | Confirmar en panel (SPEC 26)                                                                                        | 2026-11-26 16:41 |
-
 | BD    | 0014: `sync_scores_player_name()` DEFINER + EXECUTE         | ✅     | `prosecdef=true`, `search_path=""`, owner postgres, public/anon/authenticated=false, service_role=true; SQL con nombres `public.` calificados | 2026-11-26 17:16 |
 | BD    | 0014: trigger `on_profile_username_changed`                | ✅     | `AFTER UPDATE OF username`, `WHEN old IS DISTINCT FROM new`, `tgenabled=O`; solo toca `scores` del `new.id`          | 2026-11-26 17:16 |
 | BD    | 0014: pruebas rollback (abuso vía RPC/RLS)                 | ✅     | rpc como authenticated y anon → 42501; update directo de `scores` propio → 0 filas; update de username propio → 1 fila y 2/2 scores sincronizados, 0 ajenos tocados; update de profile ajeno no probado (solo 1 perfil con datos) | 2026-11-26 17:16 |
@@ -51,19 +50,31 @@
 | BD    | Advisors, RLS, policies, SPEC 18, `ensure_rls` (tras 0014) | ✅     | advisors solo `auth_leaked_password_protection` (aceptado) + INFO `unused_index`; RLS 3/3, `game_stats` invoker; policies sin cambios (insert `scores insert usuario`, sin update/delete en scores/games); `user_id` not null + FK cascade; 4 funciones DEFINER con search_path y solo service_role | 2026-11-26 17:16 |
 | BD    | Deriva migraciones (14)                                    | ✅     | 14 en BD ↔ `0001..0014`; 0014 registrada como `sync_player_name` (sin prefijo, cosmético)                           | 2026-11-26 17:16 |
 | App   | Headers y `/perfil` (Next :3000 y Angular :4200)           | ✅     | `curl -I` `/`, `/juegos/asteroids/jugar`: 3 headers; `/perfil` 307/302 → `/login`; `npm audit` 0; `check:secret-client` OK | 2026-11-26 17:16 |
+| App   | Staging Angular (SPEC 27): 3 headers + `X-Robots-Tag: noindex, nofollow` | ✅ | `curl -I` en `/`, `/api/games`, `/games/snake/fruits.png`, `/perfil`, 404: los 4 presentes, sin duplicados (`vercel.json:10-19` + `server.ts:44-49`) | 2026-11-27 14:11 |
+| App   | Staging: sin `x-powered-by`                                | ✅     | ausente en `/` y `/api/games`; `server: Vercel`                                                                     | 2026-11-27 14:11 |
+| App   | Staging: `/perfil` sin cookie, 404                         | ✅     | `/perfil` → 302 `Location: /login`; `/ruta-inexistente` → 404; `/api/nada` → 404 JSON `{"error":"not_found"}`       | 2026-11-27 14:11 |
+| App   | Staging: CSRF en `/api/*`                                  | ✅     | POST sin Origin → 403; Origin ajeno → 403; Origin propio + `text/plain` → 415; `/api/scores` sin sesión → 401; `/api/auth/me` → `{"user":null}` con `Cache-Control: private, no-store` | 2026-11-27 14:11 |
+| App   | Staging: secretos en JS servido                            | ✅     | 24 ficheros (`main` + chunks, 564 KB) y HTML sin `SUPABASE_SECRET_KEY`/`RESEND_API_KEY`/`sb_secret`/`service_role`  | 2026-11-27 14:11 |
+| App   | Staging: cookies de sesión `Secure`                        | 🟡     | código: `secure: env.secureCookies` = `NODE_ENV==='production'` (`server.ts:51,70`); `Set-Cookie` real no verificado (requiere login, no se crean sesiones) | 2026-11-27 14:11 |
+| App   | `check:secret-client`, `npm audit --omit=dev` (angular/), `.env*` en git | ✅ | check OK (incl. `angular/src/server`); audit 0 vulnerabilidades; solo `.env.template` y `angular/.env.example` versionados | 2026-11-27 14:11 |
+| App   | Next (:3000): headers, `/perfil` 307, `proxy.ts` en vivo   | n/a    | no verificado: dev server Next apagado (por petición)                                                               | 2026-11-27 14:11 |
+| BD    | Tras SPEC 27: advisors, RLS, policies, funciones, rollback, deriva | ✅ | advisors solo `auth_leaked_password_protection` (aceptado) + INFO `unused_index`; RLS 3/3, `game_stats` invoker; policies sin `true` en write, insert = `scores insert usuario`; 4 DEFINER con search_path y solo `service_role`; `ensure_rls`=O; `user_id` not null + FK cascade; anon insert → 42501, `email_for_username` anon → 42501 (authenticated con id ajeno no repetido: policies sin cambios); 14 migraciones ↔ 14 archivos | 2026-11-27 14:11 |
+| BD    | Logs Auth (429/IP)                                         | 🟡     | `auth_logs` sin campos de estado/IP legibles (129 eventos en 24 h); no concluyente                                  | 2026-11-27 14:11 |
+| Panel | Redirect URLs de staging (`/auth/callback`, `/auth/reset-password`), `SITE_URL` en Vercel, rate limit, IP forwarding, Confirm email, Google/GitHub | manual | confirmar en panel Supabase y en variables de Vercel | 2026-11-27 14:11 |
 
 Leyenda: `✅` correcto · `❌` hallazgo · `🟡` aceptado/parcial · `manual` confirmar en panel · `n/a` no aplica
 
 ## Historial de auditorías
 
-| Fecha y hora          | Resumen                                                                                                                 | Abiertos                                     |
-| ---------------- | ----------------------------------------------------------------------------------------------------------------------- | -------------------------------------------- |
+| Fecha y hora | Resumen | Abiertos |
+| ------------ | ------- | -------- |
 | 2026-11-20 (sin hora) | Primera auditoría. BD limpia; app limpia salvo headers ausentes en dev server activo (a reiniciar)                      | 1 Medio (headers no servidos, por verificar) |
 | 2026-11-20 (sin hora) | Re-auditoría: BD limpia; headers ya servidos tras el cambio a `/:path*`                                                 | 0 (cambio de `next.config.ts` sin commitear) |
 | 2026-11-25 (sin hora) | Auditoría completa SPEC 16-20 (rama spec-20): BD y app limpias, pruebas rollback OK, dev server activo, `next.config.ts` ya commiteado | 0 (3 checks de panel `manual`)               |
 | 2026-11-26 16:41 | Auditoría rama spec-26 (BFF Express Angular): BD limpia; CSRF, sesión, redirects, clave secreta y contacto OK; 2 hallazgos Bajo | 2 Bajo (errores sin handler JSON; clientIp fiable solo tras proxy) |
 | 2026-11-26 17:16 | Auditoría migración 0014 (sync player_name): función DEFINER con search_path y sin EXECUTE, trigger acotado, sin abuso vía RPC/RLS, sin regresiones SPEC 16/17/18; 0 hallazgos nuevos | 2 Bajo previos (sin cambios) |
 | 2026-11-26 (re-verificación) | Cerrado hallazgo JSON mal formado: `apiErrorHandler` ya montado; `curl` con `{bad` → 400 JSON sin traza. `clientIp` sigue abierto (corrección en SPEC 27) | 1 Bajo (`clientIp`, SPEC 27) |
+| 2026-11-27 14:11 | SPEC 27 paso 4, staging Angular en Vercel (URL pública): headers + noindex sin duplicados, sin x-powered-by, `/perfil` 302, CSRF 403/415, sin secretos en el JS servido, `check:secret-client` y audit OK; BD sin cambios ni regresiones; Next no verificado | 1 Bajo previo (`clientIp`, sin cambios) |
 
 ## Hallazgos abiertos
 
