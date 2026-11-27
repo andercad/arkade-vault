@@ -1,6 +1,7 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "ignoreCommand": "[ \"$VERCEL_ENV\" != \"production\" ]",
+  "installCommand": "npm ci --prefix .. && npm ci",
   "headers": [
     {
       "source": "/(.*)",
