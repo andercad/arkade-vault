@@ -7,6 +7,7 @@
     "start": "ng serve",
     "prebuild": "node scripts/copy-public.mjs",
     "build": "ng build",
+    "postbuild": "node scripts/remove-browser-csr-shell.mjs",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "serve:ssr:arcade-vault-angular": "node dist/arcade-vault-angular/server/server.mjs",

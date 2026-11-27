@@ -50,12 +50,14 @@ Settings → Environments → Production → Branch Tracking (o Settings → Git
 1. **Primer despliegue:** `<SPEC_BRANCH>`. Permite probar antes del merge.
 2. **Tras el merge:** cambiar a `master` y comprobar que el siguiente despliegue termina OK. No olvidar este paso: dejar la rama temporal como _Production Branch_ rompería los despliegues cuando se borre.
 
-## 4. Protección
+## 4. Acceso
 
-- Settings → Deployment Protection → **Vercel Authentication** activa para Production. La URL queda accesible solo para miembros del equipo de Vercel.
-- **Protection Bypass for Automation:** generar el secreto y guardarlo solo en tu entorno local, p. ej. `$env:PERF_BYPASS = "<token>"`. Nunca en el repo.
-- Uso del bypass: cabeceras `x-vercel-protection-bypass: <token>` y `x-vercel-set-bypass-cookie: true` (`scripts/perf.mjs` las envía si existe `PERF_BYPASS`).
-- Si el token se expone, regenerarlo en el mismo panel.
+Staging es **público**: el plan gratuito de Vercel no ofrece _Protection Bypass for Automation_, y sin él no se pueden automatizar `perf`, Lighthouse ni `security-auditor`.
+
+- Settings → Deployment Protection: Vercel Authentication puede quedar activa en _Standard Protection_; no protege el dominio de producción del proyecto (`<proyecto>.vercel.app`), que responde 200 sin login (comprobado con `curl`). Solo protege las URLs por despliegue/rama.
+- `angular/vercel.json` añade `X-Robots-Tag: noindex, nofollow` para que no se indexe.
+- Riesgo aceptado: nadie usa la web y los datos son de Supabase dev. Queda el gasto de cuota de Resend por el formulario de contacto; si hay abuso, cambia `RESEND_API_KEY` o desactiva el contacto.
+- Si en el futuro hay un plan con bypass: `PERF_BYPASS` en tu entorno local (nunca en el repo); `scripts/perf.mjs` envía `x-vercel-protection-bypass` y `x-vercel-set-bypass-cookie` si existe.
 
 ## 5. Supabase dev
 
@@ -67,13 +69,10 @@ Authentication → URL Configuration:
 
 ## 6. Comprobación de la URL desplegada
 
-Con `<TOKEN>` = tu token de bypass (variable de entorno local):
-
 | Comprobación                | Cómo                                                                                | Esperado                                                      |
 | --------------------------- | ----------------------------------------------------------------------------------- | ------------------------------------------------------------- |
-| Protección                  | `curl -s -o /dev/null -w "%{http_code}" <STAGING_URL>/`                             | 401 o redirección al login de Vercel                          |
-| Acceso con bypass           | `curl -s -o /dev/null -w "%{http_code}" -H "x-vercel-protection-bypass: <TOKEN>" <STAGING_URL>/` | 200                                             |
-| Cabeceras en HTML           | `curl -sI -H "x-vercel-protection-bypass: <TOKEN>" <STAGING_URL>/`                  | `x-content-type-options`, `x-frame-options`, `referrer-policy`; sin `x-powered-by` |
+| Acceso público              | `curl -s -o /dev/null -w "%{http_code}" <STAGING_URL>/`                             | 200 (sin login de Vercel)                                     |
+| Cabeceras en HTML           | `curl -sI <STAGING_URL>/`                                                           | `x-content-type-options`, `x-frame-options`, `referrer-policy`, `x-robots-tag: noindex, nofollow`; sin `x-powered-by` |
 | Cabeceras en API            | igual sobre `/api/games`                                                            | las tres cabeceras                                            |
 | Cabeceras en estático       | igual sobre `/games/snake/fruits.png`                                               | las tres cabeceras (una sola vez cada una)                    |
 | 404 real                    | `curl -s -o /dev/null -w "%{http_code}" ... <STAGING_URL>/ruta-inexistente`         | 404                                                           |

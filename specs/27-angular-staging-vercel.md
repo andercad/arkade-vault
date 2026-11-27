@@ -4,7 +4,7 @@
 >
 > **Depende de:** SPEC 24 (cimientos y reproductor Angular), SPEC 25 (resto de pantallas), SPEC 26 (auth, guardado y contacto), SPEC 17 (medidas de seguridad), SPEC 20 (endurecer auth: IP y origen)
 > **Fecha:** 2026-11-26
-> **Objetivo:** Desplegar `angular/` en un segundo proyecto de Vercel como staging con URL fija, contra Supabase dev y protegido con Vercel Authentication, en paralelo a Next, que sigue en producción.
+> **Objetivo:** Desplegar `angular/` en un segundo proyecto de Vercel como staging con URL fija, contra Supabase dev, público pero no indexable (plan gratuito de Vercel: sin bypass de automatización), en paralelo a Next, que sigue en producción.
 
 ---
 
@@ -26,16 +26,16 @@ Next sigue desplegado y en producción. Se mantiene la **congelación de la UI**
 - **`angular/vercel.json`:**
   - `ignoreCommand`: solo construye despliegues con `VERCEL_ENV=production` (no depende del nombre de la rama; permite usar la rama de la spec en el primer despliegue). Sin previews por rama.
   - `outputDirectory` (`dist/arcade-vault-angular/browser`), `rewrites` de todo a `/api` y `functions.includeFiles`: el preset Angular de Vercel no creó la función SSR (todo salió como estáticos y `/` daba 404), así que el proyecto usa preset **Other** y la función propia `angular/api/index.mjs`, que reexporta `reqHandler` de `server.mjs`.
-  - `headers` para los estáticos del CDN (que no pasan por Express): `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy: strict-origin-when-cross-origin` (mismos valores que `server.ts` y `next.config.ts`).
+  - `headers` para los estáticos del CDN (que no pasan por Express): `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy: strict-origin-when-cross-origin` (mismos valores que `server.ts` y `next.config.ts`) y `X-Robots-Tag: noindex, nofollow` (solo staging; no está en `server.ts`).
 - **`angular/angular.json`:** `security.allowedHosts` incluye el dominio de staging además de `localhost` (o `NG_ALLOWED_HOSTS` si ctx7 confirma que es la vía soportada). Un host no permitido sigue rechazándose.
 - **Runbook `references/deploy/staging-angular-runbook.md`:**
   - Crear el proyecto: framework Angular, Root Directory `angular`, _include outside root_, Node 22+, comando de build `npm run build` (ejecuta `prebuild`).
   - Variables de entorno **solo en Production** (Supabase **dev**): `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_SECRET_KEY` (marcada _sensitive_), `SITE_URL` (URL fija de staging sin `/` final), `RESEND_API_KEY`, `CONTACT_TO_EMAIL`, `CONTACT_FROM_EMAIL`. `NODE_ENV=production` lo pone Vercel.
   - _Production Branch_: la rama de la spec en el primer despliegue; `master` tras el merge.
-  - Protección: Vercel Authentication activa y _Protection Bypass for Automation_ para las mediciones (el token solo en variables de entorno locales, nunca en el repo).
+  - Acceso: staging **público** (plan gratuito de Vercel: sin _Protection Bypass for Automation_ no se pueden automatizar las mediciones). Vercel Authentication (_Standard Protection_) no protege el dominio de producción del proyecto, así que no se usa como control de acceso; `X-Robots-Tag: noindex, nofollow` evita la indexación. Nadie usa la web actual y el objetivo de las SPEC 24-29 es retirar Next, así que el riesgo es bajo (datos de prueba de Supabase dev); queda el consumo de cuota de Resend por el formulario de contacto.
   - Supabase dev → Authentication → URL Configuration: añadir `<STAGING_URL>/auth/callback` y `<STAGING_URL>/auth/reset-password` a Redirect URLs (Site URL no cambia). Google y GitHub no requieren cambios: su callback es el de Supabase.
   - Tabla de comprobación de la URL desplegada.
-- **`scripts/perf.mjs`:** variable opcional `PERF_BYPASS` (token de bypass); si existe, envía las cabeceras `x-vercel-protection-bypass` y `x-vercel-set-bypass-cookie`. Sin ella el comportamiento no cambia.
+- **`scripts/perf.mjs`:** variable opcional `PERF_BYPASS` (token de bypass; no se usa en este staging público, queda para un staging protegido); si existe, envía las cabeceras `x-vercel-protection-bypass` y `x-vercel-set-bypass-cookie`. Sin ella el comportamiento no cambia.
 - **Agentes `lighthouse-auditor` y `security-auditor`:** cambio mínimo para admitir una URL base de staging (parámetro opcional). La adaptación completa a Angular es de la SPEC 29.
 - **Docs:** `CLAUDE.md` y `README.md` (staging, runbook, `PERF_BYPASS`).
 
@@ -90,17 +90,17 @@ Sin piezas Angular nuevas: los cambios son de configuración (`angular/vercel.js
    - **Verificaciones:**
      - El runbook cubre todas las variables de `angular/.env.example` y la tabla de "Modelo de datos".
      - `grep -iE "eyJ|sb_secret|re_[A-Za-z0-9]{10,}" references/deploy/staging-angular-runbook.md` sin resultados (sin claves ni tokens).
-     - Incluye Vercel Authentication, bypass, rama temporal → `master` y Redirect URLs.
+     - Incluye staging público con `noindex` (sin Vercel Authentication ni bypass), rama temporal → `master` y Redirect URLs.
 
 3. **Primer despliegue y smoke funcional.** El usuario sigue el runbook; Claude verifica la URL.
    - **Acciones:**
      - Crear el proyecto Vercel, definir variables y desplegar desde la rama de la spec.
-     - Playwright contra la URL de staging (con bypass) y `curl` con y sin bypass.
+     - Playwright contra la URL de staging y `curl`.
    - **Verificaciones:**
-     - Sin bypass, la URL exige login de Vercel (401 o redirección); con bypass responde 200.
+     - La URL responde 200 sin autenticación y lleva `X-Robots-Tag: noindex, nofollow`.
      - Las 6 pantallas cargan; se juegan los 5 juegos; login con email, Google y GitHub; recuperar contraseña; guardar puntuación con sesión; `/perfil` (usuario, contraseña); el contacto llega por Resend.
      - `/ruta-inexistente` → HTTP 404 real; `/perfil` sin sesión → 302 a `/login`.
-     - `curl -I` muestra las tres cabeceras de seguridad en HTML, en `/api/games` y en un estático (`/games/snake/fruits.png`) y no hay `x-powered-by`.
+     - `curl -I` muestra las tres cabeceras de seguridad (y `X-Robots-Tag`) en HTML, en `/api/games` y en un estático (`/games/snake/fruits.png`) y no hay `x-powered-by`.
      - Las cookies de sesión llevan `HttpOnly; Secure; SameSite=Lax`.
      - El navegador solo llama a `/api/*` y a `/auth/*` (nunca a `supabase.co`); `SUPABASE_SECRET_KEY` y `RESEND_API_KEY` no aparecen en el JS servido.
      - Next en producción sigue funcionando sin cambios.
@@ -111,7 +111,7 @@ Sin piezas Angular nuevas: los cambios son de configuración (`angular/vercel.js
      - Añadir el parámetro de URL base a `.claude/agents/lighthouse-auditor.md` y `.claude/agents/security-auditor.md`.
      - Ejecutar `perf`, `lighthouse-auditor` (modo `ambas`: Next en producción frente a Angular en staging) y `security-auditor`.
    - **Verificaciones:**
-     - `PERF_URL=<staging> PERF_BYPASS=<token> npm run perf` sale con código 0 (≥58 FPS con CPU ×6, 5 juegos × skins).
+     - `PERF_URL=<staging> npm run perf` sale con código 0 (≥58 FPS con CPU ×6, 5 juegos × skins).
      - `references/lighthouse/lighthouse-audit.md` registra la tabla de paridad Next ↔ Angular (mobile y desktop); accesibilidad, SEO y buenas prácticas de staging no son peores que Next (deuda de contraste de la SPEC 25 aceptada); TTFB y LCP anotados.
      - `references/security/security-audit.md` sin hallazgos nuevos de severidad alta, o corregidos dentro del alcance.
      - Sin `PERF_BYPASS`, `node scripts/perf.mjs` contra `localhost` se comporta igual que antes.
@@ -133,7 +133,7 @@ Un commit por paso (`27-angular-staging-vercel: Paso N`).
 
 - [ ] `angular/vercel.json` existe, solo construye `VERCEL_ENV=production` y aplica las tres cabeceras de seguridad a los estáticos.
 - [ ] El build de Angular se despliega en el segundo proyecto Vercel y sirve con SSR en una URL fija; el proyecto de Next no cambia.
-- [ ] Sin autenticación de Vercel la URL no es accesible; con el token de bypass, sí.
+- [ ] La URL de staging es accesible sin autenticación y no indexable (`X-Robots-Tag: noindex, nofollow`).
 - [ ] Smoke completo OK en staging (pantallas, 5 juegos, login email/Google/GitHub, recuperación, guardar puntuación, perfil, contacto).
 - [ ] Cabeceras de seguridad en HTML, `/api/*` y estáticos; sin `x-powered-by`; cookies `HttpOnly; Secure; SameSite=Lax`.
 - [ ] Ruta desconocida → 404 real; `/perfil` sin sesión → 302 a `/login`.
@@ -159,7 +159,7 @@ Sin componentes, servicios, guards, pipes ni directivas nuevos: no hay `.spec.ts
 - **Sí:** Supabase **dev**. Razón: prod no se toca hasta la SPEC 28; los datos de staging son de prueba (se mezclan con el desarrollo local, aceptado).
 - **Sí:** URL fija de staging, sin previews. Razón: `SITE_URL`, `Origin` (CSRF), Redirect URLs de Supabase y `allowedHosts` son fijos; previews exigirían `SITE_URL` dinámico y comodines.
 - **Sí:** `ignoreCommand` por `VERCEL_ENV`. Razón: no depende del nombre de la rama y permite desplegar la rama de la spec antes del merge.
-- **Sí:** Vercel Authentication + bypass para automatización. Razón: staging no debe ser público ni indexable; las mediciones necesitan acceso programático. El token vive solo en el entorno local.
+- **Sí:** staging público + `noindex`, sin depender de Vercel Authentication. Razón: _Standard Protection_ no cubre el dominio de producción (`curl` sin cookies → 200) y el plan gratuito no ofrece bypass de automatización; las mediciones (`perf`, Lighthouse, `security-auditor`) necesitan acceso programático; nadie usa la web actual, los datos son de Supabase dev y el objetivo es retirar Next. (Decisión revisada tras el primer despliegue; antes: Vercel Authentication + bypass.)
 - **Sí:** función propia `angular/api/index.mjs` + rewrite y preset Other. Razón: la detección automática de Angular SSR de Vercel no enganchó `reqHandler` con este build (Angular 22, `outputMode: server`); se descubrió en el primer despliegue (paso 3).
 - **Sí:** cabeceras también en `vercel.json`. Razón: los estáticos los sirve el CDN y no pasan por Express.
 - **Sí:** configuración manual con runbook. Razón: Claude no tiene acceso a Vercel (igual que con prod).
@@ -179,8 +179,8 @@ Sin componentes, servicios, guards, pipes ni directivas nuevos: no hay `.spec.ts
 | `SITE_URL` incorrecta rompe CSRF (403) y redirecciones                      | Runbook con valor exacto sin `/` final; smoke de login y contacto                                 |
 | Redirect URLs de Supabase dev sin la URL de staging: OAuth y reset fallan   | Paso explícito en el runbook; smoke de Google/GitHub y recuperación                               |
 | Arranque en frío de la función aumenta TTFB y LCP                           | Medir en Lighthouse; si es relevante, spec de rendimiento posterior                               |
-| Vercel Authentication bloquea `perf` y Lighthouse                           | Bypass de automatización; token solo en entorno local                                             |
-| Filtración del token de bypass o de claves en el runbook                    | Nunca en el repo; verificación por `grep` en el paso 2; rotar si se expone                        |
+| Staging público: spam al contacto gasta cuota de Resend (dev)               | Aceptado (sin usuarios); `noindex`; límite de contacto/login en spec futura                       |
+| Filtración de claves en el runbook                                          | Nunca en el repo; verificación por `grep` en el paso 2; rotar si se expone                        |
 | Rama temporal como _Production Branch_ olvidada tras el merge               | Paso 5 y runbook; criterio de cierre                                                              |
 | `clientIp` solo es fiable tras el proxy de Vercel                           | Staging ya está tras Vercel (`x-vercel-forwarded-for`); verificar rate limit en el smoke          |
 
