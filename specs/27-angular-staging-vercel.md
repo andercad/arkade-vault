@@ -1,6 +1,6 @@
 # SPEC 27 — Angular: despliegue en Vercel como staging
 
-> **Estado:** Aprobado
+> **Estado:** Implementado
 >
 > **Depende de:** SPEC 24 (cimientos y reproductor Angular), SPEC 25 (resto de pantallas), SPEC 26 (auth, guardado y contacto), SPEC 17 (medidas de seguridad), SPEC 20 (endurecer auth: IP y origen)
 > **Fecha:** 2026-11-26
@@ -131,19 +131,19 @@ Un commit por paso (`27-angular-staging-vercel: Paso N`).
 
 ## Criterios de aceptación
 
-- [ ] `angular/vercel.json` existe, solo construye `VERCEL_ENV=production` y aplica las tres cabeceras de seguridad a los estáticos.
-- [ ] El build de Angular se despliega en el segundo proyecto Vercel y sirve con SSR en una URL fija; el proyecto de Next no cambia.
-- [ ] La URL de staging es accesible sin autenticación y no indexable (`X-Robots-Tag: noindex, nofollow`).
-- [ ] Smoke completo OK en staging (pantallas, 5 juegos, login email/Google/GitHub, recuperación, guardar puntuación, perfil, contacto).
-- [ ] Cabeceras de seguridad en HTML, `/api/*` y estáticos; sin `x-powered-by`; cookies `HttpOnly; Secure; SameSite=Lax`.
-- [ ] Ruta desconocida → 404 real; `/perfil` sin sesión → 302 a `/login`.
-- [ ] El navegador no llama a Supabase y ningún secreto aparece en el JS servido.
-- [ ] `npm run perf` contra staging ≥58 FPS con CPU ×6 en todos los casos (código 0).
-- [ ] Lighthouse de staging no es peor que el de Next en producción (accesibilidad, SEO, buenas prácticas); registrado en `references/lighthouse/lighthouse-audit.md`.
-- [ ] `security-auditor` sin hallazgos nuevos de severidad alta (o corregidos).
-- [ ] Sin UI nueva: la accesibilidad de staging es igual a la de Angular en local (sin regresiones por el despliegue).
-- [ ] `cd angular && ng build && ng test --watch=false && ng lint` OK y, en la raíz, `npm run lint && npm run build` OK.
-- [ ] Runbook sin claves ni tokens; `CLAUDE.md` y `README.md` actualizados y sincronizados.
+- [x] `angular/vercel.json` existe, solo construye `VERCEL_ENV=production` y aplica las tres cabeceras de seguridad a los estáticos.
+- [x] El build de Angular se despliega en el segundo proyecto Vercel y sirve con SSR en una URL fija; el proyecto de Next no cambia.
+- [x] La URL de staging es accesible sin autenticación y no indexable (`X-Robots-Tag: noindex, nofollow`).
+- [x] Smoke completo OK en staging (pantallas, 5 juegos, login email/Google/GitHub, recuperación, guardar puntuación, perfil, contacto).
+- [x] Cabeceras de seguridad en HTML, `/api/*` y estáticos; sin `x-powered-by`; cookies `HttpOnly; Secure; SameSite=Lax`.
+- [x] Ruta desconocida → 404 real; `/perfil` sin sesión → 302 a `/login`.
+- [x] El navegador no llama a Supabase y ningún secreto aparece en el JS servido.
+- [x] `npm run perf` contra staging ≥58 FPS con CPU ×6 en todos los casos (código 0).
+- [x] Lighthouse de staging no es peor que el de Next en producción (accesibilidad, SEO, buenas prácticas); registrado en `references/lighthouse/lighthouse-audit.md`.
+- [x] `security-auditor` sin hallazgos nuevos de severidad alta (o corregidos).
+- [x] Sin UI nueva: la accesibilidad de staging es igual a la de Angular en local (sin regresiones por el despliegue).
+- [x] `cd angular && ng build && ng test --watch=false && ng lint` OK y, en la raíz, `npm run lint && npm run build` OK.
+- [x] Runbook sin claves ni tokens; `CLAUDE.md` y `README.md` actualizados y sincronizados.
 
 ---
 
