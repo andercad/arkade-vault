@@ -13,12 +13,14 @@ Vercel → Add New → Project → importar el **mismo repositorio** que Next.
 | Ajuste                                                | Valor                                                            |
 | ----------------------------------------------------- | ---------------------------------------------------------------- |
 | Project Name                                          | `arcade-vault-angular`                                           |
-| Framework Preset                                      | Angular                                                          |
+| Framework Preset                                      | **Other** (la detección de Angular SSR no crea la función; ver abajo) |
 | Root Directory                                        | `angular`                                                        |
 | Include source files outside of the Root Directory    | **Activado** (el build usa `../lib` y `../public`)               |
 | Node.js Version                                       | 22.x o superior                                                  |
 | Build Command                                         | `npm run build` (ejecuta `prebuild`, que copia `../public`)      |
-| Install Command / Output Directory                    | por defecto (el Install Command lo fija `angular/vercel.json`)   |
+| Install Command / Output Directory                    | sin override en el panel (los fija `angular/vercel.json`)        |
+
+**Por qué "Other":** con el preset Angular, Vercel publicó `dist/arcade-vault-angular` entero como estáticos, sin función, y `/` daba 404 `NOT_FOUND`. Ahora `angular/vercel.json` fija `outputDirectory` (`dist/arcade-vault-angular/browser`, CDN), un `rewrite` de todo a `/api` y la función `angular/api/index.mjs`, que reexporta `reqHandler` de `server.mjs`. Si ya creaste el proyecto con preset Angular: Settings → Build & Deployment → Framework Preset → Other, Save y Redeploy.
 
 `angular/vercel.json` ya aporta el `installCommand` (`npm ci --prefix .. && npm ci`: instala también las dependencias de la raíz, porque `../app/globals.css` y `../lib/*` importan `tailwindcss` y `@supabase/ssr` y se resuelven desde la raíz), el `ignoreCommand` y las cabeceras de seguridad para los estáticos. El `ignoreCommand` solo construye despliegues con `VERCEL_ENV=production`, es decir, los de la _Production Branch_; no hay previews por rama.
 

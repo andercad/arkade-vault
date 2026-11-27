@@ -25,6 +25,7 @@ Next sigue desplegado y en producción. Se mantiene la **congelación de la UI**
 - **Proyecto Vercel nuevo** (`arcade-vault-angular`), mismo repositorio que Next, con _Root Directory_ `angular/` y "Include source files outside of the Root Directory" activado (el build usa `../lib` y `../public`). El proyecto de Next no se toca. Claude no tiene acceso a Vercel: la configuración la hace el usuario con un runbook (ver abajo).
 - **`angular/vercel.json`:**
   - `ignoreCommand`: solo construye despliegues con `VERCEL_ENV=production` (no depende del nombre de la rama; permite usar la rama de la spec en el primer despliegue). Sin previews por rama.
+  - `outputDirectory` (`dist/arcade-vault-angular/browser`), `rewrites` de todo a `/api` y `functions.includeFiles`: el preset Angular de Vercel no creó la función SSR (todo salió como estáticos y `/` daba 404), así que el proyecto usa preset **Other** y la función propia `angular/api/index.mjs`, que reexporta `reqHandler` de `server.mjs`.
   - `headers` para los estáticos del CDN (que no pasan por Express): `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy: strict-origin-when-cross-origin` (mismos valores que `server.ts` y `next.config.ts`).
 - **`angular/angular.json`:** `security.allowedHosts` incluye el dominio de staging además de `localhost` (o `NG_ALLOWED_HOSTS` si ctx7 confirma que es la vía soportada). Un host no permitido sigue rechazándose.
 - **Runbook `references/deploy/staging-angular-runbook.md`:**
@@ -159,6 +160,7 @@ Sin componentes, servicios, guards, pipes ni directivas nuevos: no hay `.spec.ts
 - **Sí:** URL fija de staging, sin previews. Razón: `SITE_URL`, `Origin` (CSRF), Redirect URLs de Supabase y `allowedHosts` son fijos; previews exigirían `SITE_URL` dinámico y comodines.
 - **Sí:** `ignoreCommand` por `VERCEL_ENV`. Razón: no depende del nombre de la rama y permite desplegar la rama de la spec antes del merge.
 - **Sí:** Vercel Authentication + bypass para automatización. Razón: staging no debe ser público ni indexable; las mediciones necesitan acceso programático. El token vive solo en el entorno local.
+- **Sí:** función propia `angular/api/index.mjs` + rewrite y preset Other. Razón: la detección automática de Angular SSR de Vercel no enganchó `reqHandler` con este build (Angular 22, `outputMode: server`); se descubrió en el primer despliegue (paso 3).
 - **Sí:** cabeceras también en `vercel.json`. Razón: los estáticos los sirve el CDN y no pasan por Express.
 - **Sí:** configuración manual con runbook. Razón: Claude no tiene acceso a Vercel (igual que con prod).
 - **Sí:** Resend y OAuth activos con claves de dev. Razón: paridad completa antes de la SPEC 28.
