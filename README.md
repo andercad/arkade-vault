@@ -50,7 +50,7 @@ ng test --watch=false          # tests unitarios (Vitest)
 ng lint                        # angular-eslint + jsdoc + accesibilidad de plantillas
 ```
 
-Variables en `angular/.env` (ignorado por git): `SUPABASE_URL` y `SUPABASE_PUBLISHABLE_KEY` (los mismos valores que `NEXT_PUBLIC_SUPABASE_*`). Para medir el perf de Angular: `PERF_URL=http://localhost:4300 npm run perf` desde la raíz, contra el build de producción (no `ng serve`).
+Variables en `angular/.env` (ignorado por git): `SUPABASE_URL` y `SUPABASE_PUBLISHABLE_KEY` (los mismos valores que `NEXT_PUBLIC_SUPABASE_*`). Para medir el perf de Angular: `PERF_URL=http://localhost:4300 npm run perf` desde la raíz, contra el build de producción (no `ng serve`). SPEC 27: staging público en Vercel (segundo proyecto, Root Directory `angular/`, Supabase dev, `X-Robots-Tag: noindex`); pasos en `references/deploy/staging-angular-runbook.md`; `PERF_URL=<staging> npm run perf` lo mide (`PERF_BYPASS` solo si un staging futuro tuviera protección).
 
 ## Código compartido
 
@@ -127,6 +127,7 @@ Luego abre `http://192.168.1.50:3000` en el móvil (la IP sale de `ipconfig`). R
 | `24-angular-cimientos-y-reproductor.md`        | App Angular SSR en `angular/` con el reproductor de juegos (reutiliza `lib/`); primera de las SPEC 24-29                                 |
 | `25-angular-resto-de-pantallas.md`             | Angular: home, biblioteca, detalle, salón de la fama, about y login (solo UI), nav completo y BFF con 5 endpoints                        |
 | `26-angular-auth-guardado-y-contacto.md`       | Angular: sesión en el BFF (cookies httpOnly), login/registro/OAuth/recuperación, guardado de puntuación, `/perfil` y contacto con Resend |
+| `27-angular-staging-vercel.md`                 | Angular en Vercel como staging público (`noindex`, Supabase dev): `angular/vercel.json`, runbook, `PERF_BYPASS` y auditorías contra la URL |
 | `game-jam/frogger/01-frogger-core.md`          | Frogger: motor TS en `lib/frogger/` (carretera, río, casas, vidas, tiempo)                                                               |
 | `game-jam/frogger/02-frogger-platform.md`      | Frogger en la plataforma: registro, migración `0008`, portada, pausa (botón + `P`/`Esc`) y guardado                                      |
 | `game-jam/frogger/03-frogger-hazards-audio.md` | Frogger: peligros extra y audio (pendiente de implementar)                                                                               |
