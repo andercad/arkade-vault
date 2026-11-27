@@ -1,8 +1,16 @@
 // Mide FPS y JS/frame de cada juego y skin con CPU x1 y x6 (SPEC 14).
 // Uso: con `npm run dev` activo, `npm run perf`. URL base: PERF_URL; PERF_GAMES=a,b limita juegos; PERF_HEADLESS=1 sin ventana.
+// PERF_BYPASS: token de Protection Bypass for Automation de Vercel (staging, SPEC 27); nunca en el repo.
 import { chromium } from "playwright";
 
 const BASE = process.env.PERF_URL ?? "http://localhost:3000";
+// Con token, las peticiones llevan las cabeceras de bypass y Vercel deja una cookie para el resto de la sesión.
+const EXTRA_HEADERS = process.env.PERF_BYPASS
+  ? {
+      "x-vercel-protection-bypass": process.env.PERF_BYPASS,
+      "x-vercel-set-bypass-cookie": "true",
+    }
+  : undefined;
 const GAMES = process.env.PERF_GAMES?.split(",") ?? [
   "asteroids",
   "tetris",
@@ -84,6 +92,7 @@ let failed = false;
 for (const game of GAMES) {
   const context = await browser.newContext({
     viewport: { width: 1280, height: 900 },
+    extraHTTPHeaders: EXTRA_HEADERS,
   });
   const page = await context.newPage();
   await page.addInitScript(INIT);

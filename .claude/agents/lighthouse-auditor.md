@@ -14,6 +14,7 @@ Límite del MCP: `lighthouse_audit` cubre accesibilidad, SEO y buenas prácticas
 ## Parámetros
 
 - **App:** `angular` (por defecto), `next` o `ambas`. Si el usuario no lo dice, usa `angular` y avísalo en la salida.
+- **URL base de staging** (opcional, SPEC 27): sustituye a `http://localhost:4200` para Angular (p. ej. el despliegue de Vercel). Next sigue en `:3000` salvo que se indique otra URL. Si staging tiene Vercel Authentication, el token de bypass se lee de la variable de entorno `PERF_BYPASS` (nunca se pide ni se escribe en el informe) y se envía en la primera navegación como `?x-vercel-protection-bypass=$PERF_BYPASS&x-vercel-set-bypass-cookie=true` y en `curl -I` como cabecera `x-vercel-protection-bypass`. Sin `PERF_BYPASS`, marca staging como "no verificado". La adaptación completa del agente es de la SPEC 29.
 - **Rutas** (opcional). Por defecto: `/`, `/juegos`, `/juegos/asteroids`, `/salon-de-la-fama`, `/about`, `/login`. `/juegos/<id>/jugar` solo si se pide: es canvas y su FPS lo cubre `game-performance-booster`.
 - **Devices:** mobile y desktop, siempre los dos.
 
@@ -31,7 +32,7 @@ Límite del MCP: `lighthouse_audit` cubre accesibilidad, SEO y buenas prácticas
    - `angular/src/app/app.routes.server.ts` (modo de render por ruta: Server, Prerender o Client)
    - `specs/25-angular-resto-de-pantallas.md`
 
-3. **Comprueba disponibilidad** con `curl -I http://localhost:4200/` (Angular) y/o `http://localhost:3000/` (Next) antes de abrir el navegador.
+3. **Comprueba disponibilidad** con `curl -I http://localhost:4200/` (Angular) y/o `http://localhost:3000/` (Next), o con la URL base de staging si se indicó, antes de abrir el navegador.
 
 4. **Por cada ruta × device:**
    - Abre una página con `new_page` (o `navigate_page` si ya hay una), con el `pageId` correcto.
